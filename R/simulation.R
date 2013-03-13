@@ -201,33 +201,34 @@ indicate.ftsw <- function(x) {
 }
 
 ## Simulation unitaire depuis une ligne d'un plan d'expérience
-simulate <- function(doe, unit, view) 
+play <- function(model, design, unit, view) 
 {
 	# Simulation
 	r <- results(
-		run(f,
-			begin								= doe[["begin"]][unit],
-			duration							= doe[["duration"]][unit],
-			CONFIG_ClimatNomFichier.datas_file	= paste("series",doe[["file"]][unit], sep="/"),
-			CONFIG_Sol.profondeur              	= doe[["depth"]][unit],
-			CONFIG_Conduite.jsemis    			= doe[["sow.date"]][unit],
-			CONFIG_Conduite.jrecolte            = doe[["hav.date"]][unit],
-		    CONFIG_Conduite.densite        	    = doe[["dens.val"]][unit],
-			CONFIG_Conduite.date_ferti_1       	= doe[["nit.date"]][unit],
-			CONFIG_Conduite.apport_ferti_1     	= doe[["nit.dose"]][unit],
-			CONFIG_Variete.date_TT_E1  			= doe[["TDE1"]][unit],
-			CONFIG_Variete.date_TT_F1  			= doe[["TDF1"]][unit],
-			CONFIG_Variete.date_TT_M0  			= doe[["TDM0"]][unit],
-			CONFIG_Variete.date_TT_M3  			= doe[["TDM3"]][unit],
-			CONFIG_Variete.TLN     			    = doe[["TLN"]][unit],
-			CONFIG_Variete.ext     			    = doe[["K"]][unit],
-			CONFIG_Variete.bSF   				= doe[["LLH"]][unit],
-			CONFIG_Variete.cSF   				= doe[["LLS"]][unit],
-			CONFIG_Variete.a_LE  				= doe[["LE"]][unit],
-			CONFIG_Variete.a_TR  				= doe[["TR"]][unit],
-			CONFIG_Variete.IRg   				= doe[["HI"]][unit],
-			CONFIG_Variete.PHS   				= doe[["PHS"]][unit],
-			CONFIG_Variete.thp   				= doe[["OC"]][unit]
+		run(
+      model,
+			begin								                = design[["begin"]][unit],
+			duration					              		= design[["duration"]][unit],
+			CONFIG_ClimatNomFichier.datas_file	= paste("series",design[["file"]][unit], sep="/"),
+			CONFIG_Sol.profondeur              	= design[["depth"]][unit],
+			CONFIG_Conduite.jsemis    		    	= design[["sow.date"]][unit],
+			CONFIG_Conduite.jrecolte            = design[["hav.date"]][unit],
+		  CONFIG_Conduite.densite        	    = design[["dens.val"]][unit],
+			CONFIG_Conduite.date_ferti_1       	= design[["nit.date"]][unit],
+			CONFIG_Conduite.apport_ferti_1     	= design[["nit.dose"]][unit],
+			CONFIG_Variete.date_TT_E1  		    	= design[["TDE1"]][unit],
+			CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+			CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
+			CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+			CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+			CONFIG_Variete.ext     			        = design[["K"]][unit],
+			CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+			CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+			CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+			CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+			CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+			CONFIG_Variete.PHS   				        = design[["PHS"]][unit],
+			CONFIG_Variete.thp   				        = design[["OC"]][unit]
 		)
 	)
 	
