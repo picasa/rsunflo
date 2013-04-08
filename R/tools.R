@@ -23,6 +23,9 @@ wic <- function (obs, sim, ic) {
   return(round(o, 3)) 
 }
 
+## Last : dernière valeur non nulle d'un vecteur
+last <- function(x) {tail(x[x != 0], n = 1)}
+
 ## Not in
 '%ni%' <- Negate('%in%')
 

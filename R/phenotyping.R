@@ -24,17 +24,32 @@ LeafSize <- function(length, width, a=0.736, b=-8.86, c=0.684){
 }
 
 ## Modèle de profil foliaire
-LeafProfile <- function(TLN, LLS, LLH) {
+LeafProfile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output="profile") {
+  
   # Nombre de phytomères
   n <- 1:TLN
   
-  # Paramétrage des constantes de formes
-  d <- 1.5 -0.2210304*LLH -0.0003529*LLS + 0.0825307*length(n)
-  c <- -2.313409 + 0.018158*LLH -0.001637*LLS + 0.019968*length(n) + 0.920874*d
+  # Calcul du profil foliaire selon deux méthodes pour les coefficients de forme
+  switch(
+    shape,
+    fixed = {
+      # a = -2.110168, b = 0.01447336 [Casadebaig2013] : moyenne du modèle linéaire sur la DB
+      # a = -2.049676, b = 0.04937692 [Casadebaig2013] : moyenne ajustements sur la DB observée
+      r <- LLS * exp(a*((n-LLH)/(LLH-1))^2 + b*((n-LLH)/(LLH-1))^3)    
+    },
+    model = {
+      b <- 1.5 -0.2210304*LLH -0.0003529*LLS + 0.0825307*length(n)
+      a <- -2.313409 + 0.018158*LLH -0.001637*LLS + 0.019968*length(n) + 0.920874*b          
+      r <- LLS * exp(a*((n-LLH)/(LLH-1))^2 + b*((n-LLH)/(LLH-1))^3)    
+    }
+  )
   
-  # Profil foliaire
-  r <- LLS * exp(c*((n-LLH)/(LLH-1))^2 + d*((n-LLH)/(LLH-1))^3)
-  return(data.frame(leaf=n, size=r))
+  # Sortie
+  switch(
+    output,
+    profile = return(data.frame(leaf=n, size=r)),
+    shape = return(data.frame(a=a, b=b))
+  )
 }
 
 
