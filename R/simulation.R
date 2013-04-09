@@ -1,7 +1,27 @@
-# Tools for simulation
+# Tools for input, simulation and output data.
+
+# Sol ####
+## Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
+# θ = a + (b×%Ar) + (c×%Li) + (d×%CO) + (e×Da)
+
+PotentialWaterContent <- function(
+  Argile, # %MS
+  LimonFin, # %MS
+  LimonGrossier, # %MS
+  SableFin, # %MS
+  SableGrossier, # %MS
+  CaCO3, # %MS
+  MatiereOrganique, # %MS
+  Profondeur, # mm
+  Cailloux # %MS
+  ) {
+  # [Vale2007]
+  (CaCO3 + 2*Argile + LimonFin + LimonGrossier + 0.7*(SableFin+SableGrossier)) *
+    ((100-Cailloux)/100)*(Profondeur/1000)*(1 + 0.05*MatiereOrganique - 0.1)
+}
+  
 
 # Climat ####
-
 ## Fonction pour la gestion des données climatiques
 climate <- function(x, 
 	input.format,
@@ -99,7 +119,6 @@ climate <- function(x,
 }
 
 # Simulation ####
-
 # TODO : noms en anglais
 # RootingDepth  WCFC	WCWP	StoneContent	SoilDensity	NL1	NL2	Hini_C1	Hini_C2	PlantDensity	variete	sowing	harvest	ClimateFile	apport_ferti_1	date_ferti_1	apport_ferti_2	date_ferti_2	apport_ferti_3	date_ferti_3	apport_ferti_4	date_ferti_4	apport_irrig_1	date_irrig_1	apport_irrig_2	date_irrig_2	apport_irrig_3	date_irrig_3	apport_irrig_4	date_irrig_4	apport_irrig_5	date_irrig_5	apport_irrig_6	date_irrig_6
 
