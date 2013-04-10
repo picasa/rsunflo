@@ -191,7 +191,7 @@ shape <- function(x, view) {
       
 			# viewDynamic : utilisation noms de variables en
 			colnames(x) <- c("time","RUE","LUE","LAI","TDM",
-	                   "PhasePhenoPlante","TTA2","TM","NNI","NAB",
+	                   "PhenoStage","TTA2","TM","NNI","NAB",
 	                   "ETRETM","FTSW","FT","OC","GY","ETP","RR","GR","TN","TX")
 	    },
 	    
@@ -207,7 +207,7 @@ shape <- function(x, view) {
 			colnames(x)[match(longnames, colnames(x))] <- c("OC","GY")
 		},
          
-    diagnostic = {
+    indicators = {
       # Nettoyage des noms de colonne
       x <- x[[1]]
       colnames(x) <- sub(".*\\.","", colnames(x))
@@ -229,15 +229,15 @@ indicate <- function(x) {
   
   # Définition des périodes d'intégration
   # levée - récolte
-  EH <- (x$PhasePhenoPlante > 1 & x$PhasePhenoPlante < 6)
+  EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
   # levée - floraison
-  # EF <- (x$PhasePhenoPlante == 2 | x$PhasePhenoPlante == 3)
+  # EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
   # initiation florale - début maturité
-  # FIM <- (x$PhasePhenoPlante == 3 | x$PhasePhenoPlante == 4)
+  # FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
   # floraison - début maturité
-  # FM <- x$PhasePhenoPlante == 4
+  # FM <- x$PhenoStage == 4
   # début maturité - récolte
-  # MH <- x$PhasePhenoPlante == 5
+  # MH <- x$PhenoStage == 5
   # fenetre remplissage
   # PFW <- (x$TTF1 >= 250 & x$TTF1 <= 450)
   
@@ -291,7 +291,7 @@ indicate <- function(x) {
 indicate.ftsw <- function(x) {
   
   # Période de culture (levée - maturité)
-  crop = (x$PhasePhenoPlante >1 & x$PhasePhenoPlante <6)
+  crop = (x$PhenoStage >1 & x$PhenoStage <6)
   
   # Variable dynamique
   o <- data.frame(
@@ -301,6 +301,19 @@ indicate.ftsw <- function(x) {
   return(o)
 }
 
+## Visualisation  des simulations
+display <- function(x, view="timed") {
+  switch(
+    view,
+    timed = {
+      d <- melt(x, id.vars=c("time", "TTA2"))
+      ggplot(d, aes(x=TTA2, y=value)) +
+        geom_line() +
+        facet_wrap(~ variable, scale="free") +
+        theme_bw()
+    }
+  )
+}
 
 # Analyse ####
 ## Impact d'un trait sur le rendement moyen
