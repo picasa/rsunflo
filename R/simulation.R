@@ -134,8 +134,8 @@ play <- function(model, design, unit)
       CONFIG_ClimatNomFichier.datas_file	= design[["meteo"]][unit],
       CONFIG_SimuInit.rh1                 = design[["ninit1"]][unit],
       CONFIG_SimuInit.rh2                 = design[["ninit2"]][unit],
-      CONFIG_SimuInit.Hini_C1             = design[["hinit1"]][unit]/100 * design[["hcc1"]][unit],
-      CONFIG_SimuInit.Hini_C2             = design[["hinit2"]][unit]/100 * design[["hcc2"]][unit],
+      CONFIG_SimuInit.Hini_C1             = design[["hinit1"]][unit],
+      CONFIG_SimuInit.Hini_C2             = design[["hinit2"]][unit],
       CONFIG_SimuInit.dateLevee_casForcee = format(design[["levee"]][unit], "%d/%m"),
       CONFIG_Sol.profondeur               = design[["profondeur"]][unit],
       CONFIG_Sol.Vp  		                  = design[["mineralisation"]][unit],
@@ -189,13 +189,18 @@ shape <- function(x, view) {
       x <- x[[1]]
 		  colnames(x) <- sub(".*\\.","", colnames(x))
       
+      # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
+      # to JDN as.numeric(as.Date(x, format= "%m/%d/%Y")) + 2440588
+      # delta = julian(x = 01, d = 01, y = 1970, origin = c(month=11, day=24, year=-4713))
+      x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
+      
 			# viewDynamic : utilisation noms de variables en
 			colnames(x) <- c("time","RUE","LUE","LAI","TDM",
 	                   "PhenoStage","TTA2","TM","NNI","NAB",
 	                   "ETRETM","FTSW","FT","OC","GY","ETP","RR","GR","TN","TX")
 	    },
-	    
-		end = {
+	             
+    end = {
 		  # Nettoyage des noms de colonne
 		  x <- x[[1]]
 		  colnames(x) <- sub(".*\\.","", colnames(x))
@@ -307,7 +312,7 @@ display <- function(x, view="timed") {
     view,
     timed = {
       d <- melt(x, id.vars=c("time", "TTA2"))
-      ggplot(d, aes(x=TTA2, y=value)) +
+      ggplot(d, aes(x=time, y=value)) +
         geom_line() +
         facet_wrap(~ variable, scale="free") +
         theme_bw()
