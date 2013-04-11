@@ -2,19 +2,19 @@
 
 ## Calculer r² entre observé et simulé
 rsq<-function (sim, obs, digits=2) {
-  round(cor(sim, obs)^2, digits=digits)
+  round(cor(sim, obs, na.rm=TRUE)^2, digits=digits)
 }
 ## Calculer un biais
 biais<-function (sim, obs, digits=2) {
-  round(mean(sim - obs), digits=digits)
+  round(mean(na.omit(sim - obs)), digits=digits)
 }
 ## Calculer RMSE
 rmse<- function(sim, obs, digits=2) {
-	round(sqrt(mean((sim - obs)^2)), digits=digits)
+	round(sqrt(mean(na.omit(sim - obs)^2)), digits=digits)
 }
 ## Calculer l'Efficience du modèle
 efficience<- function (sim, obs, digits=2) {
-  round(1 - (sum((sim - obs)^2)/sum((obs - mean(obs))^2)), digits=digits)
+  round(1 - (sum((na.omit(sim - obs))^2)/sum((obs - mean(obs))^2)), digits=digits)
 }
 ## Savoir combien de variété sont dans l'intervalle de confiance observé
 wic <- function (obs, sim, ic) {
