@@ -14,7 +14,7 @@ rmse<- function(sim, obs, digits=2) {
 }
 ## Calculer l'Efficience du modèle
 efficience<- function (sim, obs, digits=2) {
-  round(1 - (sum((na.omit(sim - obs))^2)/sum((obs - mean(obs))^2)), digits=digits)
+  round(1 - (sum((na.omit(sim - obs))^2)/sum((na.omit(obs) - mean(obs, na.rm=TRUE))^2)), digits=digits)
 }
 ## Savoir combien de variété sont dans l'intervalle de confiance observé
 wic <- function (obs, sim, ic) {
