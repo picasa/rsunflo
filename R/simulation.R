@@ -321,6 +321,53 @@ display <- function(x, view="timed") {
 }
 
 # Analyse ####
+
+## Calculer erreur de prédiction
+evaluate.error <- function(data, formula, output="numeric") {
+  
+  # Calcul de l'erreur d'ajustement
+  error <- ddply(
+    data,
+    as.formula(formula), summarise, 
+    rmse = rmse(simulated, observed),
+    efficiency = efficience(simulated, observed),
+    bias = biais(simulated, observed)
+  )
+  
+  # Labels pour l'erreur d'ajustement
+  label <- ddply(
+    error,
+    as.formula(formula), summarise, 
+    label = paste(
+      "rmse =", rmse,
+      ";",
+      "bias =",bias
+    )
+  )
+  
+  switch(
+    output,
+    numeric = {return(error)},
+    label = {return(label)}
+  )
+}
+
+## Graphes simulés / observés
+evaluate.plot <- function(data, formula, color) {
+  # Graphes
+  ggplot(data=data, aes(x=observed, y=simulated)) + 
+    geom_point(aes_string(color=color)) +
+    facet_wrap(as.formula(formula), scale="free") +
+    stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
+    geom_abline(intercept=0, slope=1) +
+    geom_text(
+      data=evaluate.error(data, formula, output="label"),
+      aes(x=Inf, y=-Inf, label=label),
+      colour="black", hjust=1.1, vjust=-1, size=4
+    ) +
+    theme_bw() + labs(x="Observed data", y="Simulated data")
+}
+
 ## Impact d'un trait sur le rendement moyen
 impact <- function(x) {
 	# Y_T - Y_t / mean(Y)
