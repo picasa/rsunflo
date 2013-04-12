@@ -353,7 +353,7 @@ evaluate.error <- function(data, formula, output="numeric") {
 }
 
 ## Graphes simulés / observés
-evaluate.plot <- function(data, formula, color) {
+evaluate <- function(data, formula, color) {
   # Graphes
   ggplot(data=data, aes(x=observed, y=simulated)) + 
     geom_point(aes_string(color=color)) +
