@@ -119,60 +119,73 @@ climate <- function(x,
 }
 
 # Simulation ####
-# TODO : noms en anglais
-# RootingDepth  WCFC	WCWP	StoneContent	SoilDensity	NL1	NL2	Hini_C1	Hini_C2	PlantDensity	variete	sowing	harvest	ClimateFile	apport_ferti_1	date_ferti_1	apport_ferti_2	date_ferti_2	apport_ferti_3	date_ferti_3	apport_ferti_4	date_ferti_4	apport_irrig_1	date_irrig_1	apport_irrig_2	date_irrig_2	apport_irrig_3	date_irrig_3	apport_irrig_4	date_irrig_4	apport_irrig_5	date_irrig_5	apport_irrig_6	date_irrig_6
+# TODO : adaptation de la fonction au plan : 
+#   switch 
+#   automatique selon les infos du plan : non renseigné = defaut du vpz
+
+# TODO : noms standardisés
+# Climate : ClimateFile
+# Soil : RootingDepth  WCFC	WCWP	StoneContent	SoilDensity	
+# Initialization : Ni1	Ni2	Wi1	Wi2	
+# Management : genotype PlantDensity	begin sowing	emergence harvest	
 
 ## Simulation unitaire depuis une ligne d'un plan d'expérience
-play <- function(model, design, unit) 
+play <- function(model, design, unit, template="default") 
 {
-  # Simulation
-  r <- results(
-    run(
-      model,
-      begin								                = design[["begin"]][unit],
-      duration					              		= design[["duration"]][unit],
-      CONFIG_ClimatNomFichier.datas_file	= design[["meteo"]][unit],
-      CONFIG_SimuInit.rh1                 = design[["ninit1"]][unit],
-      CONFIG_SimuInit.rh2                 = design[["ninit2"]][unit],
-      CONFIG_SimuInit.Hini_C1             = design[["hinit1"]][unit],
-      CONFIG_SimuInit.Hini_C2             = design[["hinit2"]][unit],
-      CONFIG_SimuInit.dateLevee_casForcee = format(design[["levee"]][unit], "%d/%m"),
-      CONFIG_Sol.profondeur               = design[["profondeur"]][unit],
-      CONFIG_Sol.Vp  		                  = design[["mineralisation"]][unit],
-      CONFIG_Sol.Hcc_C1 		              = design[["hcc1"]][unit],
-      CONFIG_Sol.Hcc_C2 		              = design[["hcc2"]][unit],
-      CONFIG_Sol.Hpf_C1 		              = design[["hpf1"]][unit],
-      CONFIG_Sol.Hpf_C2 		              = design[["hpf2"]][unit],
-      CONFIG_Sol.da_C1 		 	              = design[["da1"]][unit],
-      CONFIG_Sol.da_C2 		    	          = design[["da2"]][unit],
-      CONFIG_Sol.TC 		                  = design[["cailloux"]][unit],
-      CONFIG_Conduite.jsemis    		    	= format(design[["semis"]][unit], "%d/%m"),
-      CONFIG_Conduite.jrecolte            = format(design[["recolte"]][unit], "%d/%m"),
-      CONFIG_Conduite.densite        	    = design[["densite"]][unit],
-      CONFIG_Conduite.date_ferti_1       	= format(design[["azote_date1"]][unit], "%d/%m"),
-      CONFIG_Conduite.date_ferti_2        = format(design[["azote_date2"]][unit], "%d/%m"),
-      CONFIG_Conduite.apport_ferti_1     	= design[["azote_dose1"]][unit],
-      CONFIG_Conduite.apport_ferti_2      = design[["azote_dose2"]][unit],
-      CONFIG_Conduite.date_irrig_1        = format(design[["eau_date1"]][unit], "%d/%m"),
-      CONFIG_Conduite.date_irrig_2        = format(design[["eau_date2"]][unit], "%d/%m"),
-      CONFIG_Conduite.date_irrig_3        = format(design[["eau_date3"]][unit], "%d/%m"),
-      CONFIG_Conduite.apport_irrig_1     	= design[["eau_dose1"]][unit],
-      CONFIG_Conduite.apport_irrig_2      = design[["eau_dose2"]][unit],
-      CONFIG_Conduite.apport_irrig_3      = design[["eau_dose3"]][unit],
-      CONFIG_Variete.date_TT_E1  		    	= design[["TDE1"]][unit],
-      CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-      CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
-      CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-      CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-      CONFIG_Variete.ext     			        = design[["K"]][unit],
-      CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-      CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-      CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-      CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-      CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-      CONFIG_Variete.PHS   				        = design[["PHS"]][unit],
-      CONFIG_Variete.thp   				        = design[["OC"]][unit]
-    )
+  
+  switch(template,
+         
+    # default : cas d'utilisation le plus courant     
+    default = {
+      r <- results(
+        run(
+          model,
+          begin  							                = design[["begin"]][unit],
+          duration					              		= design[["duration"]][unit],
+          CONFIG_ClimatNomFichier.datas_file	= design[["meteo"]][unit],
+          CONFIG_SimuInit.rh1                 = design[["ninit1"]][unit],
+          CONFIG_SimuInit.rh2                 = design[["ninit2"]][unit],
+          CONFIG_SimuInit.Hini_C1             = design[["hinit1"]][unit],
+          CONFIG_SimuInit.Hini_C2             = design[["hinit2"]][unit],
+          CONFIG_SimuInit.dateLevee_casForcee = format(design[["levee"]][unit], "%d/%m"),
+          CONFIG_Sol.profondeur               = design[["profondeur"]][unit],
+          CONFIG_Sol.Vp  		                  = design[["mineralisation"]][unit],
+          CONFIG_Sol.Hcc_C1 		              = design[["hcc1"]][unit],
+          CONFIG_Sol.Hcc_C2 		              = design[["hcc2"]][unit],
+          CONFIG_Sol.Hpf_C1 		              = design[["hpf1"]][unit],
+          CONFIG_Sol.Hpf_C2 		              = design[["hpf2"]][unit],
+          CONFIG_Sol.da_C1 		 	              = design[["da1"]][unit],
+          CONFIG_Sol.da_C2 		    	          = design[["da2"]][unit],
+          CONFIG_Sol.TC 		                  = design[["cailloux"]][unit],
+          CONFIG_Conduite.jsemis    		    	= format(design[["semis"]][unit], "%d/%m"),
+          CONFIG_Conduite.jrecolte            = format(design[["recolte"]][unit], "%d/%m"),
+          CONFIG_Conduite.densite        	    = design[["densite"]][unit],
+          CONFIG_Conduite.date_ferti_1       	= format(design[["azote_date1"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_ferti_2        = format(design[["azote_date2"]][unit], "%d/%m"),
+          CONFIG_Conduite.apport_ferti_1     	= design[["azote_dose1"]][unit],
+          CONFIG_Conduite.apport_ferti_2      = design[["azote_dose2"]][unit],
+          CONFIG_Conduite.date_irrig_1        = format(design[["eau_date1"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_irrig_2        = format(design[["eau_date2"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_irrig_3        = format(design[["eau_date3"]][unit], "%d/%m"),
+          CONFIG_Conduite.apport_irrig_1     	= design[["eau_dose1"]][unit],
+          CONFIG_Conduite.apport_irrig_2      = design[["eau_dose2"]][unit],
+          CONFIG_Conduite.apport_irrig_3      = design[["eau_dose3"]][unit],
+          CONFIG_Variete.date_TT_E1  		    	= design[["TDE1"]][unit],
+          CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+          CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
+          CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+          CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+          CONFIG_Variete.ext     			        = design[["K"]][unit],
+          CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+          CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+          CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+          CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+          CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+          CONFIG_Variete.PHS   				        = design[["PHS"]][unit],
+          CONFIG_Variete.thp   				        = design[["OC"]][unit]
+        )
+      ) 
+    }
   )
   
   # Retour 
@@ -230,64 +243,69 @@ shape <- function(x, view) {
 
 
 ## Fonction de synthèse des covariables (1 valeur par usm)
-indicate <- function(x) {
+indicate <- function(x, view) {
   
-  # Définition des périodes d'intégration
-  # levée - récolte
-  EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
-  # levée - floraison
-  # EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
-  # initiation florale - début maturité
-  # FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
-  # floraison - début maturité
-  # FM <- x$PhenoStage == 4
-  # début maturité - récolte
-  # MH <- x$PhenoStage == 5
-  # fenetre remplissage
-  # PFW <- (x$TTF1 >= 250 & x$TTF1 <= 450)
-  
-  # Calcul des indicateurs
-  o <- data.frame(
-    # Graphes
-    # xm <- melt(x, id.vars=c("time","TTA2"))
-    # xyplot(value ~ time | variable, data=xm, type="l", scale="free")
+  switch(view,
     
-    # Ressources environnementales
-    SGR = sum(x$GR[EH] * 0.48), # PAR
-    SRR = sum(x$RR[EH]),
-    SETP = sum(x$ETP[EH]),
-    SCWD = sum(x$RR[EH] - x$ETP[EH]),
-    
-    # Contraintes hydriques
-    ## basés sur FTSW
-    SFTSW = sum(1 - x$FTSW[EH]),
-    NETR = sum(x$ETRETM[EH] < 0.6),
-    
-    # Contraintes azotées
-    # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
-    SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote sur initiation florale - récolte
-    SNAB = diff(range(x$NAB[EH])),  # quantité d'azote absorbé sur début maturité - récolte
-    
-    # Contraintes thermiques
-    SFT = sum(1 - x$FT[EH]),
-    
-    # Évolution de la surface foliaire
-    LAI = max(x$LAI[EH]),
-    DSF = sum(x$LAI[EH]), # levée - récolte
-    
-    # Rayonnement intercepté (PAR)
-    SIR = sum(x$LUE[EH] * x$GR[EH] * 0.48),
-    
-    # Photosynthèse
-    MRUE = mean(x$RUE[EH]),
-    
-    # Biomasse accumulée
-    STDM = max(x$TDM[EH]),
-    
-    # Performances
-    TT = max(x$TTA2[EH]),
-    GY = max(x$GY),
-    OCS = max(x$OC)
+    timed = {
+      # Définition des périodes d'intégration
+      # levée - récolte
+      EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
+      # levée - floraison
+      # EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
+      # initiation florale - début maturité
+      # FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
+      # floraison - début maturité
+      # FM <- x$PhenoStage == 4
+      # début maturité - récolte
+      # MH <- x$PhenoStage == 5
+      # fenetre remplissage
+      # PFW <- (x$TTF1 >= 250 & x$TTF1 <= 450)
+      
+      # Calcul des indicateurs
+      o <- data.frame(
+        # Graphes
+        # xm <- melt(x, id.vars=c("time","TTA2"))
+        # xyplot(value ~ time | variable, data=xm, type="l", scale="free")
+        
+        # Ressources environnementales
+        SGR = sum(x$GR[EH] * 0.48), # PAR
+        SRR = sum(x$RR[EH]),
+        SETP = sum(x$ETP[EH]),
+        SCWD = sum(x$RR[EH] - x$ETP[EH]),
+        
+        # Contraintes hydriques
+        ## basés sur FTSW
+        SFTSW = sum(1 - x$FTSW[EH]),
+        NETR = sum(x$ETRETM[EH] < 0.6),
+        
+        # Contraintes azotées
+        # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
+        SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote sur initiation florale - récolte
+        SNAB = diff(range(x$NAB[EH])),  # quantité d'azote absorbé sur début maturité - récolte
+        
+        # Contraintes thermiques
+        SFT = sum(1 - x$FT[EH]),
+        
+        # Évolution de la surface foliaire
+        LAI = max(x$LAI[EH]),
+        DSF = sum(x$LAI[EH]), # levée - récolte
+        
+        # Rayonnement intercepté (PAR)
+        SIR = sum(x$LUE[EH] * x$GR[EH] * 0.48),
+        
+        # Photosynthèse
+        MRUE = mean(x$RUE[EH]),
+        
+        # Biomasse accumulée
+        STDM = max(x$TDM[EH]),
+        
+        # Performances
+        TT = max(x$TTA2[EH]),
+        GY = max(x$GY),
+        OC = max(x$OC)
+      ) 
+    }
   )
   return(o)
 }
