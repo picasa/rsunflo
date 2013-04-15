@@ -123,12 +123,6 @@ climate <- function(x,
 #   switch 
 #   automatique selon les infos du plan : non renseigné = defaut du vpz
 
-# TODO : noms standardisés
-# Climate : ClimateFile
-# Soil : RootingDepth  WCFC	WCWP	StoneContent	SoilDensity	
-# Initialization : Ni1	Ni2	Wi1	Wi2	
-# Management : genotype PlantDensity	begin sowing	emergence harvest	
-
 ## Simulation unitaire depuis une ligne d'un plan d'expérience
 play <- function(model, design, unit, template="default") 
 {
@@ -142,35 +136,35 @@ play <- function(model, design, unit, template="default")
           model,
           begin  							                = design[["begin"]][unit],
           duration					              		= design[["duration"]][unit],
-          CONFIG_ClimatNomFichier.datas_file	= design[["meteo"]][unit],
-          CONFIG_SimuInit.rh1                 = design[["ninit1"]][unit],
-          CONFIG_SimuInit.rh2                 = design[["ninit2"]][unit],
-          CONFIG_SimuInit.Hini_C1             = design[["hinit1"]][unit],
-          CONFIG_SimuInit.Hini_C2             = design[["hinit2"]][unit],
-          CONFIG_SimuInit.dateLevee_casForcee = format(design[["levee"]][unit], "%d/%m"),
-          CONFIG_Sol.profondeur               = design[["profondeur"]][unit],
-          CONFIG_Sol.Vp  		                  = design[["mineralisation"]][unit],
-          CONFIG_Sol.Hcc_C1 		              = design[["hcc1"]][unit],
-          CONFIG_Sol.Hcc_C2 		              = design[["hcc2"]][unit],
-          CONFIG_Sol.Hpf_C1 		              = design[["hpf1"]][unit],
-          CONFIG_Sol.Hpf_C2 		              = design[["hpf2"]][unit],
-          CONFIG_Sol.da_C1 		 	              = design[["da1"]][unit],
-          CONFIG_Sol.da_C2 		    	          = design[["da2"]][unit],
-          CONFIG_Sol.TC 		                  = design[["cailloux"]][unit],
-          CONFIG_Conduite.jsemis    		    	= format(design[["semis"]][unit], "%d/%m"),
-          CONFIG_Conduite.jrecolte            = format(design[["recolte"]][unit], "%d/%m"),
-          CONFIG_Conduite.densite        	    = design[["densite"]][unit],
-          CONFIG_Conduite.date_ferti_1       	= format(design[["azote_date1"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_ferti_2        = format(design[["azote_date2"]][unit], "%d/%m"),
-          CONFIG_Conduite.apport_ferti_1     	= design[["azote_dose1"]][unit],
-          CONFIG_Conduite.apport_ferti_2      = design[["azote_dose2"]][unit],
-          CONFIG_Conduite.date_irrig_1        = format(design[["eau_date1"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_irrig_2        = format(design[["eau_date2"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_irrig_3        = format(design[["eau_date3"]][unit], "%d/%m"),
-          CONFIG_Conduite.apport_irrig_1     	= design[["eau_dose1"]][unit],
-          CONFIG_Conduite.apport_irrig_2      = design[["eau_dose2"]][unit],
-          CONFIG_Conduite.apport_irrig_3      = design[["eau_dose3"]][unit],
-          CONFIG_Variete.date_TT_E1  		    	= design[["TDE1"]][unit],
+          CONFIG_ClimatNomFichier.datas_file	= as.character(design[["file"]][unit]),
+          CONFIG_SimuInit.rh1                 = design[["nitrogen_initial_1"]][unit],
+          CONFIG_SimuInit.rh2                 = design[["nitrogen_initial_2"]][unit],
+          CONFIG_SimuInit.Hini_C1             = design[["water_initial_1"]][unit],
+          CONFIG_SimuInit.Hini_C2             = design[["water_initial_2"]][unit],
+          CONFIG_SimuInit.dateLevee_casForcee = format(design[["crop_emergence"]][unit], "%d/%m"),
+          CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
+          CONFIG_Sol.Vp  		                  = design[["mineralization"]][unit],
+          CONFIG_Sol.Hcc_C1 		              = design[["field_capacity_1"]][unit],
+          CONFIG_Sol.Hcc_C2 		              = design[["field_capacity_2"]][unit],
+          CONFIG_Sol.Hpf_C1 		              = design[["wilting_point_1"]][unit],
+          CONFIG_Sol.Hpf_C2 		              = design[["wilting_point_2"]][unit],
+          CONFIG_Sol.da_C1 		 	              = design[["soil_density_1"]][unit],
+          CONFIG_Sol.da_C2 		    	          = design[["soil_density_2"]][unit],
+          CONFIG_Sol.TC 		                  = design[["stone_content"]][unit],
+          CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
+          CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
+          CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
+          CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_ferti_2        = format(design[["nitrogen_date_2"]][unit], "%d/%m"),
+          CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
+          CONFIG_Conduite.apport_ferti_2      = design[["nitrogen_dose_2"]][unit],
+          CONFIG_Conduite.date_irrig_1        = format(design[["water_date_1"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_irrig_2        = format(design[["water_date_2"]][unit], "%d/%m"),
+          CONFIG_Conduite.date_irrig_3        = format(design[["water_date_3"]][unit], "%d/%m"),
+          CONFIG_Conduite.apport_irrig_1     	= design[["water_dose_1"]][unit],
+          CONFIG_Conduite.apport_irrig_2      = design[["water_dose_2"]][unit],
+          CONFIG_Conduite.apport_irrig_3      = design[["water_dose_3"]][unit],
+          CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
           CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
           CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
           CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
@@ -181,10 +175,13 @@ play <- function(model, design, unit, template="default")
           CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
           CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
           CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-          CONFIG_Variete.PHS   				        = design[["PHS"]][unit],
           CONFIG_Variete.thp   				        = design[["OC"]][unit]
         )
       ) 
+    },
+    
+    gem = {
+      
     }
   )
   
