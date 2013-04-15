@@ -11,4 +11,5 @@ Description: A set of tools for working with the SUNFLO crop model at different 
 Version: 0.1
 Author: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
 Maintainer: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
+Imports: reshape2, plyr, ggplot2, rvle
 License: GPL
