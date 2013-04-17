@@ -129,7 +129,7 @@ play <- function(model, design, unit, template="default")
   
   switch(template,
          
-    # default : cas d'utilisation le plus courant     
+    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive
     default = {
       r <- results(
         run(
@@ -180,8 +180,33 @@ play <- function(model, design, unit, template="default")
       ) 
     },
     
+    # gem : profondeur de sol, conduite extensive, tout paramètres variétaux 
     gem = {
-      
+      r <- results(
+        run(
+          model,
+          begin    						                = design[["begin"]][unit],
+          duration					              		= design[["duration"]][unit],
+          CONFIG_ClimatNomFichier.datas_file	= as.character(design[["file"]][unit]),
+          CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
+          CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
+          CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
+          CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
+          CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
+          CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
+          CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+          CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
+          CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+          CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+          CONFIG_Variete.ext     			        = design[["K"]][unit],
+          CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+          CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+          CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+          CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+          CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+          CONFIG_Variete.thp   				        = design[["OC"]][unit]
+        )
+      ) 
     }
   )
   
