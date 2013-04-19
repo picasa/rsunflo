@@ -30,47 +30,8 @@ climate <- function(x,
 	output.prefix = "TMP")
 	{
 
-	switch(input.format,
-		
-		diagvar = {
-			# Selection des colonnes utilisées pour la simulation
-			o <- x[,match(input.labels, colnames(x))]
-			colnames(o) <- output.labels
-			
-			# Test sur la présence de données manquantes
-			try(na.fail(o))
-			
-			# Test sur l'unité de rayonnement global (MJ/m2)
-			if (mean(o$RAD) > 100) 
-				{o$RAD <- o$RAD/100} else {} 
-			
-			# Ecriture des fichiers de sortie
-			filename <- paste(unique(x$NomFichierMeteo),".txt", sep="")
-			write.table(o, file = filename, sep="\t", dec=".", row.names = FALSE)
-			
-			# Sortie
-			return(data.frame(file=unique(x$NomFichierMeteo), o))
-		},
-		
-		cetiom = {
-			# Selection des colonnes utilisées pour la simulation
-			o <- x[,match(input.labels, colnames(x))]
-			colnames(o) <- output.labels
-			
-			# Test sur la présence de données manquantes
-			try(na.fail(o))
-
-			# Test sur l'unité de rayonnement global (MJ/m2)
-			if (mean(o$RAD) > 100) 
-				{o$RAD <- o$RAD/100} else {} 
-			
-			# Ecriture des fichiers de sortie
-			filename <- paste(output.prefix,"_",unique(o$Annee),".txt", sep="")
-			write.table(o, file = filename, sep="\t", dec=".", row.names = FALSE)
-			
-			# Sortie
-			return(data.frame(o))
-		},
+	switch(
+    input.format,
 		
 		climatik = {
 			# Selection des colonnes utilisées pour la simulation
@@ -81,11 +42,7 @@ climate <- function(x,
 			
 			# Test sur la présence de données manquantes
 			try(na.fail(o))
-			
-			# Test sur l'unité de rayonnement global (MJ/m2)
-			if (mean(o$RAD) > 500) 
-				{o$RAD <- o$RAD/100} else {} 
-			
+					
 			# Ecriture des fichiers de sortie
 			filename <- paste(output.prefix,"_",unique(o$Annee),".txt", sep="")
 			write.table(o, file = filename, sep="\t", dec=".", row.names = FALSE)
@@ -98,18 +55,15 @@ climate <- function(x,
 		simple = {	
 			# Selection des colonnes utilisées pour la simulation
 			o <- x[,match(input.labels, colnames(x))]
-			# Renommage au format RECORD 
+			
+      # Renommage au format RECORD 
 			colnames(o) <- output.labels
 			
 			# Test sur la présence de données manquantes
 			try(na.fail(o))
-			
-			# Test sur l'unité de rayonnement global (MJ/m2)
-			if (mean(o$RAD) > 500) 
-				{o$RAD <- o$RAD/100} else {} 
-			
+					
 			# Ecriture des fichiers de sortie
-			filename <- paste(unique(x$site),"_",unique(o$Annee),".txt", sep="")
+			filename <- paste(unique(x$id),"_",unique(o$Annee),".txt", sep="")
 			write.table(o, file = filename, sep="\t", dec=".", row.names = FALSE)
 			
 			# Sortie
