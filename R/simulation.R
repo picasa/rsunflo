@@ -144,6 +144,7 @@ play <- function(model, design, unit, template="default")
           CONFIG_ClimatNomFichier.datas_file	= as.character(design[["file"]][unit]),
           CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
           CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
+          CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
           CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
           CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
           CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
