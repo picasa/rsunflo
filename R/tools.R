@@ -50,6 +50,37 @@ ExtractAOV <- function(x){
   return(NULL)
 }
 
+## Biplot pour les objets produits par agricolae::AMMI
+biplot.ammi <- function(m) {
+  
+  env <- m$biplot[m$biplot$type == "ENV",] 
+  gen <- m$biplot[m$biplot$type == "GEN",] 
+  
+  ggplot() +
+    geom_vline(x=0, colour="grey50") + 
+    geom_hline(y=0, colour="grey50") + 
+    geom_text(
+      data=env,
+      aes(x=PC1, y=PC2, label=rownames(env)),
+      angle=0, size=3, colour="grey50"
+    ) + 
+    geom_segment(
+      data=env,
+      aes(x=0, y=0, xend=PC1, yend=PC2),
+      size=0.2, colour="grey70"
+    ) + 
+    geom_text(
+      data=gen,
+      aes(x=PC1, y=PC2, label=rownames(gen)),
+      angle=0, size=3, vjust=1
+    ) +
+    labs(
+      x=paste("PC 1 (",m$analysis$percent[1]," %)", sep=""),
+      y=paste("PC 2 (",m$analysis$percent[2]," %)", sep="")
+    ) +
+    theme_bw()  
+}
+
 ## Scatterplot pair matrix
 # https://github.com/mike-lawrence/ez/blob/master/R/ezCor.R
 Pairs <- 
