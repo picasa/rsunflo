@@ -53,15 +53,17 @@ ExtractAOV <- function(x){
 ## Biplot pour les objets produits par agricolae::AMMI
 biplot.ammi <- function(m) {
   
-  env <- m$biplot[m$biplot$type == "ENV",] 
+  env <- m$biplot[m$biplot$type == "ENV",]
+  env <- mutate(env, names = rownames(env))
   gen <- m$biplot[m$biplot$type == "GEN",] 
+  gen <- mutate(gen, names = rownames(gen))
   
   ggplot() +
     geom_vline(x=0, colour="grey50") + 
     geom_hline(y=0, colour="grey50") + 
     geom_text(
       data=env,
-      aes(x=PC1, y=PC2, label=rownames(env)),
+      aes(x=PC1, y=PC2, label=names),
       angle=0, size=3, colour="grey50"
     ) + 
     geom_segment(
@@ -71,7 +73,7 @@ biplot.ammi <- function(m) {
     ) + 
     geom_text(
       data=gen,
-      aes(x=PC1, y=PC2, label=rownames(gen)),
+      aes(x=PC1, y=PC2, label=names),
       angle=0, size=3, vjust=1
     ) +
     labs(
