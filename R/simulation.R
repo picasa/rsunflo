@@ -186,8 +186,9 @@ shape <- function(x, view) {
       
 			# viewDynamic : utilisation noms de variables en
 			colnames(x) <- c("time","RUE","LUE","LAI","TDM",
-	                   "PhenoStage","TTA2","TM","NNI","NAB",
-	                   "ETRETM","FTSW","FT","OC","GY","ETP","RR","GR","TN","TX")
+	                   "PhenoStage","TTA2","TM","FNRUE","NNI","NAB",
+	                   "ETRETM","FHRUE","FHTR","FTSW","FTRUE",
+                       "OC","GY","ETP","RR","GR","TN","TX")
 	    },
 	             
     end = {
@@ -255,14 +256,17 @@ indicate <- function(x, view) {
         ## basés sur FTSW
         SFTSW = sum(1 - x$FTSW[EH]),
         NETR = sum(x$ETRETM[EH] < 0.6),
+        SFHTR = sum(1 - x$FHTR[EH]),
+        SFHRUE = sum(1 - x$FHRUE[EH]), 
         
         # Contraintes azotées
         # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
         SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote sur initiation florale - récolte
         SNAB = diff(range(x$NAB[EH])),  # quantité d'azote absorbé sur début maturité - récolte
+        SFNRUE = sum(1 - x$FNRUE[EH]),
         
         # Contraintes thermiques
-        SFT = sum(1 - x$FT[EH]),
+        SFTRUE = sum(1 - x$FTRUE[EH]),
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
