@@ -73,17 +73,85 @@ climate <- function(x,
 }
 
 # Simulation ####
-# TODO : adaptation de la fonction au plan : 
-#   switch 
-#   automatique selon les infos du plan : non renseigné = defaut du vpz
+
+## Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
+design <- function(design, file, template="default", format="websim") {
+  switch(
+    template,
+    
+    default = {
+      switch(
+        format,
+      
+        websim = {
+          
+          # Mise en forme des champs de date
+          p <- mutate(
+            design,
+            id = paste(id, genotype, sep="_"),
+            file = paste(station,"_",annee,".txt", sep=""),
+            duration = as.character(crop_harvest - begin + 5),
+            begin = format(begin, "%Y-%m-%d"),
+            crop_sowing = format(crop_sowing, "%d/%m"),
+            crop_emergence = format(crop_emergence, "%d/%m"),
+            crop_harvest = format(crop_harvest, "%d/%m"),
+            nitrogen_date_1 = format(nitrogen_date_1, "%d/%m"),
+            nitrogen_date_2 = format(nitrogen_date_2, "%d/%m"),
+            water_date_1 = format(water_date_1, "%d/%m"),
+            water_date_2 = format(water_date_2, "%d/%m"),
+            water_date_3 = format(water_date_3, "%d/%m"),
+          )
+              
+          # Mise en forme du fichier 
+          # Entetes depuis fichier csv websim
+          names.websim <- c("Nom","Debut","Duree","date_TT_E1/77","date_TT_F1/78",
+                            "date_TT_M0/79","date_TT_M3/80","TLN/72","bSF/75",
+                            "cSF/76","ext/81","a_LE/73","a_TR/74","IRg/69",
+                            "thp/82","datas_file/1","profondeur/68","Hcc_C1/59",
+                            "Hpf_C1/61","Hcc_C2/60","Hpf_C2/62","da_C1/66",
+                            "da_C2/67","TC/64","Vp/65","dateLevee_casForcee/54",
+                            "rh1/55","rh2/56","Hini_C1/51","Hini_C2/52","jsemis/25",
+                            "jrecolte/24","densite/23","date_ferti_1/13","apport_ferti_1/3",
+                            "date_ferti_2/14","apport_ferti_2/4","date_irrig_1/17",
+                            "apport_irrig_1/7","date_irrig_2/18","apport_irrig_2/8",
+                            "date_irrig_3/19","apport_irrig_3/9")
+          
+          # Entetes depuis fichier xls ou r pour rsunflo (ordre de websim)
+          names.rsunflo <- c("id","begin","duration","TDE1","TDF1","TDM0","TDM3",
+                             "TLN","LLH","LLS","K","LE","TR","HI","OC","file",
+                             "root_depth","field_capacity_1","wilting_point_1",
+                             "field_capacity_2","wilting_point_2", "soil_density_1",
+                             "soil_density_2","stone_content","mineralization",
+                             "crop_emergence","nitrogen_initial_1","nitrogen_initial_2",
+                             "water_initial_1","water_initial_2","crop_sowing",
+                             "crop_harvest","crop_density","nitrogen_date_1",
+                             "nitrogen_dose_1","nitrogen_date_2","nitrogen_dose_2",
+                             "water_date_1","water_dose_1","water_date_2","water_dose_2",
+                             "water_date_3","water_dose_3")
+          
+          p <- p[,names.rsunflo]
+          names(p) <- names.websim
+          
+          # Ecriture
+          writeWorksheetToFile(file=file, data=p, sheet="Feuille1")
+          
+        }
+      )
+    }
+  )
+}
+
 
 ## Simulation unitaire depuis une ligne d'un plan d'expérience
+# TODO : adaptation de la fonction au plan : 
+#   automatique selon les infos du plan : non renseigné = defaut du vpz
+
 play <- function(model, design, unit, template="default") 
 {
   
   switch(template,
          
-    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive
+    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée
     default = {
       r <- results(
         run(
@@ -195,7 +263,10 @@ shape <- function(x, view) {
 		  # Nettoyage des noms de colonne
 		  x <- x[[1]]
 		  colnames(x) <- sub(".*\\.","", colnames(x))
-		  
+      
+		  # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
+		  x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
+      
       # viewStatic
 			longnames <- c(
 				"photo_TH_aFinMATURATION",
@@ -207,6 +278,9 @@ shape <- function(x, view) {
       # Nettoyage des noms de colonne
       x <- x[[1]]
       colnames(x) <- sub(".*\\.","", colnames(x))
+      
+      # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
+      x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
       
       # viewStatic
       longnames <- c(
