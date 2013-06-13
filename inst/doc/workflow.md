@@ -32,7 +32,7 @@ TLN|Nombre de feuille potentiel|
 ### Pédoclimat
 nom | label | unit
 ----|-------|-----
-file  Nom du fichier climatique
+file|Nom du fichier climatique|
 soil_density_1|Densité apparente du sol dans l'horizon de surface (0 - 30 cm)|g.cm-3
 soil_density_2|Densité apparente du sol dans l'horizon inférieur (30 cm - profondeur)|g.cm-3
 field_capacity_1|Humidité massique à la capacité au champ dans l'horizon de surface (0 - 30 cm)|%
@@ -40,7 +40,7 @@ field_capacity_2|Humidité massique à la capacité au champ dans l'horizon inf�
 wilting_point_1|Humidité massique au point de flétrissement dans l'horizon de surface (0 - 30 cm)|%
 wilting_point_2|Humidité massique au point de flétrissement dans l'horizon inférieur (30 cm - profondeur)|%
 root_depth|Profondeur d'enracinement maximale|mm
-stone_content|Taux de cailloux|[0 ; 1]
+stone_content|Taux de cailloux|[0;1]
 mineralization|Vitesse potentielle de minéralisation|kg/ha/jour normalise
 
 ### Conduite
