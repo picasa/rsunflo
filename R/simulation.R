@@ -89,7 +89,7 @@ design <- function(design, file, template="default", format="websim") {
           p <- mutate(
             design,
             id = paste(id, genotype, sep="_"),
-            file = paste(station,"_",annee,".txt", sep=""),
+            file = paste("casadebaig/",station,"_",annee,".txt", sep=""),
             duration = as.character(crop_harvest - begin + 5),
             begin = format(begin, "%Y-%m-%d"),
             crop_sowing = format(crop_sowing, "%d/%m"),
