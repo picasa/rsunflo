@@ -253,7 +253,7 @@ shape <- function(x, view) {
       x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
       
 			# viewDynamic : utilisation noms de variables en
-			colnames(x) <- c("time","RUE","LUE","LAI","TDM",
+			colnames(x) <- c("time","RUE","RIE","LAI","TDM",
 	                   "PhenoStage","TTA2","TM","FNRUE","NNI","NAB",
 	                   "ETRETM","FHRUE","FHTR","FTSW","FTRUE",
                        "OC","GY","ETP","RR","GR","TN","TX")
@@ -347,7 +347,7 @@ indicate <- function(x, view) {
         DSF = sum(x$LAI[EH]), # levée - récolte
         
         # Rayonnement intercepté (PAR)
-        SIR = sum(x$LUE[EH] * x$GR[EH] * 0.48),
+        SIR = sum(x$RIE[EH] * x$GR[EH] * 0.48),
         
         # Photosynthèse
         MRUE = mean(x$RUE[EH]),
