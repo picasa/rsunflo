@@ -1,4 +1,4 @@
-# SUNFLO en 10 minutes
+# SUNFLO en 30 minutes
 Cette notice présente les principales étapes nécessaires pour réaliser une expérimentation numérique avec le modèle SUNFLO.
 Selon les questions abordées (démonstration, simulation de réseaux d'essais multilocaux, exploration, ...) le type de plan d'expérience conçu et les outils logiciels utilisés varient considérablement.   
 
@@ -37,6 +37,9 @@ TR|Seuil de réponse de la conductance stomatique à une contrainte hydrique|-|[
 HI|Indice de récolte potentiel|-|[@Casadebaig2011]
 OC|Teneur en huile dans l’akène en conditions potentielles|%, 0% humidité|[@Casadebaig2011]
 
+**table des paramètres : variétés**
+
+
 ### Pédoclimat
 nom | label | unité | référence
 ----|-------|-------|----------
@@ -50,6 +53,23 @@ soil_density_1|Densité apparente du sol dans l'horizon de surface (0 - 30 cm)|g
 soil_density_2|Densité apparente du sol dans l'horizon inférieur (30 cm - profondeur)|g.cm-3|
 stone_content|Taux de cailloux|[0; 1]|
 mineralization|Vitesse potentielle de minéralisation|kg/ha/jour normalise|[@Vale2007]
+
+**table des paramètres : pédoclimat**
+
+
+#### Données climatiques
+Sunflo utilise des données climatiques disponibles dans des fichiers texte. Chaque fichier représente une année avec l'enregistrement de 5 variables (colonnes) au pas de temps journalier (lignes).  
+La fonction `rsunflo::climate` permet de créer ces fichiers depuis les principaux formats (meteo-france, INRA climatik). Sinon, un exemple de fichier climatique formaté pour sunflo est disponible sur websim.
+
+nom | label | unité
+----|-------|-----
+TN|Température minimale|°C
+TX|Température maximale|°C
+GR|Rayonnement global incident|MJ/m2
+ETP|Evapotranspiration de référence|mm
+RR|Précipitations|mm
+
+**table des variables climatique d'entrée**
 
 ### Conduite
 nom | label | unité
@@ -68,6 +88,8 @@ water_dose_2|Irrigation (dose)|mm
 water_date_3|Irrigation (date)|jj/mm
 water_dose_3|Irrigation (dose)|mm
 
+**table des paramètres : conduite**
+
 ### Initialisation
 nom | label | unité
 ----|-------|-----
@@ -79,6 +101,7 @@ nitrogen_initial_2|Reliquats azotés dans l'horizon inférieur (30 cm - profonde
 water_initial_1|Humidité massique initiale dans l'horizon de surface  (0 - 30 cm)|%
 water_initial_2|Humidité massique initiale dans l'horizon inférieur  (30 cm - profondeur)|%
 
+**table des paramètres : initialisation**
 
 ## Plannification
 Cette étape consiste à concevoir le plan d'expérience numérique à réaliser et à en préparer une représentation informatique (fichier ou objet). Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longeur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
@@ -108,6 +131,7 @@ design(p, file = paste(wd,"data/plans/plan_websim_rnpi.xls", sep=""), format="we
 ## Simulation
 Une fois le plan conçu et créé au format adapté au simulateur utilisé, les simulations sont effectuées en série. Les variables de sorties sont celles définies dans le patron de simulation. Selon la vue utilisée lors de la simulation, les sorties sont disponibles à chaque pas de temps (vue dynamique) ou bien seulement à la fin de la simulation (vue statique). Les deux tables suivantes résument le contenu de ces vues.
 
+### Variables de sorties et indicateurs
 nom | label | unité
 ----|-------|-----
 TN|Température minimale|°C
@@ -134,6 +158,10 @@ GY|Rendement en grain|q/ha
 OC|Teneur en huile|%, grain à 0% humidite
 
 **table des variables de sorties dynamiques**
+
+**table des variables de sortie statique**
+
+**table des indicateurs**
 
 ### Utilisation locale via une interface graphique (1-10)
 Cette utilisation ne fonctionne pas avec un plan d'expérience défini. Elle est donc adaptée à un faible nombre de simulation, car il faut changer chaque paramètre séquentiellement dans l'interface graphique GVLE. Cette solution permet par contre de facilement changer les variables de sorties observées lors de la simulation. L'utilisation de l'interface GVLE n'est pas documentée pour sunflo (cf. notices de l'équipe RECORD).
