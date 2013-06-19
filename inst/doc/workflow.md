@@ -131,38 +131,6 @@ design(p, file = paste(wd,"data/plans/plan_websim_rnpi.xls", sep=""), format="we
 ## Simulation
 Une fois le plan conçu et créé au format adapté au simulateur utilisé, les simulations sont effectuées en série. Les variables de sorties sont celles définies dans le patron de simulation. Selon la vue utilisée lors de la simulation, les sorties sont disponibles à chaque pas de temps (vue dynamique) ou bien seulement à la fin de la simulation (vue statique). Les deux tables suivantes résument le contenu de ces vues.
 
-### Variables de sorties et indicateurs
-nom | label | unité
-----|-------|-----
-TN|Température minimale|°C
-TX|Température maximale|°C
-TM|Température moyenne|°C
-GR|Rayonnement global incident|MJ/m2
-ETP|Evapotranspiration de référence|mm
-RR|Précipitations|mm
-TTA2|Temps thermique cumulé depuis la levée|°C.j
-PhenoStage|Index de phénologie|-
-FTSW|Facteur de contrainte hydrique|-
-FHTR|Facteur de réponse de la transpiration à la contrainte hydrique|-
-FHRUE|Facteur de réponse de la photosynthèse à la contrainte hydrique|-
-ETRETM|Ratio ETR/ETM|-
-FTRUE|Facteur de réponse de la photosynthèse à la contrainte thermique|-
-NAB|Azote absorbé|kg/ha/j
-NNI|Indice de nutrition azoté|-
-FNRUE|Facteur de réponse de la photosynthèse à la contrainte azote|-
-LAI|Indice foliaire|-
-RIE|Efficience d'interception de la lumière|-
-RUE|Efficience d'utilisation de la lumière|-
-TDM|Biomasse aérienne|g/m2
-GY|Rendement en grain|q/ha
-OC|Teneur en huile|%, grain à 0% humidite
-
-**table des variables de sorties dynamiques**
-
-**table des variables de sortie statique**
-
-**table des indicateurs**
-
 ### Utilisation locale via une interface graphique (1-10)
 Cette utilisation ne fonctionne pas avec un plan d'expérience défini. Elle est donc adaptée à un faible nombre de simulation, car il faut changer chaque paramètre séquentiellement dans l'interface graphique GVLE. Cette solution permet par contre de facilement changer les variables de sorties observées lors de la simulation. L'utilisation de l'interface GVLE n'est pas documentée pour sunflo (cf. notices de l'équipe RECORD).
 
@@ -198,11 +166,51 @@ d <- mlply(
 d <- ldply(compact(d))
 ```
 
+### Variables de sorties et indicateurs
+#### Variables disponibles à chaque pas de temps
+nom | label | unité
+----|-------|-----
+TN|Température minimale|°C
+TX|Température maximale|°C
+TM|Température moyenne|°C
+GR|Rayonnement global incident|MJ/m2
+ETP|Evapotranspiration de référence|mm
+RR|Précipitations|mm
+TTA2|Temps thermique cumulé depuis la levée|°C.j
+PhenoStage|Index de phénologie|-
+FTSW|Facteur de contrainte hydrique|-
+FHTR|Facteur de réponse de la transpiration à la contrainte hydrique|-
+FHRUE|Facteur de réponse de la photosynthèse à la contrainte hydrique|-
+ETRETM|Ratio ETR/ETM|-
+FTRUE|Facteur de réponse de la photosynthèse à la contrainte thermique|-
+NAB|Azote absorbé|kg/ha/j
+NNI|Indice de nutrition azoté|-
+FNRUE|Facteur de réponse de la photosynthèse à la contrainte azote|-
+LAI|Indice foliaire|-
+RIE|Efficience d'interception de la lumière|-
+RUE|Efficience d'utilisation de la lumière|-
+TDM|Biomasse aérienne|g/m2
+GY|Rendement en grain|q/ha
+OC|Teneur en huile|%, grain à 0% humidite
+
+**table des variables de sorties dynamiques**
+
+#### Variables disponible en fin de simulation
+**table des variables de sortie statique**
+
+
+
 
 ## Analyse
-*assemblage et traitements post-simulation*  
+### Assemblage et traitements post-simulation  
 Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, regression...). C'est cette possibilité qui est utilisée pour calculer des indicteurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
 
-*analyse*  
-Les procédures d'utilisation proposées dans cette notice n'incluent pas de méthode d'analyse de données. Pour une question de recherche, l'import des données dans R permet de profiter de ses outils statistiques. Pour une question plus axée sur le développement, l'analyse des données peut s'envisager dans l'outil web de simulation. Le framework de websim peut ainsi être installé pour servir de support à la construction d'un outil d'aide à la décision.
+#### Indicateurs calculés depuis des variables dynamiques.
+
+**table des indicateurs**
+
+
+### Méthodes d'analyse  
+Les procédures d'utilisation proposées dans cette notice n'incluent pas de méthode d'analyse de données. L'import des données dans R permet de profiter de ses outils statistiques. 
+Pour une question plus axée sur le développement, l'analyse des données peut s'envisager dans l'outil web de simulation. Le framework de websim peut ainsi être installé pour servir de support à la construction d'un outil d'aide à la décision.
 

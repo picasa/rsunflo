@@ -301,16 +301,22 @@ indicate <- function(x, view) {
     
     timed = {
       # Définition des périodes d'intégration
-      # levée - récolte
+      
+      # levée - fin maturité
       EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
+      
       # levée - floraison
       # EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
+      
       # initiation florale - début maturité
       # FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
+      
       # floraison - début maturité
       # FM <- x$PhenoStage == 4
-      # début maturité - récolte
+      
+      # début maturité - fin maturité
       # MH <- x$PhenoStage == 5
+      
       # fenetre remplissage
       # PFW <- (x$TTF1 >= 250 & x$TTF1 <= 450)
       
@@ -335,8 +341,8 @@ indicate <- function(x, view) {
         
         # Contraintes azotées
         # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
-        SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote sur initiation florale - récolte
-        SNAB = diff(range(x$NAB[EH])),  # quantité d'azote absorbé sur début maturité - récolte
+        SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote 
+        SNAB = diff(range(x$NAB[EH])),  # quantité totale d'azote absorbé 
         SFNRUE = sum(1 - x$FNRUE[EH]),
         
         # Contraintes thermiques
@@ -344,7 +350,7 @@ indicate <- function(x, view) {
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
-        DSF = sum(x$LAI[EH]), # levée - récolte
+        DSF = sum(x$LAI[EH]), 
         
         # Rayonnement intercepté (PAR)
         SIR = sum(x$RIE[EH] * x$GR[EH] * 0.48),
