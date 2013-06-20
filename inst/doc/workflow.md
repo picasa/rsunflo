@@ -9,17 +9,17 @@ Différentes procédures sont proposées selon le volume de simulation :
 
 Pour chacune des ces procédures, 4 étapes successives sont nécessaires : 
 
-1. rassembler les données d'entrées et de paramétrage
-2. concevoir le plan de l'expérimentation numérique
-3. réaliser les simulations 
-4. organiser les sorties et analyser les données
+1. rassembler les données d'entrées et de paramétrage ([paramétrage](## Paramétrage))
+2. concevoir le plan de l'expérimentation numérique ([planification](## Planification))
+3. réaliser les simulations ([simulation](## Simulation))
+4. organiser les sorties et analyser les données ([analyse](## Analyse))
 
 ![workflow](figures/workflow.png)
 **Procédures d'utilisation** : Les traits gris représentent les différentes procédures d'utilisation des outils logiciels. Les cadres gris nécessitent une installation locale des logiciels mentionnés, le cadre bleu permet une utilisation distante, via une interface web. Les chevrons représentent des logiciels et les rectangles, des packages. Les formes arrondies représentent des jeux de données.
 
 ## Paramétrage
 L'utilisation par défaut de sunflo nécessite 42 paramètres et 5 variables d'entrées répartis en 4 volets : variétes, pédoclimat, conduite de culture et initialisation. Si une partie de ces informations n'est pas renseignée, la simulation échoue.  
-Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixe qui constituent un *patron de simulation*. Ce mode d'emploi se base sur un patron existant (varieto), mais il est possible d'en créer d'autre pour adapter l'utilisation du modèle à la quantité de données d'entrées disponibles (ou étudiées). Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des patrons de simulation, le détail du paramétrage et propose des valeurs par défaut. 
+Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixe qui constituent un *patron de simulation*. Ce mode d'emploi se base sur un patron existant (varieto), mais il est possible d'en créer d'autres pour adapter l'utilisation du modèle à la quantité de données d'entrées disponibles (ou étudiées). Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des patrons de simulation, le détail du paramétrage et propose des valeurs par défaut. 
 
 ### Variété
 nom | label | unité | référence
@@ -30,12 +30,12 @@ TDM0|Durée de la phase levée (A2) - debut maturité (M0)|°Cd|[@Lecoeur2011]
 TDM3|Durée de la phase levée (A2) - maturité (M3)|°Cd|[@Lecoeur2011]
 TLN|Nombre de feuille potentiel|feuilles|[@Lecoeur2011]
 LLH|Rang (depuis le sol) de la plus grande feuille du profil foliaire à la floraison|feuilles|[@Lecoeur2011]
-LLS|Surface de la plus grande feuille du profil folaire à la floraison|cm2|[@Lecoeur2011]
-K|Coefficient d’extinction du rayonnement lors de la phase végétative (E1-F1)|-|[@Lecoeur2011]
+LLS|Surface de la plus grande feuille du profil foliaire à la floraison|cm2|[@Lecoeur2011]
+K|Coefficient d'extinction du rayonnement lors de la phase végétative (E1-F1)|-|[@Lecoeur2011]
 LE|Seuil de réponse de l'expansion foliaire à une contrainte hydrique|-|[@Casadebaig2008]
 TR|Seuil de réponse de la conductance stomatique à une contrainte hydrique|-|[@Casadebaig2008]
 HI|Indice de récolte potentiel|-|[@Casadebaig2011]
-OC|Teneur en huile dans l’akène en conditions potentielles|%, 0% humidité|[@Casadebaig2011]
+OC|Teneur en huile dans l'akène en conditions potentielles|%, 0% humidité|[@Casadebaig2011]
 
 **table des paramètres : variétés**
 
@@ -78,9 +78,9 @@ crop_sowing |Date de semis|jj/mm
 crop_harvest|Date de récolte|jj/mm
 crop_density|Densité du peuplement à la levée|plantes/m2
 nitrogen_date_1|Fertilisation (date)|jj/mm
-nitrogen_dose_1|Fertilisation (dose)|kg/ha eq. azote mineral
+nitrogen_dose_1|Fertilisation (dose)|kg/ha eq. azote minéral
 nitrogen_date_2|Fertilisation (date)|jj/mm
-nitrogen_dose_2|Fertilisation (dose)|kg/ha eq. azote mineral
+nitrogen_dose_2|Fertilisation (dose)|kg/ha eq. azote minéral
 water_date_1|Irrigation (date)|jj/mm
 water_dose_1|Irrigation (dose)|mm
 water_date_2|Irrigation (date)|jj/mm
@@ -96,15 +96,15 @@ nom | label | unité
 begin |Date de début de la simulation|jj/mm/aaaa
 duration|Durée de la simulation|jour
 crop_emergence|Date de levée (forçage)|jj/mm
-nitrogen_initial_1|Reliquats azotés dans l'horizon de surface (0 - 30 cm)|kg/ha eq. azote mineral
-nitrogen_initial_2|Reliquats azotés dans l'horizon inférieur (30 cm - profondeur)|kg/ha eq. azote mineral
+nitrogen_initial_1|Reliquats azotés dans l'horizon de surface (0 - 30 cm)|kg/ha eq. azote minéral
+nitrogen_initial_2|Reliquats azotés dans l'horizon inférieur (30 cm - profondeur)|kg/ha eq. azote minéral
 water_initial_1|Humidité massique initiale dans l'horizon de surface  (0 - 30 cm)|%
 water_initial_2|Humidité massique initiale dans l'horizon inférieur  (30 cm - profondeur)|%
 
 **table des paramètres : initialisation**
 
-## Plannification
-Cette étape consiste à concevoir le plan d'expérience numérique à réaliser et à en préparer une représentation informatique (fichier ou objet). Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longeur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
+## Planification
+Cette étape consiste à concevoir le plan d'expérience numérique à réaliser et à en préparer une représentation informatique (fichier ou objet). Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longueur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
 Ce plan peut être créé manuellement (séquentiellement, ligne après ligne) ou bien automatiquement, en combinant de manière définie les niveaux de différents facteurs étudiés.   
 La première solution correspond souvent à la simulation d'expérimentations réelles (MET). Dans ce cas, l'utilisation d'un tableur pour créer un fichier est préférable. Les entêtes des colonnes du fichier sont les noms des paramètres présentés dans les tableaux précédents.  
 La deuxième solution est utilisée plutôt pour l'exploration du modèle, les plans créés peuvent être des combinaisons factorielles de paramètres (s'ils sont peu nombreux) ou des plans issus de méthodes d'analyse de sensibilité.  
@@ -114,7 +114,7 @@ Dans tout les cas, les plans créés peuvent être utilisés soit avec le simula
 ### Exemple
 Le plan (2 années du réseau d'essai post-inscription) a été initialement créé avec un tableur en utilisant les noms des paramètres en entête. Le fichier du plan est simplement lu et ré-écrit dans le format utilisé par websim.
 
-```r
+```R
 ## Import
 plan <- loadWorkbook(file=paste(wd,"data/plans/plan_reseau_rnpi.xlsx", sep=""))
 e <- readWorksheet(plan, sheet="design", header=TRUE)
@@ -145,10 +145,10 @@ L'interface web *websim* permet, outre la création manuelle de simulations, d'a
 L'utilisation de sunflo via R est plus abstraite que l'utilisation d'interfaces utilisateurs, mais constitue à la fois une procédure parfaitement reproductible et plus rapide (facteur ~10) pour réaliser des expérimentations numériques.  
 La fonction `rsunflo::play` permet de simuler une ligne d'une matrice qui représente le plan d'expérience créé via un tableur. 
 La fonction `rsunflo::shape` met en forme et renomme les variables de sorties. 
-Le package `plyr` est utilisé pour itérer les simulations sur l'ensemble des lignes du plan. Ce calcul peut facilement être distribué sur plusieurs coeurs ou processeurs à l'aide du package `doMC` (cf aide de `plyr`). A cette étape, le résultat de chaque simulation est stocké dans un élement de liste. Les simulations qui échouent retournent un élément vide, les fonctions `Filter` et `compact` permettent de filtrer les simulations réussies. Pour l'instant, les causes de l'erreur ne sont pas remontées dans R (voir les logs de VLE).
+Le package `plyr` est utilisé pour itérer les simulations sur l'ensemble des lignes du plan. Ce calcul peut facilement être distribué sur plusieurs coeurs ou processeurs à l'aide du package `doMC` (cf aide de `plyr`). A cette étape, le résultat de chaque simulation est stocké dans un élément de liste. Les simulations qui échouent retournent un élément vide, les fonctions `Filter` et `compact` permettent de filtrer les simulations réussies. Pour l'instant, les causes de l'erreur ne sont pas remontées dans R (voir les logs de VLE).
 
 #### Exemple
-```r
+```R
 # Modèle et plan
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 design <- as.list(p)
@@ -196,6 +196,13 @@ OC|Teneur en huile|%, grain à 0% humidite
 **table des variables de sorties dynamiques**
 
 #### Variables disponible en fin de simulation
+nom|label|unité
+---|-----|------
+JSE|Nombre de jours de stress hydrique (ETR/ETM < 0.6) pour la période initiation florale - début floraison|jours
+JSF|Nombre de jours de stress hydrique (ETR/ETM < 0.6) pour la période début floraison - début maturité|jours
+JSM|Nombre de jours de stress hydrique (ETR/ETM < 0.6) pour la période début maturité - fin maturité|jours
+GY|Rendement en grain|q/ha
+OC|Teneur en huile|%, grain 0% humidité
 **table des variables de sortie statique**
 
 
@@ -203,9 +210,31 @@ OC|Teneur en huile|%, grain à 0% humidite
 
 ## Analyse
 ### Assemblage et traitements post-simulation  
-Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, regression...). C'est cette possibilité qui est utilisée pour calculer des indicteurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
+Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, régression...). C'est cette possibilité qui est utilisée pour calculer des indicateurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
 
 #### Indicateurs calculés depuis des variables dynamiques.
+nom|position|label|calcul|unité
+----|-------|-----|------|------
+SGR|cycle|Rayonnement incident (PAR)|sum(GR*0.48)|MJ/m2
+SRR|cycle|Précipitations|sum(RR)|mm
+SETP|cycle|Evapotranspiration|sum(ETP)|mm
+SCWD|cycle|Déficit hydrique climatique|sum(P-ETP)|mm
+SFTSW|cycle|Déficit hydrique édaphique (quantitatif)|sum(1-FTSW)|-
+NETR|cycle|Déficit hydrique édaphique (qualitatif)|sum(ETR/ETM < 0.6)|jours
+SFHTR|cycle|Effet de la contrainte hydrique sur la transpiration|sum(1-FHTR)|-
+SFHRUE|cycle|Effet de la contrainte hydrique sur la photosynthèse|sum(1-FHRUE)|-
+SNNI|cycle|Déficit azoté|sum(1-NNI)|-
+SNAB|cycle|Azote absorbé|diff(range(NAB))|kg/ha
+SFNRUE|cycle|Effet de la contrainte azote sur la photosynthèse|sum(1-FNRUE)|-
+SFTRUE|cycle|Effet de la contrainte thermique sur la photosynthèse|sum(1-FTRUE)|-
+LAI|cycle|LAI maximum|max(LAI)|-
+DSF|cycle|Durée de surface foliaire|sum(LAI)|-
+SIR|cycle|Rayonnement intercepté (PAR)|sum(RIE*GR*0.48)|MJ/m2
+MRUE|cycle|Photosynthèse|mean(RUE)|g/MJ/m2
+STDM|cycle|Biomasse|max(TDM)|g/m2
+TT|cycle|Temps thermique (base 4.8°C)|max(TTA2)|°C.j
+GY|cycle|Rendement en grain|max(GY)|q/ha
+OC|cycle|Teneur en huile|max(OC)|%, grain 0% humidité
 
 **table des indicateurs**
 
