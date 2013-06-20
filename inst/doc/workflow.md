@@ -3,16 +3,16 @@ Cette notice présente les principales étapes nécessaires pour réaliser une e
 Selon les questions abordées (démonstration, simulation de réseaux d'essais multilocaux, exploration, ...) le type de plan d'expérience conçu et les outils logiciels utilisés varient considérablement.   
 
 Différentes procédures sont proposées selon le volume de simulation : 
-* utilisation locale via une interface graphique (1-10)
-* utilisation distance via une interface web (10-500)
-* utilisation locale via un langage de script (10-1M)
+* utilisation locale via une interface graphique (1-10 simulations : [GVLE](#utilisation-locale-via-une-interface-graphique-1-10))
+* utilisation distance via une interface web (10-500 simulations : [websim](#utilisation-distance-via-une-interface-web-10-500))
+* utilisation locale via un langage de script (10-1M simulations: [rsunflo](#utilisation-locale-via-un-langage-de-script-10-1m))
 
 Pour chacune des ces procédures, 4 étapes successives sont nécessaires : 
 
-1. rassembler les données d'entrées et de paramétrage ([paramétrage](## Paramétrage))
-2. concevoir le plan de l'expérimentation numérique ([planification](## Planification))
-3. réaliser les simulations ([simulation](## Simulation))
-4. organiser les sorties et analyser les données ([analyse](## Analyse))
+1. rassembler les données d'entrées et de paramétrage ([paramétrage](#paramtrage))
+2. concevoir le plan de l'expérimentation numérique ([planification](#planification))
+3. réaliser les simulations ([simulation](#simulation))
+4. organiser les sorties et analyser les données ([analyse](#analyse))
 
 ![workflow](figures/workflow.png)
 **Procédures d'utilisation** : Les traits gris représentent les différentes procédures d'utilisation des outils logiciels. Les cadres gris nécessitent une installation locale des logiciels mentionnés, le cadre bleu permet une utilisation distante, via une interface web. Les chevrons représentent des logiciels et les rectangles, des packages. Les formes arrondies représentent des jeux de données.
