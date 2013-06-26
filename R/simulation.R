@@ -32,12 +32,43 @@ climate <- function(x,
 
 	switch(
     input.format,
+    
+    # Format site, date, [mesures]
+    date={
+      # Ajout des colonnes utilisées par RECORD
+      x <- mutate(
+        x,
+        JourJ = as.numeric(format(date, "%j")),
+        Annee = as.numeric(format(date, "%Y")),
+        Mois = as.numeric(format(date, "%m")),
+        Jour = as.numeric(format(date, "%d")), 
+      )
+      
+      # Mise en forme du fichier de sortie
+      o <- cbind(
+        x[,c("JourJ","Annee","Mois","Jour")],
+        x[,match(input.labels, colnames(x))]
+      )
+      # Renomme les colonnes au format RECORD
+      colnames(o) <- output.labels
+      
+      # Test sur la présence de données manquantes
+      try(na.fail(o))
+      
+      # Ecriture des fichiers de sortie
+      filename <- paste(unique(x$id),".txt", sep="")
+      write.table(o, file = filename, sep="\t", dec=".", row.names = FALSE)
+      
+      # Sortie
+      return(data.frame(o))
+    },
 		
 		climatik = {
 			# Selection des colonnes utilisées pour la simulation
 			o <- x[,match(input.labels, colnames(x))]
-			# Ajout colonne Jour calendaires et renommage
+			# Ajout colonne Jour calendaires 
 			o <- cbind(JourJ = 1:dim(o)[1], o)
+			# Renomme les colonnes au format RECORD
 			colnames(o) <- output.labels
 			
 			# Test sur la présence de données manquantes
@@ -51,7 +82,7 @@ climate <- function(x,
 			return(data.frame(o))
 		},
 		
-    # Format id, site, [RECORD]
+    # Format id, site, [mesures]
 		simple = {	
 			# Selection des colonnes utilisées pour la simulation
 			o <- x[,match(input.labels, colnames(x))]
