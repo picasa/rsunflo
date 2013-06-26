@@ -119,8 +119,8 @@ design <- function(design, file, template="default", format="websim") {
           # Mise en forme des champs de date
           p <- mutate(
             design,
-            id = paste(id, genotype, sep="_"),
-            file = paste("casadebaig/",station,"_",annee,".txt", sep=""),
+            id = paste(carol, genotype, sep="_"),
+            file = paste("casadebaig/",carol,".txt", sep=""),
             duration = as.character(crop_harvest - begin + 5),
             begin = format(begin, "%Y-%m-%d"),
             crop_sowing = format(crop_sowing, "%d/%m"),
