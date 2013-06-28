@@ -403,7 +403,7 @@ indicate <- function(x, view) {
 }
 
 ## Dynamique de FTSW sur la période de culture
-indicate.ftsw <- function(x) {
+indicateFTSW <- function(x) {
   
   # Période de culture (levée - maturité)
   crop = (x$PhenoStage >1 & x$PhenoStage <6)
@@ -433,7 +433,7 @@ display <- function(x, view="timed") {
 # Analyse ####
 
 ## Calculer erreur de prédiction
-evaluate.error <- function(data, formula, output="numeric") {
+EvaluateError <- function(data, formula, output="numeric") {
   
   # Calcul de l'erreur d'ajustement
   error <- ddply(
@@ -471,7 +471,7 @@ evaluate <- function(data, formula, color) {
     stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
     geom_text(
-      data=evaluate.error(data, formula, output="label"),
+      data=EvaluateError(data, formula, output="label"),
       aes(x=Inf, y=-Inf, label=label),
       colour="black", hjust=1.1, vjust=-1, size=4
     ) +

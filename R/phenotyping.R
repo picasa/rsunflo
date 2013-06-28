@@ -95,3 +95,11 @@ BreakLinear <- function(x, a, b) {
   }
   return(t)        
 }
+
+## Phenotypage réponse : Extraire un dataframe du paramétrage d'un objet nls 
+ExtractParametersResponse <- function(x) {
+  t <- data.frame(summary(x)$parameters)
+  colnames(t) <- c("value","sd","t","pr")
+  return(t)
+}
+

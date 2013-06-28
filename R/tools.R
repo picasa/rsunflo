@@ -1,3 +1,33 @@
+# File management
+ModelMakerManagement <- function(x) {
+  
+  # Nitrogen (2 modalities)
+  s <- x[x$Fertilisation != 0,c("date","Fertilisation")]
+  names(s) <- c("date","dose")
+  n <- data.frame(
+    nitrogen_date_1 = s$date[1],
+    nitrogen_dose_1 = s$dose[1],
+    nitrogen_date_2 = s$date[2],
+    nitrogen_dose_2 = s$dose[2]
+  )
+  
+  # Water (3 modalities)
+  s <- x[x$Irrigation != 0,c("date","Irrigation")]
+  names(s) <- c("date","dose")
+  w <- data.frame(
+    water_date_1 = s$date[1],
+    water_dose_1 = s$dose[1],
+    water_date_2 = s$date[2],
+    water_dose_2 = s$dose[2],
+    water_date_3 = s$date[3],
+    water_dose_3 = s$dose[3]
+  )
+  
+  # Output
+  return(data.frame(n,w))
+}
+
+
 # General purpose tools and function
 
 ## Calculer r² entre observé et simulé
@@ -34,24 +64,17 @@ length.na <- function(x){length(na.omit(x))}
 
 ## Correspondance partielle entre les noms de variétés fournis et une liste de référence
 # max.distance = list(sub=3, del=6, ins=3)
-FuzzyMatch <- function(x, reference, index=1){
+MatchFuzzy <- function(x, reference, index=1){
   agrep(pattern = x, x = reference, max.distance = 0.1, value=TRUE, ignore.case=TRUE)[index]
 }
 
-## Extraire un dataframe du paramétrage d'un objet nls (données réponse)
-ExtractParameters <- function(x) {
-  t <- data.frame(summary(x)$parameters)
-  colnames(t) <- c("value","sd","t","pr")
-  return(t)
-}
 
-ExtractAOV <- function(x){
-  # as.data.frame(summary(aov(x))[[1]]
-  return(NULL)
-}
+
+
+# Graphical representations
 
 ## Biplot pour les objets produits par agricolae::AMMI
-biplot.ammi <- function(m) {
+BiplotAMMI <- function(m) {
   
   env <- m$biplot[m$biplot$type == "ENV",]
   env <- mutate(env, names = rownames(env))
