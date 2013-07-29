@@ -433,7 +433,7 @@ display <- function(x, view="timed") {
 # Analyse ####
 
 ## Calculer erreur de prédiction
-EvaluateError <- function(data, formula, output="numeric") {
+evaluateError <- function(data, formula, output="numeric") {
   
   # Calcul de l'erreur d'ajustement
   error <- ddply(

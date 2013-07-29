@@ -59,9 +59,6 @@ last <- function(x) {tail(x[x != 0], n = 1)}
 ## Not in
 '%ni%' <- Negate('%in%')
 
-## Longueur d'un vecteur sans valeurs manquantes
-length.na <- function(x){length(na.omit(x))}
-
 ## Correspondance partielle entre les noms de variétés fournis et une liste de référence
 # max.distance = list(sub=3, del=6, ins=3)
 MatchFuzzy <- function(x, reference, index=1){
