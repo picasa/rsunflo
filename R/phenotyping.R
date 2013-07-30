@@ -14,6 +14,16 @@ ThermalTime <- function(climate, eID, start, end, Tb = 4.8){
   }
 }
 
+## Calcul de stades phénologiques secondaires depuis la date de floraison
+PhenoStage <- function(flowering) {
+  r <- data.frame(
+    TDF1 = flowering,
+    TDE1 = 0.576 * flowering,
+    TDM0 = flowering + 246.5
+  )
+  return(r)
+}
+
 # Architecture
 ## Modèle de surface de feuille = f(Longeur, Largeur) cm
 LeafSize <- function(length, width, a=0.736, b=-8.86, c=0.684){

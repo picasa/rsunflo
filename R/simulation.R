@@ -261,7 +261,30 @@ play <- function(model, design, unit, template="default")
           CONFIG_Variete.thp   				        = design[["OC"]][unit]
         )
       ) 
-    }
+    },
+
+  # genotype : année, paramètres variétaux réduits
+   genotype = {
+     r <- results(
+       run(
+         model,
+         begin      					                = design[["begin"]][unit],
+         CONFIG_ClimatNomFichier.datas_file	= as.character(design[["file"]][unit]),
+         CONFIG_Variete.date_TT_E1  		      = 0.576 * design[["TDF1"]][unit],
+         CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+         CONFIG_Variete.date_TT_M0  			    = 246.5 + design[["TDF1"]][unit],
+         CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+         CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+         CONFIG_Variete.ext     			        = design[["K"]][unit],
+         CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+         CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+         CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+         CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+         CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+         CONFIG_Variete.thp   				        = design[["OC"]][unit]
+       )
+     ) 
+   }
   )
   
   # Retour 
