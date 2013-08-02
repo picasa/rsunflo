@@ -194,7 +194,9 @@ play <- function(model, design, unit, template="default")
           CONFIG_SimuInit.rh2                 = design[["nitrogen_initial_2"]][unit],
           CONFIG_SimuInit.Hini_C1             = design[["water_initial_1"]][unit],
           CONFIG_SimuInit.Hini_C2             = design[["water_initial_2"]][unit],
-          CONFIG_SimuInit.dateLevee_casForcee = format(design[["crop_emergence"]][unit], "%d/%m"),
+          CONFIG_SimuInit.dateLevee_casForcee = ifelse(format(design[["crop_emergence"]][unit], "%m") == "01",
+                                                      "00/00", format(design[["crop_emergence"]][unit], "%d/%m")
+                                                ),
           CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
           CONFIG_Sol.Vp  		                  = design[["mineralization"]][unit],
           CONFIG_Sol.Hcc_C1 		              = design[["field_capacity_1"]][unit],
@@ -349,30 +351,22 @@ shape <- function(x, view) {
 
 
 ## Fonction de synthèse des covariables (1 valeur par usm)
-indicate <- function(x, view) {
+indicate <- function(x, view="timed") {
   
   switch(view,
     
     timed = {
       # Définition des périodes d'intégration
-      
       # levée - fin maturité
       EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
-      
       # levée - floraison
-      # EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
-      
+      #EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
       # initiation florale - début maturité
-      # FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
-      
+      #FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
       # floraison - début maturité
-      # FM <- x$PhenoStage == 4
-      
+      #FM <- x$PhenoStage == 4
       # début maturité - fin maturité
-      # MH <- x$PhenoStage == 5
-      
-      # fenetre remplissage
-      # PFW <- (x$TTF1 >= 250 & x$TTF1 <= 450)
+      #MH <- x$PhenoStage == 5
       
       # Calcul des indicateurs
       o <- data.frame(
@@ -420,7 +414,102 @@ indicate <- function(x, view) {
         GY = max(x$GY),
         OC = max(x$OC)
       ) 
-    }
+    },
+         
+    diagvar = {
+       # Définition des périodes d'intégration
+       # levée - fin maturité
+       EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
+       # semis - levée
+       SE <- (x$PhenoStage == 1)
+       # levée - floraison
+       EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
+       # initiation florale - début maturité
+       FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
+       # floraison - début maturité
+       FM <- x$PhenoStage == 4
+       # début maturité - fin maturité
+       MH <- x$PhenoStage == 5
+           
+       # Calcul des indicateurs
+       o <- data.frame(
+         # Ressources environnementales
+         # Cumul de précipitations
+         P_TOT = sum(x$RR[EH]),
+         P_VEG = sum(x$RR[EF]),
+         P_FLO = sum(x$RR[FM]),
+         P_REM = sum(x$RR[MH]),
+         
+         # Déficit hydrique climatique : sum(P-ETP)
+         PE_TOT = sum((x$RR-x$ETP)[EH]),
+         PE_VEG = sum((x$RR-x$ETP)[EF]),
+         PE_FLO = sum((x$RR-x$ETP)[FM]),
+         PE_REM = sum((x$RR-x$ETP)[MH]),
+         
+         # Déficit hydrique édaphique : mean(ETR/ETM)
+         DH_TOT = mean(x$ETRETM[EH]),
+         DH_VEG = mean(x$ETRETM[EF]),
+         DH_FLO = mean(x$ETRETM[FM]),
+         DH_REM = mean(x$ETRETM[MH]),
+         
+         # Déficit hydrique édaphique qualitatif : length(ETR/ETM < 0.6)
+         ISH_TOT = length(x$ETRETM[EH & x$ETRETM < 0.6]),
+         ISH_VEG = length(x$ETRETM[EF & x$ETRETM < 0.6]), 
+         ISH_FLO = length(x$ETRETM[FM & x$ETRETM < 0.6]),
+         ISH_REM = length(x$ETRETM[MH & x$ETRETM < 0.6]),
+         
+         # Déficit hydrique édaphique quantitatif : sum(1-FTSW)
+         FTSW_TOT = sum(1 - x$FTSW[EH]),
+         FTSW_VEG = sum(1 - x$FTSW[EF]), 
+         FTSW_FLO = sum(1 - x$FTSW[FM]),
+         FTSW_REM = sum(1 - x$FTSW[MH]),
+         
+         # Somme de température (base 6°C)
+         ST_TOT = sum((x$TM[EH] - 6)[(x$TM[EH] - 6) > 0]),
+         ST_VEG = sum((x$TM[EF] - 6)[(x$TM[EF] - 6) > 0]),
+         ST_FLO = sum((x$TM[FM] - 6)[(x$TM[FM] - 6) > 0]),
+         ST_REM = sum((x$TM[MH] - 6)[(x$TM[MH] - 6) > 0]),
+         
+         # Somme de rayonnement
+         SR_TOT = sum(x$RG[EH]),
+         SR_VEG = sum(x$RG[EF]),
+         SR_FLO = sum(x$RG[FM]),
+         SR_REM = sum(x$RG[MH]),
+         
+         # Somme de température à la levée (semis - levée)
+         ST_A2 = sum((x$TM[SE] - 6)[(x$TM[SE] - 6) > 0]),
+         
+         # Température basse en debut de cycle (jours Tmin < 15)
+         BT_VEG = length(x$TN[EF][x$TN[EF] < 15]),
+         
+         # Température haute en fin de cycle
+         HT_REM = length(x$TX[FM][x$TX[FM] > 32]),
+         
+         # Azote absorbé avant maturité (Nabs / Rendement ?)
+         N_TOT = max(x$NAB[EF | FM]),
+         
+         # INN à la floraison
+         INN_F1 = x$NNI[FM][1],
+         
+         # Nombre de jours INN < 0.8 jusqu'à M0
+         ISN_M0 = length(x$NNI[EF | FM][x$NNI[EF | FM] < 0.8]),
+         IEN_M0 = length(x$NNI[EF | FM][(x$NNI[EF | FM] > 1.2) & (x$NNI[EF | FM] < 2)]),
+         
+         # Indice foliaire maximum
+         IF_MAX = max(x$LAI),
+         
+         # Durée de surface foliaire : sum(x$LAI)
+         DSF = sum(x$LAI[EH]),
+         
+         # Biomasse
+         PS_TOT = max(x$TDM[EH]),
+         PS_F1 = x$TDM[FM][1],
+         
+         # Performance
+         RDT_SIM = max(x$GY),
+         TH_SIM = max(x$OC)
+       ) 
+     }         
   )
   return(o)
 }
