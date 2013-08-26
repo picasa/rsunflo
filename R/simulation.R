@@ -1,8 +1,10 @@
 # Tools for input, simulation and output data.
 
 # Sol ####
-## Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
+
+# Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
 # θ = a + (b×%Ar) + (c×%Li) + (d×%CO) + (e×Da)
+#' @export PotentialWaterContent
 
 PotentialWaterContent <- function(
   Argile, # %MS
@@ -22,7 +24,8 @@ PotentialWaterContent <- function(
   
 
 # Climat ####
-## Fonction pour la gestion des données climatiques
+# Fonction pour la gestion des données climatiques
+#' @export climate
 climate <- function(x, 
 	input.format,
 	input.labels,
@@ -105,7 +108,8 @@ climate <- function(x,
 
 # Simulation ####
 
-## Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
+# Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
+#' @export design
 design <- function(design, file, template="default", format="websim") {
   switch(
     template,
@@ -173,9 +177,11 @@ design <- function(design, file, template="default", format="websim") {
 }
 
 
-## Simulation unitaire depuis une ligne d'un plan d'expérience
+
+# Simulation unitaire depuis une ligne d'un plan d'expérience
 # TODO : adaptation de la fonction au plan : 
 #   automatique selon les infos du plan : non renseigné = defaut du vpz
+#' @export play
 
 play <- function(model, design, unit, template="default") 
 {
@@ -293,7 +299,9 @@ play <- function(model, design, unit, template="default")
   return(r)
 }
 
-## Mise en forme des données brutes de sortie
+
+# Mise en forme des données brutes de sortie
+#' @export shape
 shape <- function(x, view) {
   
 	switch(view,
@@ -350,7 +358,8 @@ shape <- function(x, view) {
 }
 
 
-## Fonction de synthèse des covariables (1 valeur par usm)
+# Fonction de synthèse des covariables (1 valeur par usm)
+#' @export indicate
 indicate <- function(x, view="timed") {
   
   switch(view,
@@ -471,10 +480,10 @@ indicate <- function(x, view="timed") {
          ST_REM = sum((x$TM[MH] - 6)[(x$TM[MH] - 6) > 0]),
          
          # Somme de rayonnement
-         SR_TOT = sum(x$RG[EH]),
-         SR_VEG = sum(x$RG[EF]),
-         SR_FLO = sum(x$RG[FM]),
-         SR_REM = sum(x$RG[MH]),
+         SR_TOT = sum(x$GR[EH]),
+         SR_VEG = sum(x$GR[EF]),
+         SR_FLO = sum(x$GR[FM]),
+         SR_REM = sum(x$GR[MH]),
          
          # Somme de température à la levée (semis - levée)
          ST_A2 = sum((x$TM[SE] - 6)[(x$TM[SE] - 6) > 0]),
@@ -514,7 +523,9 @@ indicate <- function(x, view="timed") {
   return(o)
 }
 
-## Dynamique de FTSW sur la période de culture
+
+# Dynamique de FTSW sur la période de culture
+#' @export indicateFTSW
 indicateFTSW <- function(x) {
   
   # Période de culture (levée - maturité)
@@ -528,7 +539,8 @@ indicateFTSW <- function(x) {
   return(o)
 }
 
-## Visualisation  des simulations
+# Visualisation  des simulations
+#' @export display
 display <- function(x, view="timed") {
   switch(
     view,
@@ -544,7 +556,8 @@ display <- function(x, view="timed") {
 
 # Analyse ####
 
-## Calculer erreur de prédiction
+# Calculer erreur de prédiction
+#' @export evaluateError
 evaluateError <- function(data, formula, output="numeric") {
   
   # Calcul de l'erreur d'ajustement
@@ -574,7 +587,9 @@ evaluateError <- function(data, formula, output="numeric") {
   )
 }
 
-## Graphes simulés / observés
+
+# Graphes simulés / observés
+#' @export evaluate
 evaluate <- function(data, formula, color) {
   # Graphes
   ggplot(data=data, aes(x=observed, y=simulated)) + 
@@ -590,7 +605,9 @@ evaluate <- function(data, formula, color) {
     theme_bw() + labs(x="Observed data", y="Simulated data")
 }
 
-## Impact d'un trait sur le rendement moyen
+
+# Impact d'un trait sur le rendement moyen
+#' @export impact
 impact <- function(x) {
 	# Y_T - Y_t / mean(Y)
 	r <- data.frame(

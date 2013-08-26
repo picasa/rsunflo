@@ -1,12 +1,23 @@
 Package: rsunflo
-Title: Tools for phenotyping, simulating and modelling with the SUNFLO crop model
-Description: A set of tools for working with the SUNFLO crop model at different steps. 
-		input data : computing genotype-specific parameters and creating climatic files.
-		simulation : designing virtual experiments and multi-simulation.
-		modelling : tracking the variation of prediction capacity along with model development.
+Title: Tools for phenotyping, simulating and modelling with the SUNFLO crop
+    model
+Description: A set of tools for working with the SUNFLO crop model at different
+    steps. input data : computing genotype-specific parameters and creating
+    climatic files. simulation : designing virtual experiments and
+    multi-simulation. modelling : tracking the variation of prediction capacity
+    along with model development.
 Version: 0.1
 Author: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
 Maintainer: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
-Imports: reshape2, plyr, ggplot2
-Suggests: rvle
+Imports:
+    reshape2,
+    plyr,
+    ggplot2
+Suggests:
+    rvle
 License: GPL
+Collate:
+    'phenotyping.R'
+    'simulation.R'
+    'tools.R'
+    'modelling.R'

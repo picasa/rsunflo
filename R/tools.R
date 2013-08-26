@@ -1,4 +1,6 @@
-# File management
+# File management ####
+
+#' @export ModelMakerManagement
 ModelMakerManagement <- function(x) {
   
   # Nitrogen (2 modalities)
@@ -28,38 +30,49 @@ ModelMakerManagement <- function(x) {
 }
 
 
-# General purpose tools and function
+# General purpose tools and function ####
 
-## Calculer r² entre observé et simulé
-rsq<-function (sim, obs, digits=2) {
+# Calculer r² entre observé et simulé
+#' @export rsq
+rsq <- function (sim, obs, digits=2) {
   round(cor(sim, obs, na.rm=TRUE)^2, digits=digits)
 }
-## Calculer un biais
-biais<-function (sim, obs, digits=2) {
+
+# Calculer un biais
+#' @export biais
+biais <- function (sim, obs, digits=2) {
   round(mean(na.omit(sim - obs)), digits=digits)
 }
-## Calculer RMSE
-rmse<- function(sim, obs, digits=2) {
+
+# Calculer RMSE
+#' @export  rmse
+rmse <- function(sim, obs, digits=2) {
 	round(sqrt(mean(na.omit(sim - obs)^2)), digits=digits)
 }
-## Calculer l'Efficience du modèle
-efficience<- function (sim, obs, digits=2) {
+
+# Calculer l'Efficience du modèle
+#' @export efficience
+efficience <- function (sim, obs, digits=2) {
   round(1 - (sum((na.omit(sim - obs))^2)/sum((na.omit(obs) - mean(obs, na.rm=TRUE))^2)), digits=digits)
 }
-## Savoir combien de variété sont dans l'intervalle de confiance observé
+
+# Savoir combien de variété sont dans l'intervalle de confiance observé
+#' @export wic
 wic <- function (obs, sim, ic) {
   d=(sim <= obs + ic) & (sim >= obs - ic)
   o=length(d[d==T])/length(ic)
   return(round(o, 3)) 
 }
 
-## Last : dernière valeur non nulle d'un vecteur
+# Last : dernière valeur non nulle d'un vecteur
+#' @export last
 last <- function(x) {tail(x[x != 0], n = 1)}
 
-## Not in
+# Not in
+#' @export '%ni%'
 '%ni%' <- Negate('%in%')
 
-## Correspondance partielle entre les noms de variétés fournis et une liste de référence
+# Correspondance partielle entre les noms de variétés fournis et une liste de référence
 # max.distance = list(sub=3, del=6, ins=3)
 MatchFuzzy <- function(x, reference, index=1){
   agrep(pattern = x, x = reference, max.distance = 0.1, value=TRUE, ignore.case=TRUE)[index]
@@ -68,9 +81,10 @@ MatchFuzzy <- function(x, reference, index=1){
 
 
 
-# Graphical representations
+# Graphical representations ####
 
-## Biplot pour les objets produits par agricolae::AMMI
+# Biplot pour les objets produits par agricolae::AMMI
+#' @export BiplotAMMI
 BiplotAMMI <- function(m) {
   
   env <- m$biplot[m$biplot$type == "ENV",]
@@ -103,8 +117,9 @@ BiplotAMMI <- function(m) {
     theme_bw()  
 }
 
-## Scatterplot pair matrix
+# Scatterplot pair matrix
 # https://github.com/mike-lawrence/ez/blob/master/R/ezCor.R
+#' @export Pairs
 Pairs <- 
   function(
     data

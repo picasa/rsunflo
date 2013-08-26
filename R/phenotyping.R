@@ -1,7 +1,8 @@
 # Tools for phenotyping and genotypic parameterisation
 
-# Phenologie
-## Somme de temps thermique entre deux bornes : climat, date1, date2
+# Phenologie ####
+# Somme de temps thermique entre deux bornes : climat, date1, date2
+#' @export ThermalTime
 ThermalTime <- function(climate, eID, start, end, Tb = 4.8){
   if (is.na(start) | is.na(end)) {
     return(NA)
@@ -14,7 +15,8 @@ ThermalTime <- function(climate, eID, start, end, Tb = 4.8){
   }
 }
 
-## Calcul de stades phénologiques secondaires depuis la date de floraison
+# Calcul de stades phénologiques secondaires depuis la date de floraison
+#' @export PhenoStage
 PhenoStage <- function(flowering) {
   r <- data.frame(
     TDF1 = flowering,
@@ -24,8 +26,12 @@ PhenoStage <- function(flowering) {
   return(r)
 }
 
-# Architecture
-## Modèle de surface de feuille = f(Longeur, Largeur) cm
+
+
+# Architecture ####
+
+# Modèle de surface de feuille = f(Longeur, Largeur) cm
+#' @export LeafSize
 LeafSize <- function(length, width, a=0.736, b=-8.86, c=0.684){
 	ifelse(length * width < (b/(c - a)),
 		c * length * width,
@@ -33,7 +39,9 @@ LeafSize <- function(length, width, a=0.736, b=-8.86, c=0.684){
 	)
 }
 
-## Modèle de profil foliaire
+
+# Modèle de profil foliaire
+#' @export LeafProfile
 LeafProfile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output="profile") {
   
   # Nombre de phytomères
@@ -63,8 +71,10 @@ LeafProfile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output="
 }
 
 
-## Modèle de coefficient d'extinction = f(TLN, LLS, LLH)
+
+# Modèle de coefficient d'extinction = f(TLN, LLS, LLH)
 # Coeff_k = -1,11.10-2 x n_Fmax – 1,09.10-2 x NF – 1,12.10-3 x SFimax – 0,11 x H + 6,5.10-5 x (0,5 x NF x SFimax + 30 x NF) + 1,58
+#' @export ExtCoef
 ExtCoef <- function(TLN, LLH, LLS, H) {  
   # Methode Pouzet-Bugat [Pouzet1985]
   TPA <- 0.5*TLN*LLS +30*TLN  
@@ -74,29 +84,36 @@ ExtCoef <- function(TLN, LLH, LLS, H) {
   return(K)
 }
 
-# Allocation
-## Conversion de teneur en huile aux normes (9% eau, 2% impureté) vers la teneur GPS
+
+
+# Allocation ####
+
+# Conversion de teneur en huile aux normes (9% eau, 2% impureté) vers la teneur GPS
+#' @export OilContentGPS
 OilContentGPS <- function(x, humidity=9, impurity=2) {
   r <- (1-impurity/100) * (1-humidity/100)
   return(x * 1/r)
 }
 
-# Réponse
-## Réponse de la transpiration plante / conductance stomatique à la contrainte hydrique
-# TR ~ (1.05/(1+4.5*exp(a*FTSW)))
+
+
+# Response ####
+# Réponse de la transpiration plante / conductance stomatique à la contrainte hydrique
+#' @export Conductance
 Conductance <- function(x, a) {
    t = 1.05 / (1 + 4.5 * exp(a * x))
    return(t)
 }
 
-## Réponse de l'expansion à la contrainte hydrique
-# LE ~ (-1 + 2/(1+exp(a*FTSW)))
+# Réponse de l'expansion à la contrainte hydrique
+#' @export Expansion
 Expansion <- function(x, a) {
   t = (2 /(1 + exp(a * x))) -1
   return(t)
 }
 
-## Fonction bi-linéaire
+# Fonction bi-linéaire
+#' @export BreakLinear
 BreakLinear <- function(x, a, b) {
   t=NULL
   for (i in 1:length(x)) {
@@ -106,7 +123,8 @@ BreakLinear <- function(x, a, b) {
   return(t)        
 }
 
-## Phenotypage réponse : Extraire un dataframe du paramétrage d'un objet nls 
+# Phenotypage réponse : Extraire un dataframe du paramétrage d'un objet nls 
+#' @export ExtractParametersResponse
 ExtractParametersResponse <- function(x) {
   t <- data.frame(summary(x)$parameters)
   colnames(t) <- c("value","sd","t","pr")
