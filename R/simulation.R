@@ -110,7 +110,7 @@ climate <- function(x,
 
 # Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
 #' @export design
-design <- function(design, file, template="default", format="websim") {
+design <- function(design, file, template="default", format="websim", user="casadebaig") {
   switch(
     template,
     
@@ -120,15 +120,19 @@ design <- function(design, file, template="default", format="websim") {
       
         websim = {
           
-          # Mise en forme des champs de date
+          # Mise en forme des champs de date, duration.
           p <- mutate(
             design,
             id = paste(carol, genotype, sep="_"),
-            file = paste("casadebaig/",carol,".txt", sep=""),
+            file = paste(user,"/meteo/", carol, ".txt", sep=""),
             duration = as.character(crop_harvest - begin + 5),
             begin = format(begin, "%Y-%m-%d"),
             crop_sowing = format(crop_sowing, "%d/%m"),
-            crop_emergence = format(crop_emergence, "%d/%m"),
+            crop_emergence = ifelse(
+              format(crop_emergence, "%m") == "01",
+              "00/00",
+              format(crop_emergence, "%d/%m")
+            ),
             crop_harvest = format(crop_harvest, "%d/%m"),
             nitrogen_date_1 = format(nitrogen_date_1, "%d/%m"),
             nitrogen_date_2 = format(nitrogen_date_2, "%d/%m"),
@@ -136,7 +140,9 @@ design <- function(design, file, template="default", format="websim") {
             water_date_2 = format(water_date_2, "%d/%m"),
             water_date_3 = format(water_date_3, "%d/%m"),
           )
-              
+          
+          
+          
           # Mise en forme du fichier 
           # Entetes depuis fichier csv websim
           names.websim <- c("Nom","Debut","Duree","date_TT_E1/77","date_TT_F1/78",

@@ -1,0 +1,77 @@
+
+## Dependances
+```{r dependancies, message=FALSE}
+# Dépendances
+library(XLConnect)
+library(plyr)
+library(rsunflo)
+```
+
+
+## Plannification
+### Création de plan d'expérience (WebSim)
+```{r design_websim}
+# Import des données
+## Essais (n=2)
+d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+## Genotypes (n=3)
+g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
+
+# Plan factoriel complet
+p <- expand.grid(carol=d$carol, genotype=g$genotype)
+p <- join(join(p, d), g)
+
+# Ecriture au format websim
+design(p, file="inst/doc/design_websim.xls", format="websim", user="casadebaig")
+```
+
+### Création du plan d'expérience (rsunflo)
+```{r design_rsunflo}
+# Import des données
+## Essais (n=2)
+d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+## Genotypes (n=3)
+g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
+
+# Plan factoriel complet
+p <- expand.grid(carol=d$carol, genotype=g$genotype)
+p <- join(join(p, d), g)
+
+# Mise en forme au format rsunflo
+DurationSoil = 5 # durée (j) de la période de simulation sans culture
+p <- mutate(
+  p,
+  id = 1:dim(p)[1],
+  begin = as.numeric(as.Date(begin)) + 2440588,
+  end = as.numeric(as.Date(crop_harvest)) + 2440588 + DurationSoil,
+  duration = end - begin,
+  file = paste("DB/reseaux/",carol,".txt",sep="")
+)
+```
+
+
+
+## Simulation
+### Simulation avec le paquet rsunflo
+```{r simulation_rsunflo}
+# Dependances
+library(rvle)
+
+# Modèle et plan
+sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
+design <- as.list(p)
+
+# Test
+shape(results(run(sunflo)), view = "timed")
+shape(play(sunflo, design, unit=1), view="timed")
+display(shape(play(sunflo, design, unit=1), view="timed"))
+
+# Simulation
+d <- mlply(
+  design$id,
+  function(x){failwith(NULL, shape)(play(sunflo, design, unit=x), view="timed")}
+)
+# Filter(is.null, d)
+d <- ldply(compact(d))
+```
+

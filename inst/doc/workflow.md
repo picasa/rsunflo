@@ -1,4 +1,4 @@
-# SUNFLO en 30 minutes
+# Notice d'utilisation du modèle SUNFLO 
 Cette notice présente les principales étapes nécessaires pour réaliser une expérimentation numérique avec le modèle SUNFLO.
 Selon les questions abordées (démonstration, simulation de réseaux d'essais multilocaux, exploration, ...) le type de plan d'expérience conçu et les outils logiciels utilisés varient considérablement.   
 
@@ -109,22 +109,24 @@ Ce plan peut être créé manuellement (séquentiellement, ligne après ligne) o
 La première solution correspond souvent à la simulation d'expérimentations réelles (MET). Dans ce cas, l'utilisation d'un tableur pour créer un fichier est préférable. Les entêtes des colonnes du fichier sont les noms des paramètres présentés dans les tableaux précédents.  
 La deuxième solution est utilisée plutôt pour l'exploration du modèle, les plans créés peuvent être des combinaisons factorielles de paramètres (s'ils sont peu nombreux) ou des plans issus de méthodes d'analyse de sensibilité.  
 
-Dans tout les cas, les plans créés peuvent être utilisés soit avec le simulateur local (rsunflo) ou distant (websim). Si ce dernier est utilisé, le format du fichier du plan est crucial (type des colonnes). La fonction `rsunflo::design` permet de convertir le fichier créé vers le format de websim (cf. aide de websim).
+Dans tout les cas, les plans créés peuvent être utilisés soit avec le simulateur local (rsunflo) ou distant (websim). Si ce dernier est utilisé, le format du fichier du plan est crucial (type et format des colonnes). La fonction `rsunflo::design` permet de convertir le fichier créé vers le format de websim (cf. aide de websim).
 
 ### Exemple
-Le plan (2 années du réseau d'essai post-inscription) a été initialement créé avec un tableur en utilisant les noms des paramètres en entête. Le fichier du plan est simplement lu et ré-écrit dans le format utilisé par websim.
+Le plan (fichier [design.xlsx](design.xlsx)) a été initialement créé avec un tableur en utilisant en entête les noms des paramètres et variables d'entrée présenté dans les tables précédentes. Le fichier du plan est simplement lu, assemblé, et ré-écrit dans le format utilisé par websim. Le nom d'utilisateur utilisé dans websim doit être passé en argument à la fonction `rsunflo::design`. Les fichiers et données pour reproduire cet exemple sont fournis avec le paquet.
 
 ```R
-## Import
-plan <- loadWorkbook(file=paste(wd,"data/plans/plan_reseau_rnpi.xlsx", sep=""))
-e <- readWorksheet(plan, sheet="design", header=TRUE)
-g <- readWorksheet(plan, sheet="genotypes", header=TRUE)
+# Import des données
+## Essais (n=2)
+d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+## Genotypes (n=3)
+g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
 
-## Assemblage et formatage
-p <- join(e, g[complete.cases(g),], type = "inner")
+# Plan factoriel complet
+p <- expand.grid(carol=d$carol, genotype=g$genotype)
+p <- join(join(p, d), g)
 
-## Ecriture au format websim
-design(p, file = paste(wd,"data/plans/plan_websim_rnpi.xls", sep=""), format="websim")
+# Ecriture au format websim
+design(p, file="inst/doc/design_websim.xls", format="websim", user="casadebaig")
 ```
 
 
@@ -144,7 +146,8 @@ L'interface web *websim* permet, outre la création manuelle de simulations, d'a
 ### Utilisation locale via un langage de script (10-1M)
 L'utilisation de sunflo via R est plus abstraite que l'utilisation d'interfaces utilisateurs, mais constitue à la fois une procédure parfaitement reproductible et plus rapide (facteur ~10) pour réaliser des expérimentations numériques.  
 La fonction `rsunflo::play` permet de simuler une ligne d'une matrice qui représente le plan d'expérience créé via un tableur. 
-La fonction `rsunflo::shape` met en forme et renomme les variables de sorties. 
+La fonction `rsunflo::shape` met en forme et renomme les variables de sorties.
+La fonction `rsunflo::display` représente chaque variable de sortie en fonction du temps.
 Le package `plyr` est utilisé pour itérer les simulations sur l'ensemble des lignes du plan. Ce calcul peut facilement être distribué sur plusieurs coeurs ou processeurs à l'aide du package `doMC` (cf aide de `plyr`). A cette étape, le résultat de chaque simulation est stocké dans un élément de liste. Les simulations qui échouent retournent un élément vide, les fonctions `Filter` et `compact` permettent de filtrer les simulations réussies. Pour l'instant, les causes de l'erreur ne sont pas remontées dans R (voir les logs de VLE).
 
 #### Exemple
@@ -154,13 +157,14 @@ sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 design <- as.list(p)
 
 # Test
-shape(results(run(sunflo)), view = "indicators")
-shape(play(sunflo, design, unit=1), view="indicators")
+shape(results(run(sunflo)), view = "timed")
+shape(play(sunflo, design, unit=1), view="timed")
+display(shape(play(sunflo, design, unit=1), view="timed"))
 
 # Simulation
 d <- mlply(
   design$id,
-  function(x){failwith(NULL, shape)(play(sunflo, design, unit=x), view="indicators")}
+  function(x){failwith(NULL, shape)(play(sunflo, design, unit=x), view="timed")}
 )
 # Filter(is.null, d)
 d <- ldply(compact(d))
@@ -210,7 +214,7 @@ OC|Teneur en huile|%, grain 0% humidité
 
 ## Analyse
 ### Assemblage et traitements post-simulation  
-Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, régression...). C'est cette possibilité qui est utilisée pour calculer des indicateurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
+Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, régression...). C'est cette possibilité qui est utilisée pour calculer un panel pré-défini d'indicateurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
 
 #### Indicateurs calculés depuis des variables dynamiques.
 nom|position|label|calcul|unité
