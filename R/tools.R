@@ -1,7 +1,7 @@
 # File management ####
 
-#' @export ModelMakerManagement
-ModelMakerManagement <- function(x) {
+#' @export modelmaker_management
+modelmaker_management <- function(x) {
   
   # Nitrogen (2 modalities)
   s <- x[x$Fertilisation != 0,c("date","Fertilisation")]
@@ -74,7 +74,7 @@ last <- function(x) {tail(x[x != 0], n = 1)}
 
 # Correspondance partielle entre les noms de variétés fournis et une liste de référence
 # max.distance = list(sub=3, del=6, ins=3)
-MatchFuzzy <- function(x, reference, index=1){
+match_fuzzy <- function(x, reference, index=1){
   agrep(pattern = x, x = reference, max.distance = 0.1, value=TRUE, ignore.case=TRUE)[index]
 }
 
@@ -84,8 +84,8 @@ MatchFuzzy <- function(x, reference, index=1){
 # Graphical representations ####
 
 # Biplot pour les objets produits par agricolae::AMMI
-#' @export BiplotAMMI
-BiplotAMMI <- function(m) {
+#' @export biplot_ammi
+biplot_ammi <- function(m) {
   
   env <- m$biplot[m$biplot$type == "ENV",]
   env <- mutate(env, names = rownames(env))
@@ -119,8 +119,8 @@ BiplotAMMI <- function(m) {
 
 # Scatterplot pair matrix
 # https://github.com/mike-lawrence/ez/blob/master/R/ezCor.R
-#' @export Pairs
-Pairs <- 
+#' @export pairs
+pairs <- 
   function(
     data
     , r_size_lims = c(10,30)

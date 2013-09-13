@@ -4,9 +4,9 @@
 
 # Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
 # θ = a + (b×%Ar) + (c×%Li) + (d×%CO) + (e×Da)
-#' @export PotentialWaterContent
+#' @export soil_water_capacity
 
-PotentialWaterContent <- function(
+soil_water_capacity <- function(
   Argile, # %MS
   LimonFin, # %MS
   LimonGrossier, # %MS
@@ -531,8 +531,8 @@ indicate <- function(x, view="timed") {
 
 
 # Dynamique de FTSW sur la période de culture
-#' @export indicateFTSW
-indicateFTSW <- function(x) {
+#' @export indicate_ftsw
+indicate_ftsw <- function(x) {
   
   # Période de culture (levée - maturité)
   crop = (x$PhenoStage >1 & x$PhenoStage <6)
@@ -563,8 +563,8 @@ display <- function(x, view="timed") {
 # Analyse ####
 
 # Calculer erreur de prédiction
-#' @export evaluateError
-evaluateError <- function(data, formula, output="numeric") {
+#' @export evaluate_error
+evaluate_error <- function(data, formula, output="numeric") {
   
   # Calcul de l'erreur d'ajustement
   error <- ddply(
@@ -604,7 +604,7 @@ evaluate <- function(data, formula, color) {
     stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
     geom_text(
-      data=EvaluateError(data, formula, output="label"),
+      data=evaluate_error(data, formula, output="label"),
       aes(x=Inf, y=-Inf, label=label),
       colour="black", hjust=1.1, vjust=-1, size=4
     ) +
