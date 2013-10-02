@@ -19,7 +19,16 @@ Pour chacune des ces procédures, 4 étapes successives sont nécessaires :
 
 ## Paramétrage
 L'utilisation par défaut de sunflo nécessite 42 paramètres et 5 variables d'entrées répartis en 4 volets : variétes, pédoclimat, conduite de culture et initialisation. Si une partie de ces informations n'est pas renseignée, la simulation échoue.  
-Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixe qui constituent un *patron de simulation*. Ce mode d'emploi se base sur un patron existant (varieto), mais il est possible d'en créer d'autres pour adapter l'utilisation du modèle à la quantité de données d'entrées disponibles (ou étudiées). Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des patrons de simulation, le détail du paramétrage et propose des valeurs par défaut. 
+Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixé.  
+L'interface *websim* permet de créer différentes version d'un même modèle informatique utilisant [*VLE+RECORD*](http://www.vle-project.org/wiki/Main_Page). A chaque usage correspond donc une version *ad hoc*,  nommée *patrons de simulation* dans *websim*. Bien que ces patrons peuvent être créés par les utilisateurs dans l'interface, trois patrons sont utilisables pour SUNFLO:
+
+modèle | patron |                 usage                        | paramètres
+-------|--------|----------------------------------------------|-----------
+SUNFLO | varieto|version par défaut, evaluation variétale      | 42
+SUNFLO | gem    |version simplifiée, experimentation numérique | 21
+SUNFLO | genotype|paramétrage variétal uniquement |12
+
+Ce mode d'emploi se base sur le patron *varieto*. Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des patrons de simulation, le détail du paramétrage et propose des valeurs par défaut. 
 
 ### Variété
 nom | label | unité | référence
@@ -137,11 +146,12 @@ Une fois le plan conçu et créé au format adapté au simulateur utilisé, les 
 Cette utilisation ne fonctionne pas avec un plan d'expérience défini. Elle est donc adaptée à un faible nombre de simulation, car il faut changer chaque paramètre séquentiellement dans l'interface graphique GVLE. Cette solution permet par contre de facilement changer les variables de sorties observées lors de la simulation. L'utilisation de l'interface GVLE n'est pas documentée pour sunflo (cf. notices de l'équipe RECORD).
 
 ### Utilisation distance via une interface web (10-500)
-L'interface web *websim* permet, outre la création manuelle de simulations, d'automatiser le processus de simulation quand un fichier de plan d'expérience est disponible : 
+L'interface web *websim* permet, outre la création manuelle de simulations, d'automatiser le processus de simulation quand un fichier de plan d'expérience est disponible.  
 
-1. la page `Simulations | Gerer via des tableaux` lit ce fichier et crée les simulations correspondantes
-2. la page `Plan d'expérience | Gerer` permet d'assembler et de simuler le contenu du plan
-3. la page `Plan d'expérience | Acceder aux fichiers` rassemble les sorties sont au format excel, un fichier par simulation.
+1. `Patrons de simulation | Utiliser` : choix du patron de simulation ([lien direct](http://147.99.107.100/sunflo/choose_pattern_to_use/8/))
+2. `Simulations | Gerer via des tableaux` : lecture du fichier de plan et création des simulations correspondantes
+3. `Plan d'expérience | Gerer` : assemblage et simulation du contenu du plan
+4. `Plan d'expérience | Acceder aux fichiers` : export des résultas (format excel, un fichier par simulation).
 
 ### Utilisation locale via un langage de script (10-1M)
 L'utilisation de sunflo via R est plus abstraite que l'utilisation d'interfaces utilisateurs, mais constitue à la fois une procédure parfaitement reproductible et plus rapide (facteur ~10) pour réaliser des expérimentations numériques.  

@@ -1,5 +1,6 @@
 # rsunflo
-Tools for phenotyping, simulating and modelling with the SUNFLO crop model
+Tools for phenotyping, simulating and modelling with the SUNFLO crop model. 
+Convenience and utility functions for personal use. Not to be published anywhere.
 
 A set of tools for working with the SUNFLO crop model at different steps. 
 * input data : computing genotype-specific parameters and creating climatic files.

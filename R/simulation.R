@@ -194,7 +194,7 @@ play <- function(model, design, unit, template="default")
   
   switch(template,
          
-    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée
+    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée (n=42)
     default = {
       r <- results(
         run(
@@ -247,7 +247,7 @@ play <- function(model, design, unit, template="default")
       ) 
     },
     
-    # gem : profondeur de sol, conduite extensive, tout paramètres variétaux 
+    # gem : profondeur de sol, conduite extensive, tout paramètres variétaux (n=21)
     gem = {
       r <- results(
         run(
@@ -277,7 +277,7 @@ play <- function(model, design, unit, template="default")
       ) 
     },
 
-  # genotype : année, paramètres variétaux réduits
+  # genotype : année, paramètres variétaux réduits ()
    genotype = {
      r <- results(
        run(
