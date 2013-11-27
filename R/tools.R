@@ -123,11 +123,11 @@ biplot_ammi <- function(m) {
 pairs <- 
   function(
     data
-    , r_size_lims = c(10,30)
+    , r_size_lims = c(10,20)
     , point_alpha = .5
     , density_height = 1
     , density_adjust = 1
-    , density_colour = 'white'
+    , density_colour = 'lightgrey'
     , label_size = 10
     , label_colour = 'black'
     , label_alpha = .5
@@ -275,7 +275,7 @@ pairs <-
       geom = 'ribbon'
       , geom_par = list(
         colour = 'transparent'
-        , fill = 'lightgrey'
+        , fill = density_colour
       )
       , data = dens
       , mapping = aes_string(
