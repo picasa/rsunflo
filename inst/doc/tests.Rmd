@@ -5,6 +5,8 @@
 library(XLConnect)
 library(plyr)
 library(rsunflo)
+library(reshape2)
+library(ggplot2)
 ```
 
 
@@ -13,25 +15,25 @@ library(rsunflo)
 ```{r design_websim}
 # Import des données
 ## Essais (n=2)
-d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+d <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="essais")
 ## Genotypes (n=3)
-g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
+g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
 p <- expand.grid(carol=d$carol, genotype=g$genotype)
 p <- join(join(p, d), g)
 
 # Ecriture au format websim
-design(p, file="inst/doc/design_websim.xls", format="websim", user="casadebaig")
+design(p, file="inst/doc/files/design_websim.xls", format="websim", user="casadebaig")
 ```
 
 ### Création du plan d'expérience (rsunflo)
 ```{r design_rsunflo}
 # Import des données
 ## Essais (n=2)
-d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+d <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="essais")
 ## Genotypes (n=3)
-g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
+g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
 p <- expand.grid(carol=d$carol, genotype=g$genotype)

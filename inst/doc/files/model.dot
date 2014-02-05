@@ -1,0 +1,108 @@
+/* Graphe de dépendance */
+/* dot -T pdf -o model.pdf model.dot  */
+
+digraph G {
+    compound = true
+    ranksep = "0.8"
+	rankdir = TB
+	nodesep = "0.8"
+    //concentrate = true
+    //splines = compound
+	ratio = "auto"
+	//colorscheme=accent3
+
+
+  /* Nodes */
+	node [shape=plaintext, fontsize=25]
+	bgcolor=white
+	edge [arrowsize=1, color=gray]
+		
+	
+	subgraph clusterInputs {
+		label="Inputs"
+		fontsize=35
+		
+	    subgraph clusterInputEnvironment {
+			label="Environment"
+			fontsize=35
+			Climate
+			Soil
+			Management
+			Initial Conditions
+		}
+		
+	    subgraph clusterInputGenetics {
+			label="Genetics"
+			fontsize=35
+			Specie
+			Cultivar 
+		}
+    }
+		    
+	subgraph clusterCrop {
+		label="Crop"
+		fontsize=35
+		
+	    subgraph clusterCropPotential {
+			label="Potential Yield"
+			fontsize=35
+			
+		    subgraph clusterCropPhenology {
+				label="Phenology"
+				fontsize=35
+			}
+		    
+		    subgraph clusterCropLeafArea {
+				label="Leaf Area"
+				fontsize=35
+			}
+	
+		    subgraph clusterCropInterception {
+				label="Light Interception"
+				fontsize=35
+		    }
+		    
+		    subgraph clusterCropBiomass {
+				label="Light Interception"
+				fontsize=35
+		    }
+		    
+		    subgraph clusterCropAllocation {
+				label="Light Interception"
+				fontsize=35
+			}
+			
+		    subgraph clusterCropInterception {
+				label="Light Interception"
+				fontsize=35
+		    }
+		}
+		    
+	    subgraph clusterCropStress {
+			label="Phenology"
+			fontsize=35
+			
+		    subgraph clusterCropStressWater {
+				label="Water Stress"
+				fontsize=35
+		    }
+		    
+		    subgraph clusterCropStressNitrogen {
+				label="Nitrogen Stress"
+				fontsize=35
+		    }
+		    
+		    subgraph clusterCropStressTemperature {
+				label="Thermal Stress"
+				fontsize=35
+			}
+			
+		    subgraph clusterCropStressRadiation {
+				label="Radiation Stress"
+				fontsize=35
+		    }			
+		}
+	}	
+}    
+				
+ 
