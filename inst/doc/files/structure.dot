@@ -1,36 +1,39 @@
 /* Graphe de dépendance */
-/* dot -T pdf -o model.pdf model.dot  */
+/* dot -T pdf -o structure.pdf structure.dot  */
 
 digraph G {
-    compound = true
+  dpi=200
+  size = "8.3, 11.7"
+  fontname = Helvetica
+  fontnames = "ps"
+  compound = true
 	rankdir = LR
-    ranksep = "0.8"
+  ranksep = "0.8"
 	nodesep = "0.8"
-    //concentrate = true
-    splines = line
-    //splines = compound
+  //concentrate = true
+  splines = line
+  //splines = compound
 	ratio = "auto"
 	//colorscheme=set14 //  1=red, 2=blue, 3=green, 4=violet 
 
-
-	/* Nodes */
+  // # Nodes ----
 	node [shape=plaintext, fontsize=25]
 	bgcolor=white
 	edge [arrowsize=1, color=gray]
 	
-	/* Genotypic Parameters */
-	CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
-	CultivarParameters [fontname="Helvetica-Bold"]
-	ThermalTimeFlowering [fontname="Helvetica-Bold"]
-	ThermalTimeMaturity [fontname="Helvetica-Bold"]
-	LeafNumber [fontname="Helvetica-Bold"]
-	LeafSize [fontname="Helvetica-Bold"]
-	LeafProfile [fontname="Helvetica-Bold"]
-	ExtinctionCoefficient [fontname="Helvetica-Bold"]
-	PotentialHarvestIndex [fontname="Helvetica-Bold"]
-	PotentialOilContent [fontname="Helvetica-Bold"]
-	WaterResponseExpansion [fontname="Helvetica-Bold"]
-	WaterResponseConductance [fontname="Helvetica-Bold"]
+	// # Genotypic Parameters ----
+  CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
+	CultivarParameters [fontname="Helvetica Bold"]
+	ThermalTimeFlowering [fontname="Helvetica Bold"]
+	ThermalTimeMaturity [fontname="Helvetica Bold"]
+	LeafNumber [fontname="Helvetica Bold"]
+	LeafSize [fontname="Helvetica Bold"]
+	LeafProfile [fontname="Helvetica Bold"]
+	ExtinctionCoefficient [fontname="Helvetica Bold"]
+	PotentialHarvestIndex [fontname="Helvetica Bold"]
+	PotentialOilContent [fontname="Helvetica Bold"]
+	WaterResponseExpansion [fontname="Helvetica Bold"]
+	WaterResponseConductance [fontname="Helvetica Bold"]
 	
 	
 	subgraph clusterInputs {
@@ -43,7 +46,8 @@ digraph G {
 			
 			InitialConditions
 			
-		    subgraph clusterInputEnvironmentClimate {
+			// # EnvironmentClimate ----  
+      subgraph clusterInputEnvironmentClimate {
 				label="Climate"
 				fontsize=35
 				pencolor=gray
@@ -54,7 +58,8 @@ digraph G {
 				Rainfall
 			}
 			
-		    subgraph clusterInputEnvironmentManagement {
+			// # EnvironmentManagement ----  
+      subgraph clusterInputEnvironmentManagement {
 				label="Management"
 				fontsize=35
 				pencolor=gray
@@ -65,7 +70,8 @@ digraph G {
 				Irrigation
 			}
 			
-		    subgraph clusterInputEnvironmentSoil {
+      // # EnvironmentSoil ----
+		  subgraph clusterInputEnvironmentSoil {
 				label="Soil"
 				fontsize=35
 				pencolor=gray
@@ -109,6 +115,7 @@ digraph G {
 			label="Potential"
 			fontsize=35
 			
+      // # CropPhenology ----
 			subgraph clusterCropPhenology {
 				label="Phenology"
 				fontsize=35
@@ -125,7 +132,8 @@ digraph G {
 				
 			}
 			
-		    subgraph clusterCropLeafArea {
+			// # CropLeafArea ----
+		  subgraph clusterCropLeafArea {
 				label="Leaf Area"
 				fontsize=35
 				pencolor=gray
@@ -140,7 +148,8 @@ digraph G {
 				LeafSenescenceRate -> LeafArea
 			}
 	
-		    subgraph clusterCropInterception {
+			// # CropInterception ----
+      subgraph clusterCropInterception {
 				label="Light Interception"
 				fontsize=35
 				pencolor=gray
@@ -153,8 +162,9 @@ digraph G {
 				PlantLeafArea -> LAI
 				LAI -> RIE
 		    }
-		    
-		    subgraph clusterCropBiomass {
+		  
+			// # CropBiomass ----
+		  subgraph clusterCropBiomass {
 				label="Biomass"
 				fontsize=35
 				pencolor=gray
@@ -168,8 +178,9 @@ digraph G {
 				RUE -> CropBiomass
 				CropBiomass
 		    }
-		    
-		    subgraph clusterCropPerformance {
+		  
+			// # CropPerformance ----
+		  subgraph clusterCropPerformance {
 				label="Performance"
 				fontsize=35
 				pencolor=gray
@@ -192,7 +203,8 @@ digraph G {
 			label="Environmental Stress"
 			fontsize=35
 			
-		    subgraph clusterCropStressWater {
+			// # CropStressWater ----
+      subgraph clusterCropStressWater {
 				label="Water Stress"
 				fontsize=35
 				pencolor=gray
@@ -214,7 +226,8 @@ digraph G {
 				WaterStress -> HarvestIndex [style=dotted, colorscheme=set14, color=2]
 		    }
 		    
-		    subgraph clusterCropStressNitrogen {
+			// # CropStressNitrogen ----  
+      subgraph clusterCropStressNitrogen {
 				label="Nitrogen Stress"
 				fontsize=35
 				pencolor=gray
@@ -236,8 +249,9 @@ digraph G {
 				NitrogenStressRUE -> RUE [style=dotted, colorscheme=set14, color=3]
 				
 		    }
-		    
-		    subgraph clusterCropStressTemperature {
+		  
+			// # CropStressTemperature ----
+		  subgraph clusterCropStressTemperature {
 				label="Thermal Stress"
 				fontsize=35
 				pencolor=gray
@@ -253,7 +267,8 @@ digraph G {
 				ThermalStressAllocation -> {HarvestIndex OilContent} [style=dotted, colorscheme=set14, color=1]
 			}
 			
-		    subgraph clusterCropStressRadiation {
+			// # CropStressRadiation ----
+		  subgraph clusterCropStressRadiation {
 				label="Radiation Stress"
 				fontsize=35
 				pencolor=gray
