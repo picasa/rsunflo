@@ -3,14 +3,14 @@
 
 digraph G {
     compound = true
-    ranksep = "0.8"
 	rankdir = LR
+    ranksep = "0.8"
 	nodesep = "0.8"
     //concentrate = true
     splines = line
     //splines = compound
 	ratio = "auto"
-	//colorscheme=accent3
+	//colorscheme=set14 //  1=red, 2=blue, 3=green, 4=violet 
 
 
 	/* Nodes */
@@ -19,6 +19,8 @@ digraph G {
 	edge [arrowsize=1, color=gray]
 	
 	/* Genotypic Parameters */
+	CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
+	CultivarParameters [fontname="Helvetica-Bold"]
 	ThermalTimeFlowering [fontname="Helvetica-Bold"]
 	ThermalTimeMaturity [fontname="Helvetica-Bold"]
 	LeafNumber [fontname="Helvetica-Bold"]
@@ -39,18 +41,39 @@ digraph G {
 			label="Environment"
 			fontsize=35
 			
-			Soil
-			Management
 			InitialConditions
 			
 		    subgraph clusterInputEnvironmentClimate {
 				label="Climate"
 				fontsize=35
+				pencolor=gray
 				
 				Temperature
 				Radiation
 				PET
 				Rainfall
+			}
+			
+		    subgraph clusterInputEnvironmentManagement {
+				label="Management"
+				fontsize=35
+				pencolor=gray
+				
+				SowingDate
+				SowingDensity
+				Fertilization
+				Irrigation
+			}
+			
+		    subgraph clusterInputEnvironmentSoil {
+				label="Soil"
+				fontsize=35
+				pencolor=gray
+				
+				WaterCapacity
+				RootingDepth
+				SoilDensity
+				MineralizationRate
 			}
 		}
 		
@@ -61,7 +84,7 @@ digraph G {
 		    subgraph clusterInputGeneticsSpecies {
 				label="Species"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				SpeciesParameter
 			}
@@ -69,7 +92,7 @@ digraph G {
 		    subgraph clusterInputGeneticsCultivar {
 				label="Cultivar"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				CultivarParameters
 			}
@@ -81,29 +104,31 @@ digraph G {
 		label="Crop"
 		fontsize=35
 		
-		subgraph clusterCropPhenology {
-			label="Phenology"
-			fontsize=35
-			
-			// Inputs
-			LeafNumber -> LeafAppearance
-			Temperature -> ThermalTime [style=dotted]
-			
-			// Module
-			ThermalTime -> {LeafAppearance LeafLongevity}
-			LeafAppearance
-			LeafLongevity
-			
-		}
 
 	    subgraph clusterCropPotential {
-			label="Performance"
+			label="Potential"
 			fontsize=35
-									 
+			
+			subgraph clusterCropPhenology {
+				label="Phenology"
+				fontsize=35
+				pencolor=gray
+				
+				// Inputs
+				LeafNumber -> LeafAppearance
+				Temperature -> ThermalTime [style=dotted, colorscheme=set14, color=1]
+				
+				// Module
+				ThermalTime -> {LeafAppearance LeafLongevity}
+				LeafAppearance
+				LeafLongevity
+				
+			}
+			
 		    subgraph clusterCropLeafArea {
 				label="Leaf Area"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
 				{LeafProfile LeafSize} -> LeafGrowthRate
@@ -118,7 +143,7 @@ digraph G {
 		    subgraph clusterCropInterception {
 				label="Light Interception"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
 				ExtinctionCoefficient -> RIE
@@ -132,42 +157,34 @@ digraph G {
 		    subgraph clusterCropBiomass {
 				label="Biomass"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
 				{ThermalTimeFlowering ThermalTimeMaturity} -> RUE
-				{Radiation RIE} -> CropBiomass [style=dotted]
+				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4]
+				RIE -> CropBiomass 
 				
 				// Module
 				RUE -> CropBiomass
 				CropBiomass
 		    }
 		    
-		    subgraph clusterCropPotentialYield {
-				label="Yield"
+		    subgraph clusterCropPerformance {
+				label="Performance"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
 				PotentialHarvestIndex -> HarvestIndex
+				PotentialOilContent -> OilContent
 				CropBiomass -> CropYield
 				
 				// Module
 				HarvestIndex -> CropYield
-			}
-			
-		    subgraph clusterCropPotentialQuality {
-				label="Oil Content"
-				fontsize=35
-				style=dotted
-				
-				// Inputs
-				PotentialOilContent -> OilContent
-				
-				// Module
 				OilContent
 			}
-		   	{rank=same; PotentialHarvestIndex; PotentialOilContent}
+			
+		   	//{rank=same; PotentialHarvestIndex; PotentialOilContent}
  			
 		}
 		    
@@ -178,13 +195,13 @@ digraph G {
 		    subgraph clusterCropStressWater {
 				label="Water Stress"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 
 				// Inputs
 				WaterResponseConductance -> WaterStressConductance
 				WaterResponseExpansion -> WaterStressExpansion
-				{RIE PET} -> WaterDemand [style=dotted]		
-				{Rainfall} -> WaterSupply [style=dotted]
+				{RIE PET} -> WaterDemand [style=dotted, colorscheme=set14, color=2]		
+				{Rainfall} -> WaterSupply [style=dotted, colorscheme=set14, color=2]
 				
 				// Module
 				RootGrowth -> WaterSupply
@@ -192,54 +209,61 @@ digraph G {
 				WaterStress -> {WaterStressConductance WaterStressExpansion}
 				
 				// Outputs
-				WaterStressExpansion -> LeafGrowthRate [style=dotted]
-				WaterStressConductance -> RUE [style=dotted]
-				WaterStress -> HarvestIndex [style=dotted]
+				WaterStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=2]
+				WaterStressConductance -> {ThermalTime RUE} [style=dotted, colorscheme=set14, color=2]
+				WaterStress -> HarvestIndex [style=dotted, colorscheme=set14, color=2]
 		    }
 		    
 		    subgraph clusterCropStressNitrogen {
 				label="Nitrogen Stress"
 				fontsize=35
-				style=dotted
+				pencolor=gray
+				
+				// Inputs
+				//Fertilization -> NitrogenSupply [style=dotted, colorscheme=set14, color=3]
+				Temperature -> Mineralization [style=dotted, colorscheme=set14, color=1]
+				//WaterStress -> Mineralization [style=dotted, colorscheme=set14, color=2]
+				CropBiomass -> NitrogenDemand [style=dotted, colorscheme=set14, color=3]
 				
 				// Module
+				//PotentialMineralizationRate -> Mineralization
 				Mineralization -> NitrogenSupply
 				{NitrogenSupply NitrogenDemand} -> NitrogenStress
 				NitrogenStress -> {NitrogenStressRUE NitrogenStressExpansion}
 				
 				// Outputs
-				NitrogenStressExpansion -> LeafGrowthRate [style=dotted]
-				NitrogenStressRUE -> RUE [style=dotted]
+				NitrogenStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=3]
+				NitrogenStressRUE -> RUE [style=dotted, colorscheme=set14, color=3]
 				
 		    }
 		    
 		    subgraph clusterCropStressTemperature {
 				label="Thermal Stress"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
-				Temperature -> ThermalStress [style=dotted]
+				Temperature -> ThermalStress [style=dotted, colorscheme=set14, color=1]
 				
 				// Module
 				ThermalStress -> {ThermalStressRUE ThermalStressAllocation}
 				
 				// Outputs
-				ThermalStressRUE -> RUE [style=dotted]
-				ThermalStressAllocation -> {OilContent} [style=dotted]
+				ThermalStressRUE -> RUE [style=dotted, colorscheme=set14, color=1]
+				ThermalStressAllocation -> {HarvestIndex OilContent} [style=dotted, colorscheme=set14, color=1]
 			}
 			
 		    subgraph clusterCropStressRadiation {
 				label="Radiation Stress"
 				fontsize=35
-				style=dotted
+				pencolor=gray
 				
 				// Inputs
-				Radiation -> RadiationStress [style=dotted]
-				PlantLeafArea -> RadiationStress [style=dotted]
+				Radiation -> RadiationStress [style=dotted, colorscheme=set14, color=4]
+				PlantLeafArea -> RadiationStress [style=dotted, colorscheme=set14, color=4]
 				
 				// Module
-				RadiationStress -> LeafGrowthRate [style=dotted]
+				RadiationStress -> LeafGrowthRate [style=dotted, colorscheme=set14, color=4]
 		    }			
 		}
 	}	
