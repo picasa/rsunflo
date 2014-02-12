@@ -14,13 +14,14 @@ Pour chacune des ces procédures, 4 étapes successives sont nécessaires :
 3. réaliser les simulations ([simulation](#simulation))
 4. organiser les sorties et analyser les données ([analyse](#analyse))
 
-![workflow](figures/workflow.png)
+![workflow](files/workflow.png)
 **Procédures d'utilisation** : Les traits gris représentent les différentes procédures d'utilisation des outils logiciels. Les cadres gris nécessitent une installation locale des logiciels mentionnés, le cadre bleu permet une utilisation distante, via une interface web. Les chevrons représentent des logiciels et les rectangles, des packages. Les formes arrondies représentent des jeux de données.
+
 
 ## Paramétrage
 L'utilisation par défaut de sunflo nécessite 42 paramètres et 5 variables d'entrées répartis en 4 volets : variétes, pédoclimat, conduite de culture et initialisation. Si une partie de ces informations n'est pas renseignée, la simulation échoue.  
 Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixé.  
-L'interface *websim* permet de créer différentes version d'un même modèle informatique utilisant [*VLE+RECORD*](http://www.vle-project.org/wiki/Main_Page). A chaque usage correspond donc une version *ad hoc*,  nommée *patrons de simulation* dans *websim*. Bien que ces patrons peuvent être créés par les utilisateurs dans l'interface, trois patrons sont utilisables pour SUNFLO:
+L'interface *websim* permet de créer différentes version d'un même modèle informatique utilisant [*VLE+RECORD*](http://www.vle-project.org/wiki/Main_Page). A chaque usage correspond donc une version *ad hoc*,  nommée *patrons de simulation* dans *websim*. Bien que ces patrons peuvent être créés par les utilisateurs dans l'interface, trois patrons sont utilisables pour SUNFLO :
 
 modèle | patron |                 usage                        | paramètres
 -------|--------|----------------------------------------------|-----------
@@ -112,8 +113,9 @@ water_initial_2|Humidité massique initiale dans l'horizon inférieur  (30 cm - 
 
 **table des paramètres : initialisation**
 
+
 ## Planification
-Cette étape consiste à concevoir le plan d'expérience numérique à réaliser et à en préparer une représentation informatique (fichier ou objet). Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longueur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
+Cette étape consiste à concevoir une plan d'expérience numérique et à en préparer une représentation informatique (fichier ou objet) en vue de la simulation. Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longueur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
 Ce plan peut être créé manuellement (séquentiellement, ligne après ligne) ou bien automatiquement, en combinant de manière définie les niveaux de différents facteurs étudiés.   
 La première solution correspond souvent à la simulation d'expérimentations réelles (MET). Dans ce cas, l'utilisation d'un tableur pour créer un fichier est préférable. Les entêtes des colonnes du fichier sont les noms des paramètres présentés dans les tableaux précédents.  
 La deuxième solution est utilisée plutôt pour l'exploration du modèle, les plans créés peuvent être des combinaisons factorielles de paramètres (s'ils sont peu nombreux) ou des plans issus de méthodes d'analyse de sensibilité.  
@@ -153,7 +155,7 @@ L'interface web *websim* permet, outre la création manuelle de simulations, d'a
 3. `Plan d'expérience | Gerer` : assemblage et simulation du contenu du plan
 4. `Plan d'expérience | Acceder aux fichiers` : export des résultas (format excel, un fichier par simulation).
 
-### Utilisation locale via un langage de script (10-1M)
+### Utilisation locale via un langage de script (10-1E6)
 L'utilisation de sunflo via R est plus abstraite que l'utilisation d'interfaces utilisateurs, mais constitue à la fois une procédure parfaitement reproductible et plus rapide (facteur ~10) pour réaliser des expérimentations numériques.  
 La fonction `rsunflo::play` permet de simuler une ligne d'une matrice qui représente le plan d'expérience créé via un tableur. 
 La fonction `rsunflo::shape` met en forme et renomme les variables de sorties.
@@ -181,7 +183,7 @@ d <- ldply(compact(d))
 ```
 
 ### Variables de sorties et indicateurs
-#### Variables disponibles à chaque pas de temps
+
 nom | label | unité
 ----|-------|-----
 TN|Température minimale|°C
@@ -209,7 +211,6 @@ OC|Teneur en huile|%, grain à 0% humidite
 
 **table des variables de sorties dynamiques**
 
-#### Variables disponible en fin de simulation
 nom|label|unité
 ---|-----|------
 JSE|Nombre de jours de stress hydrique (ETR/ETM < 0.6) pour la période initiation florale - début floraison|jours
@@ -226,7 +227,6 @@ OC|Teneur en huile|%, grain 0% humidité
 ### Assemblage et traitements post-simulation  
 Le package `plyr` permet également d'appliquer un même traitement sur un ensemble d'éléments, qu'il s'agisse simplement d'un assemblage (exemple ci-dessus) ou d'une opération statistique (description, régression...). C'est cette possibilité qui est utilisée pour calculer un panel pré-défini d'indicateurs depuis des sorties dynamiques brutes (cf. fonction `rsunflo::indicate`).
 
-#### Indicateurs calculés depuis des variables dynamiques.
 nom|position|label|calcul|unité
 ----|-------|-----|------|------
 SGR|cycle|Rayonnement incident (PAR)|sum(GR*0.48)|MJ/m2
@@ -250,10 +250,10 @@ TT|cycle|Temps thermique (base 4.8°C)|max(TTA2)|°C.j
 GY|cycle|Rendement en grain|max(GY)|q/ha
 OC|cycle|Teneur en huile|max(OC)|%, grain 0% humidité
 
-**table des indicateurs**
+**table des indicateurs calculés depuis des variables dynamiques**
 
 
 ### Méthodes d'analyse  
-Les procédures d'utilisation proposées dans cette notice n'incluent pas de méthode d'analyse de données. L'import des données dans R permet de profiter de ses outils statistiques. 
-Pour une question plus axée sur le développement, l'analyse des données peut s'envisager dans l'outil web de simulation. Le framework de websim peut ainsi être installé pour servir de support à la construction d'un outil d'aide à la décision.
+L'import des données dans R permet de profiter de ses outils statistiques. 
+Pour une question plus orientée vers le développement, l'analyse des données peut s'envisager dans l'outil web de simulation. Le framework de websim peut ainsi être installé pour servir de support à la construction d'un outil d'aide à la décision.
 

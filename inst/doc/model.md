@@ -14,8 +14,7 @@
 
 ## Environmental factors
 ### Thermal stress
-
-
+![plot of chunk CropStressTemperature](figure/CropStressTemperature.png) 
 
 
 $$
@@ -28,6 +27,11 @@ ThermalStressRUE = \left\{
 	\end{array} \right.
 $$
 
+with : 
+* $T_b = 4.8$, base temperature (°C)
+* $T_{ol} = 20$, optimal lower temperature (°C)
+* $T_{ou} = 28$, optimal upper temperature (°C)
+* $T_c = 37$, critical temperature (°C)
 
 
 
