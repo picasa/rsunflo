@@ -1,6 +1,40 @@
 # Tools for phenotyping and genotypic parameterisation
 
-# Phenologie ####
+# Soil ####
+
+# Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
+# θ = a + (b×%Ar) + (c×%Li) + (d×%CO) + (e×Da)
+#' @export soil_water_capacity_type
+
+soil_water_capacity_type <- function(
+  Argile, # %MS
+  LimonFin, # %MS
+  LimonGrossier, # %MS
+  SableFin, # %MS
+  SableGrossier, # %MS
+  CaCO3, # %MS
+  MatiereOrganique, # %MS
+  Profondeur, # mm
+  Cailloux # %MS
+) {
+  # [Vale2007]
+  (CaCO3 + 2*Argile + LimonFin + LimonGrossier + 0.7*(SableFin+SableGrossier)) *
+    ((100-Cailloux)/100)*(Profondeur/1000)*(1 + 0.05*MatiereOrganique - 0.1)
+}
+
+# estimer la réserve utile (mm) depuis la capacité de rétention en eau volumique et la profondeur
+#' @export soil_water_capacity
+soil_water_capacity <- function(
+  RootDepth = 1800, # length (mm)
+  FieldCapacity = 19.7, # % weight
+  WiltingPoint = 9.7, # % weight
+  SoilDensity = 1.4, # mass/volume (g/cm3)
+  StoneContent = 0 # 
+) {(FieldCapacity/100 - WiltingPoint/100) * RootDepth * SoilDensity * (1 - StoneContent)}
+
+
+
+# Phenology ####
 # Somme de temps thermique entre deux bornes : climat, date1, date2
 #' @export thermal_time
 thermal_time <- function(climate, eID, start, end, Tb = 4.8){

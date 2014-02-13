@@ -1,29 +1,6 @@
 # Tools for input, simulation and output data.
 
-# Sol ####
-
-# Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
-# θ = a + (b×%Ar) + (c×%Li) + (d×%CO) + (e×Da)
-#' @export soil_water_capacity
-
-soil_water_capacity <- function(
-  Argile, # %MS
-  LimonFin, # %MS
-  LimonGrossier, # %MS
-  SableFin, # %MS
-  SableGrossier, # %MS
-  CaCO3, # %MS
-  MatiereOrganique, # %MS
-  Profondeur, # mm
-  Cailloux # %MS
-  ) {
-  # [Vale2007]
-  (CaCO3 + 2*Argile + LimonFin + LimonGrossier + 0.7*(SableFin+SableGrossier)) *
-    ((100-Cailloux)/100)*(Profondeur/1000)*(1 + 0.05*MatiereOrganique - 0.1)
-}
-  
-
-# Climat ####
+# Climate ####
 # Fonction pour la gestion des données climatiques
 #' @export climate
 climate <- function(x, 
@@ -560,7 +537,7 @@ display <- function(x, view="timed") {
   )
 }
 
-# Analyse ####
+# Analysis ####
 
 # Calculer erreur de prédiction
 #' @export evaluate_error

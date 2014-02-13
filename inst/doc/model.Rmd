@@ -63,6 +63,7 @@ $$ with $T_b = 4.8$, base temperature (°C); $T_{ol} = 20$, optimal lower temper
 
 
 ### Water stress
+$$WaterStressPheno = a(T_m-T_b)(1-WaterStressConductance)$$
 
 ### Nitrogen stress
 

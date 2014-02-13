@@ -30,7 +30,7 @@ modelmaker_management <- function(x) {
 }
 
 
-# General purpose tools and function ####
+# Statistical indicators and function ####
 
 # Calculer r² entre observé et simulé
 #' @export rsq
