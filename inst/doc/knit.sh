@@ -3,5 +3,5 @@
 # dot -T png -o files/structure.png files/structure.dot
 
 # Documentation
-pandoc -V model.md -o model.html
-pandoc -V documentclass:scrartcl model.md -o model.pdf
+# pandoc -V model.md -o model.html
+# pandoc -V documentclass:scrartcl model.md -o model.pdf

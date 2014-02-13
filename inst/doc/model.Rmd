@@ -17,10 +17,9 @@ library(plyr)
 
 ## Environmental factors
 ### Thermal stress
+#### ThermalStressRUE [@Villalobos1996]
 ```{r ThermalStressRUE, echo=FALSE}
-# ThermalStressRUE
-## Function
-ThermalStressRUE.p <- c(4.8,20,28,37)
+# Function
 ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   ifelse(
     tm > tb & tm < tol, tm * (1/(tol - tb)) - (tb/(tol - tb)),
@@ -36,20 +35,20 @@ ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   )
 }
 
-## Graph
+# Graph
 s <- seq(0,45,by=0.2)
 d <- data.frame(
   x = s,
   y = ThermalStressRUE(s)
 )
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature", y="ThermalStressRUE")
-ggsave(p, file="./figure/ThermalStressRUE.svg", height=4, width=4.5, units="in")
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressRUE")
+ggsave(p, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=100)
 ```
 
 ThermalStressRUE | water stress impact on photosynthesis | 
 -----|----------|
-![ThermalStressRUE](figure/ThermalStressRUE.svg)| $$
+![ThermalStressRUE](figure/ThermalStressRUE.png)| $$
 ThermalStressRUE = \left\{ 
   \begin{array}{ll}
   T_m \cdot \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
@@ -60,11 +59,98 @@ ThermalStressRUE = \left\{
 $$ with $T_b = 4.8$, base temperature (°C); $T_{ol} = 20$, optimal lower temperature (°C); $T_{ou} = 28$, optimal upper temperature (°C); $T_c = 37$, critical temperature (°C)
 
 
+#### ThermalStressMineralization [@Vale2007]
+```{r ThermalStressMineralization, echo=FALSE}
+# Function
+ThermalStressMineralization <- function(tm, tb=15, tc=36) {
+  tc/(1 + (tc - 1) * exp(-0.119 * (tm - tb)))
+}
+
+## Graph
+s <- seq(0,45,by=0.2)
+d <- data.frame(
+  x = s,
+  y = ThermalStressMineralization(s)
+)
+
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressMineralization")
+ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=100)
+```
+
+ThermalStressMineralization | water stress impact on nitrogen mineralization rate | 
+-----|----------|
+![ThermalStressMineralization](figure/ThermalStressMineralization.png)| $$
+ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \cdot exp^{(-0.119 \cdot (T_m - T_b))}}
+$$ with $T_b = 15$, base temperature (°C); $T_c = 36$, critical temperature (°C)
+
+#### ThermalStressAllocation
 
 
 ### Water stress
-$$WaterStressPheno = a(T_m-T_b)(1-WaterStressConductance)$$
+
+#### WaterStressExpansion, WaterStressConductance
+```{r WaterStressProcess, echo=FALSE}
+# Function
+WaterStressProcess <- function(ftsw, a=-5) {
+  -1 + 2/(1 + exp(a*ftsw))
+}
+
+## Graph
+s <- seq(0,1, by=0.01)
+d <- data.frame(
+  x = s,
+  Expansion = WaterStressProcess(s, a=-4.42),
+  Conductance = WaterStressProcess(s, a=-9.3)
+)
+d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+  labs(x="WaterStress (FTSW)", y="WaterStressProcess") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=100)
+```
+
+WaterStressProcess | water stress impact on leaf expansion or transpiration rate | 
+-----|----------|
+![WaterStressProcess](figure/WaterStressProcess.png)| $$
+WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \cdot WaterStress)}}
+$$ with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
+
+
+#### WaterStressPhenology
+$$WaterStressPhenology = a \cdot (1 - WaterStressConductance)$$
+with $a=0.1$, scaling parameter for water-stress plant heating
+
+#### WaterStressMineralization
+$$WaterStressMineralization = 1 - (1 - y_0) \cdot (1 - RelativeWaterContent_{layer1})$$
+
 
 ### Nitrogen stress
 
 ### Radiation stress
+#### RadiationStressExpansion [@Ray2003]
+
+```{r RadiationStressExpansion, echo=FALSE}
+# Function
+RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.09) {
+  s * (a + (b/(1 + exp((c - nipar)/d))))
+}
+
+## Graph
+s <- seq(0,15,by=0.1)
+d <- data.frame(
+  x = s,
+  y = RadiationStressExpansion(nipar=s)
+)
+
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion")
+ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=100)
+```
+
+RadiationStressExpansion | plant density impact on leaf expansion| 
+-----|----------|
+![RadiationStressExpansion](figure/RadiationStressExpansion.png)| $$
+RadiationStressExpansion = s \cdot a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}
+$$ with $s=2.5$, scaling parameter for density effect; $a=-0.14$; $b=1.13$; $c=4.13$; $d=2.09$
+
+
