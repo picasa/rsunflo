@@ -2,43 +2,44 @@
 /* dot -T pdf -o structure.pdf structure.dot  */
 
 digraph G {
-  dpi=200
-  size = "8.3, 11.7"
-  fontname = Helvetica
-  fontnames = "ps"
-  compound = true
-	rankdir = LR
-  ranksep = "0.8"
-	nodesep = "0.8"
-  //concentrate = true
-  splines = line
-  //splines = compound
-	ratio = "auto"
-	//colorscheme=set14 //  1=red, 2=blue, 3=green, 4=violet 
+    dpi=200
+    size = "8.3, 11.7"
+    fontname = Helvetica
+    fontnames = "ps"
+    compound = true
+    rankdir = LR
+    ranksep = "0.8"
+    nodesep = "0.8"
+    //concentrate = true
+    splines = line
+    //splines = compound
+    ratio = "auto"
+    //colorscheme=set14 //  1=red, 2=blue, 3=green, 4=violet 
 
-  // # Nodes ----
-	node [shape=plaintext, fontsize=25]
-	bgcolor=white
-	edge [arrowsize=1, color=gray]
+    // # Nodes ----
+    node [shape=plaintext, fontsize=25]
+    //node [shape=circle, label=""]
+    bgcolor=white
+    edge [arrowsize=1, color=gray]
+    
+    // # Genotypic Parameters ----
+    //InitialConditions -> ThermalTime [style=invis] // Vertical alignment
+    CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
+    
+    CultivarParameters [fontname="Helvetica Bold"]
+    ThermalTimeFlowering [fontname="Helvetica Bold"]
+    ThermalTimeMaturity [fontname="Helvetica Bold"]
+    LeafNumber [fontname="Helvetica Bold"]
+    LeafSize [fontname="Helvetica Bold"]
+    LeafProfile [fontname="Helvetica Bold"]
+    ExtinctionCoefficient [fontname="Helvetica Bold"]
+    PotentialHarvestIndex [fontname="Helvetica Bold"]
+    PotentialOilContent [fontname="Helvetica Bold"]
+    WaterResponseExpansion [fontname="Helvetica Bold"]
+    WaterResponseConductance [fontname="Helvetica Bold"]
 	
-	// # Genotypic Parameters ----
-	//InitialConditions -> ThermalTime [style=invis] // Vertical alignment
-	CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
 	
-	CultivarParameters [fontname="Helvetica Bold"]
-	ThermalTimeFlowering [fontname="Helvetica Bold"]
-	ThermalTimeMaturity [fontname="Helvetica Bold"]
-	LeafNumber [fontname="Helvetica Bold"]
-	LeafSize [fontname="Helvetica Bold"]
-	LeafProfile [fontname="Helvetica Bold"]
-	ExtinctionCoefficient [fontname="Helvetica Bold"]
-	PotentialHarvestIndex [fontname="Helvetica Bold"]
-	PotentialOilContent [fontname="Helvetica Bold"]
-	WaterResponseExpansion [fontname="Helvetica Bold"]
-	WaterResponseConductance [fontname="Helvetica Bold"]
-	
-	
-	subgraph clusterInputs {
+    subgraph clusterInputs {
 		label="Inputs"
 		fontsize=35
 		
@@ -83,7 +84,7 @@ digraph G {
 				SoilDensity
 				MineralizationRate
 			}
-		}
+	  }
 		
 	    subgraph clusterInputGenetics {
 			label="Genetics"
@@ -105,7 +106,7 @@ digraph G {
 				CultivarParameters
 			}
 		}
-    }
+  }
     
 		    
 	subgraph clusterCrop {
@@ -163,7 +164,7 @@ digraph G {
 				// Module
 				PlantLeafArea -> LAI
 				LAI -> RIE
-		    }
+		  }
 		  
 			// # CropBiomass ----
 		  subgraph clusterCropBiomass {
@@ -179,7 +180,7 @@ digraph G {
 				// Module
 				RUE -> CropBiomass
 				CropBiomass
-		    }
+		  }
 		  
 			// # CropPerformance ----
 		  subgraph clusterCropPerformance {
@@ -195,11 +196,9 @@ digraph G {
 				// Module
 				HarvestIndex -> CropYield
 				OilContent
-			}
-			
-		   	//{rank=same; PotentialHarvestIndex; PotentialOilContent}
- 			
 		}
+		   	//{rank=same; PotentialHarvestIndex; PotentialOilContent}
+	}
 		    
 	    subgraph clusterCropStress {
 			label="Environmental Stress"
@@ -257,8 +256,7 @@ digraph G {
 				// Outputs
 				NitrogenStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=3]
 				NitrogenStressRUE -> RUE [style=dotted, colorscheme=set14, color=3]
-				
-		    }
+		  }
 		  
 			// # CropStressTemperature ----
 		  subgraph clusterCropStressTemperature {
@@ -276,7 +274,6 @@ digraph G {
 				ThermalStressRUE -> RUE [style=dotted, colorscheme=set14, color=1]
 				ThermalStressAllocation -> {HarvestIndex OilContent} [style=dotted, colorscheme=set14, color=1]
 				//ThermalStressMineralization -> Mineralization [style=dotted, colorscheme=set14, color=1]
-				
 			}
 			
 			// # CropStressRadiation ----
@@ -291,7 +288,7 @@ digraph G {
 				
 				// Module
 				RadiationStress -> LeafGrowthRate [style=dotted, colorscheme=set14, color=4]
-		    }			
+		  }			
 		}
 	}	
 }    
