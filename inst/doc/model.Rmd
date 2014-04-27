@@ -1,52 +1,179 @@
-```{r header, message=FALSE, echo=FALSE}
+---
+title: "Documentation for the SUNFLO crop model"
+output:
+  html_document:
+    fig_height: 10
+    fig_width: 10
+    theme: default
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+bibliography: ./files/bibliography.bib
+---
+
+
+
+```{r header, message=FALSE, warning=FALSE ,echo=FALSE}
+# TODO : manage to get consistent look between github markdown interpretation (sundown) and knitr html (rmarkdown)
+# TODO : made small parameters table linked subsets of the complete parameter table
+
 library(ggplot2)
 library(reshape2)
-library(plyr)
+library(dplyr)
+library(pander)
+library(XLConnect)
 
 setwd("/home/casadebaig/Documents/Travail/2011_SUNFLO/dev/rsunflo/inst/doc/")
+
+# data
+db <- loadWorkbook(file="./files/parameterization.xlsx") 
+sunflo <- list(
+  inputs = readWorksheet(db, sheet="inputs"),
+  parameters = readWorksheet(db, sheet="parameters"),
+  outputs = readWorksheet(db, sheet="outputs")
+)
+sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
+
+# options
+fig_dpi = 100
 ```
 
-# Documentation for the SUNFLO crop model
 
-## Model structure
+# Model structure
 ```{r structure, echo=FALSE, eval=FALSE}
 # Build model graph from R
-system("dot -T pdf -o ./files/structure.pdf ./files/structure.dot")
-system("dot -T png -o ./files/structure.png ./files/structure.dot")
+graph_ext <- "pdf"
+graph_nodes <- "-Nlabel= -Nshape=circle -Gdpi=150 -Earrowsize=2 -Epenwidth=4 -Estyle=dotted"
 
-# Replace nodes names by points 
-system("dot -T png -o ./files/structure_simple.png ./files/structure.dot -Nlabel= -Nshape=circle")
+# Simple graph : replace nodes names by points
+call <- paste0("dot -T ",graph_ext," -o ./files/structure_nodes.",graph_ext," ./files/structure_nodes.dot")
+system(call)
+# system(paste(call, graph_nodes))
+
+# Complete graph
+call <- paste0("dot -T ",graph_ext," -o ./files/structure.",graph_ext," ./files/structure.dot")
+system(call)
+
 ```
+
+## Modules
+![structure](./files/structure_nodes.png) 
+
+## Variables
 ![structure](./files/structure.png) 
 
-## Model outline
 
 
-## Crop potential growth
-### Phenology
-#### LeafAppearance
-#### LeafLongevity
+# Inputs
 
-### Leaf Area
-#### LeafProfile
-#### LeafGrowthRate, LeafSenescenceRate, LeafArea
+## Environment
+### Climate
+```{r InputsClimate, echo=FALSE, results='asis'}
+# data
+s <- select(sunflo$inputs, label=label.doc, description=label.en, unit)
+# table
+pandoc.table(s, style = "rmarkdown", split.tables="Inf", justify="left")
+```
+### Soil
+### Management
 
-### Light interception
-#### LAI
-#### RIE
+## Genetics
+### Species
+### Cultivar
 
-### Biomass production
-#### RUE
-#### CropBiomass [@Monteith1977]
+
+# Crop potential growth
+## Phenology
+### Inputs
+```{r InputsPhenology, echo=FALSE, results='asis'}
+# data
+s <- filter(sunflo$parameters, module=="Phenology") %.%
+  select(label=label.doc, description=label.en, value, unit, reference)
+
+# table
+pandoc.table(s, style = "multiline", split.tables="Inf", justify="left")
+```
+
+### Emergence
+$Emergence = Germination + ElongationRate \cdot SowingDepth$
+
+with : 
+$Germination = 86$, Thermal time for germination (°C.d) [@Casadebaig2011] ;
+$ElongationRate = 1.19$, Hypocotyl elongation rate (°Cd/mm) [@Villalobos1996] ;
+$SowingDepth = 30$, Sowing depth (mm).
+
+### ThermalTime
+$$
+  ThermalTime_d=
+	\left\{ 
+	\begin{array}{ll}
+	\int_0^d (T_m - T_b) \cdot (1 + WaterStressPhenology) \cdot dt & \textrm{if $T_m > T_b$} \\  
+	0 & \textrm{else}
+	\end{array} 
+	\right.
+$$
+
+with : 
+$T_m$, Daily mean air temperature (°C); 
+$T_b = 4.8$, Basal temperature (°C) see [@Granier1998]; 
+$ThermalStressPhenology$ Water stress effect on plant heating
+
+### PhenoStages
+```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2.5}
+# Data
+s <- filter(sunflo$parameters, module=="Phenology", !(label.doc %in% c("ElongationRate","SowingDepth"))) %.%
+  select(label=label.doc, value)
+s[s$label=="Germination",]$value <- -200+ s[s$label=="Germination",]$value
+s <- rbind(s, data.frame(label="Emergence", value=0))
+
+s <- mutate(
+  s,
+  phase=c("Vegetative","Floral Initiation","Flowering","Grain Filling","Germination","Elongation"),
+  start=c(0, 482, 836, 1083, -200, -200+86.2),
+  end=value
+)
+
+s <- mutate(s, phase=factor(phase, levels=phase))
+
+# plot
+p <- ggplot(s) +
+  geom_segment(aes(x=start, xend=end, y=0, yend=0, color=phase), size=5) +
+  geom_text(aes(x=value, y=0, label=label), vjust=0.5, size=3, angle=90, hjust=-0.1) +
+  theme_bw() + labs(x="ThermalTime", y="") + ylim(0,0.5) +
+  scale_color_manual(values = terrain.colors(6)) +
+  theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
+
+print(p)
+# ggsave(p, file="./figure/PhenoStage.png", height=2.5, width=8, units="in", dpi=fig_dpi)
+```
+
+
+### LeafAppearance
+
+### LeafLongevity
+
+## Leaf Area
+### LeafProfile
+### LeafGrowthRate, LeafSenescenceRate, LeafArea
+
+## Light interception
+### LAI
+### RIE
+
+## Biomass production
+### RUE
+### CropBiomass [@Monteith1977]
 $$dCropBiomass = 0.48 \cdot Radiation \cdot RIE \cdot RUE \cdot dt$$
 
-### Crop performance
+## Crop performance
 
 
-## Environmental factors
-### Thermal stress
-#### ThermalStressRUE [@Villalobos1996]
-```{r ThermalStressRUE, echo=FALSE}
+# Environmental factors limiting crop production
+
+## Thermal stress
+### ThermalStressRUE [@Villalobos1996]
+```{r ThermalStressRUE, echo=FALSE, fig.width=4, fig.height=3.5}
 # Function
 ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   ifelse(
@@ -71,16 +198,12 @@ d <- data.frame(
 )
 
 p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressRUE")
-ggsave(p, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=100)
-
-# Equation
-# wget "http://chart.apis.google.com/chart?cht=tx&chl=e=mc^2" -O "chart.png"
-# s <- readWorksheetFromFile(file="./files/equations.xlsx", sheet="sunflo")
+print(p)
+# ggsave(p, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-ThermalStressRUE | water stress impact on photosynthesis | 
------------------|---------------------------------------|
-![](figure/ThermalStressRUE.png)| $$
+
+$$
 ThermalStressRUE = \left\{ 
   \begin{array}{ll}
   T_m \cdot \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
@@ -89,13 +212,14 @@ ThermalStressRUE = \left\{
   0 & \textrm{else}
 	\end{array}
   \right.
-$$ |
+$$
 
 with $T_b = 4.8$, base temperature (°C); $T_{ol} = 20$, optimal lower temperature (°C); $T_{ou} = 28$, optimal upper temperature (°C); $T_c = 37$, critical temperature (°C)
 
 
-#### ThermalStressMineralization [@Vale2007]
-```{r ThermalStressMineralization, echo=FALSE}
+
+### ThermalStressMineralization [@Vale2007]
+```{r ThermalStressMineralization, echo=FALSE, fig.width=4, fig.height=3.5}
 # Function
 ThermalStressMineralization <- function(tm, tb=15, tc=36) {
   tc/(1 + (tc - 1) * exp(-0.119 * (tm - tb)))
@@ -109,22 +233,21 @@ d <- data.frame(
 )
 
 p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressMineralization")
-ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=100)
+print(p)
+# ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-ThermalStressMineralization | water stress impact on nitrogen mineralization rate | 
-----------------------------|-----------------------------------------------------|
-![](figure/ThermalStressMineralization.png)| $$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \cdot exp^{(-0.119 \cdot (T_m - T_b))}}$$ | 
+$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \cdot exp^{(-0.119 \cdot (T_m - T_b))}}$$
 
 with $T_b = 15$, base temperature (°C); $T_c = 36$, critical temperature (°C)
 
-#### ThermalStressAllocation
+### ThermalStressAllocation
 
 
-### Water stress
+## Water stress
 
-#### WaterStressExpansion, WaterStressConductance
-```{r WaterStressProcess, echo=FALSE}
+### WaterStressExpansion, WaterStressConductance
+```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4}
 # Function
 WaterStressProcess <- function(ftsw, a=-5) {
   -1 + 2/(1 + exp(a*ftsw))
@@ -142,30 +265,30 @@ d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
 p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
   labs(x="WaterStress (FTSW)", y="WaterStressProcess") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
-ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=100)
+
+print(p)
+# ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=fig_dpi)
 ```
 
-WaterStressProcess | water stress impact on leaf expansion or transpiration rate | 
--------------------|-------------------------------------------------------------|
-![](figure/WaterStressProcess.png)| $$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \cdot WaterStress)}}$$ |
+$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \cdot WaterStress)}}$$ 
 
 with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
 
 
-#### WaterStressPhenology
+### WaterStressPhenology
 $$WaterStressPhenology = a \cdot (1 - WaterStressConductance)$$
 with $a=0.1$, scaling parameter for water-stress plant heating
 
-#### WaterStressMineralization
+### WaterStressMineralization
 $$WaterStressMineralization = 1 - (1 - y_0) \cdot (1 - RelativeWaterContent_{layer1})$$
 
 
-### Nitrogen stress
+## Nitrogen stress
 
-### Radiation stress
-#### RadiationStressExpansion [@Ray2003]
+## Radiation stress
+### RadiationStressExpansion [@Rey2003]
 
-```{r RadiationStressExpansion, echo=FALSE}
+```{r RadiationStressExpansion, echo=FALSE, fig.width=4, fig.height=3.5}
 # Function
 RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.09) {
   s * (a + (b/(1 + exp((c - nipar)/d))))
@@ -178,14 +301,15 @@ d <- data.frame(
   y = RadiationStressExpansion(nipar=s)
 )
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion")
-ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=100)
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() +
+  labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion")
+
+print(p)
+# ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-RadiationStressExpansion | plant density impact on leaf expansion| 
--------------------------|---------------------------------------|
-![](figure/RadiationStressExpansion.png)| $$RadiationStressExpansion = s \cdot a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ |
+$$RadiationStressExpansion = s \cdot a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
 
 with $s=2.5$, scaling parameter for density effect; $a=-0.14$; $b=1.13$; $c=4.13$; $d=2.09$
 
-
+# References

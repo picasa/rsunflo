@@ -1,67 +1,66 @@
 /* Graphe de dépendance */
-/* dot -T pdf -o structure.pdf structure.dot  */
-/* dot -T png -o structure.png structure.dot  */
-/* dot -T svg -o structure.svg structure.dot  */
+/* dot -T pdf -o structure_nodes.pdf structure_nodes.dot  */
+/* dot -T png -o structure_nodes.png structure_nodes.dot  */
+/* dot -T svg -o structure_nodes.svg structure_nodes.dot  */
 /* dot -T png -o structure_simple.png structure.dot -Nlabel= -Nshape=circle -Gdpi=150 -Earrowsize=2 -Epenwidth=4 -Estyle=dotted*/
 
 digraph G {
-    dpi=300
+    dpi=150
     size = "5, 5"
     fontname = Helvetica
     fontnames = "ps"
-    compound = true
-    rankdir = LR
-    ranksep = "0.6"
-    nodesep = "0.6"
+    //compound = true
+    rankdir = TB
+    ranksep = "0.8"
+    nodesep = "0.8"
     //concentrate = true
     splines = line
-    //splines = compound
     ratio = "auto"
-    //colorscheme=set14 //  1=red, 2=blue, 3=green, 4=violet 
+   
 
-    // # Styling ----
-    //node [shape=circle, label=""]
-    node [shape=plaintext, fontsize=25]
+    // # Styling ---- 1=red, 2=blue, 3=green, 4=violet (colorscheme=set14)
     bgcolor=white
-    edge [arrowsize=1, color=gray]
+    node [shape=circle, label="", width=0.4]
+    edge [arrowsize=2, penwidth=4, style="dotted", color=gray]
+
+    
+    // # Stupid alignment control ----
+    InitialConditions -> ThermalTime [style="invis"] // Vertical alignment
+    CultivarParameters -> ThermalTime [style="invis"] // Vertical alignment
     
     // # Genotypic Parameters ----
-    //InitialConditions -> ThermalTime [style=invis] // Vertical alignment
-    CultivarParameters -> ThermalTime [style=invis] // Vertical alignment
-    
-    CultivarParameters [fontname="Helvetica Bold"]
-    ThermalTimeFlowering [fontname="Helvetica Bold"]
-    ThermalTimeMaturity [fontname="Helvetica Bold"]
-    LeafNumber [fontname="Helvetica Bold"]
-    LeafSize [fontname="Helvetica Bold"]
-    LeafProfile [fontname="Helvetica Bold"]
-    ExtinctionCoefficient [fontname="Helvetica Bold"]
-    PotentialHarvestIndex [fontname="Helvetica Bold"]
-    PotentialOilContent [fontname="Helvetica Bold"]
-    WaterResponseExpansion [fontname="Helvetica Bold"]
-    WaterResponseConductance [fontname="Helvetica Bold"]
+    CultivarParameters [style=filled, fillcolor=black]
+    ThermalTimeFlowering [style=filled, fillcolor=black]
+    ThermalTimeMaturity [style=filled, fillcolor=black]
+    LeafNumber [style=filled, fillcolor=black]
+    LeafSize [style=filled, fillcolor=black]
+    LeafProfile [style=filled, fillcolor=black]
+    ExtinctionCoefficient [style=filled, fillcolor=black]
+    PotentialHarvestIndex [style=filled, fillcolor=black]
+    PotentialOilContent [style=filled, fillcolor=black]
+    WaterResponseExpansion [style=filled, fillcolor=black]
+    WaterResponseConductance [style=filled, fillcolor=black]
 	
 	
     subgraph clusterInputs {
 		label="Inputs"
 		fontsize=35
-		
+				
 	    subgraph clusterInputEnvironment {
 			label="Environment"
 			fontsize=35
 			
-			InitialConditions
 			
 			// # EnvironmentClimate ----  
       subgraph clusterInputEnvironmentClimate {
-				label="Climate"
+				label="  Climate  "
 				fontsize=35
 				pencolor=gray
 				
-				Temperature
-				Radiation
-				PET
-				Rainfall
+				Temperature [style=filled, colorscheme=set14, fillcolor=1]
+				PET [style=filled, colorscheme=set14, fillcolor=2] 
+				Rainfall [style=filled, colorscheme=set14, fillcolor=2]
+				Radiation [style=filled, colorscheme=set14, fillcolor=4]
 			}
 			
 			// # EnvironmentManagement ----  
@@ -72,25 +71,34 @@ digraph G {
 				
 				SowingDate
 				SowingDensity
-				Fertilization
-				Irrigation
+				Fertilization [style=filled, colorscheme=set14, fillcolor=3]
+				Irrigation [style=filled, colorscheme=set14, fillcolor=2]
 			}
 			
       // # EnvironmentSoil ----
 		  subgraph clusterInputEnvironmentSoil {
-				label="Soil"
+				label="    Soil    "
 				fontsize=35
 				pencolor=gray
 				
-				WaterCapacity
-				RootingDepth
-				SoilDensity
-				MineralizationRate
+				WaterCapacity [style=filled, colorscheme=set14, fillcolor=2] 
+				RootingDepth [style=filled, colorscheme=set14, fillcolor=2]
+				SoilDensity [style=filled, colorscheme=set14, fillcolor=2]
+				MineralizationRate [style=filled, colorscheme=set14, fillcolor=3]
+			}
+			
+			// # EnvironmentInitial ----  
+      subgraph clusterInputEnvironmentInit {
+				label="Initialization"
+				fontsize=35
+				pencolor=gray
+				
+				InitialConditions
 			}
 	  }
 		
 	    subgraph clusterInputGenetics {
-			label="Genetics"
+			label="   Genetics   "
 			fontsize=35
 
 		    subgraph clusterInputGeneticsSpecies {
@@ -98,7 +106,7 @@ digraph G {
 				fontsize=35
 				pencolor=gray
 				
-				SpeciesParameter
+				SpeciesParameters
 			}
 		    
 		    subgraph clusterInputGeneticsCultivar {
@@ -128,8 +136,8 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
+				Temperature -> ThermalTime [style=dotted, colorscheme=set14, color=1, constraint=false] // InputsVariable
 				LeafNumber -> LeafAppearance
-				Temperature -> ThermalTime [style=dotted, colorscheme=set14, color=1]
 				
 				// Module
 				ThermalTime -> {LeafAppearance LeafLongevity}
@@ -177,7 +185,7 @@ digraph G {
 				
 				// Inputs
 				{ThermalTimeFlowering ThermalTimeMaturity} -> RUE
-				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4]
+				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4]  // InputsVariable
 				RIE -> CropBiomass 
 				
 				// Module
@@ -202,7 +210,9 @@ digraph G {
 		}
 		   	//{rank=same; PotentialHarvestIndex; PotentialOilContent}
 	}
-		    
+		   
+		   
+		  // # CropStress ----  
 	    subgraph clusterCropStress {
 			label="Environmental Stress"
 			fontsize=35
@@ -214,11 +224,11 @@ digraph G {
 				pencolor=gray
 
 				// Inputs
+				{Rainfall Irrigation} -> WaterSupply [style=dotted, colorscheme=set14, color=2] // InputsVariable
+				Temperature -> {RootGrowth} [style=dotted, colorscheme=set14, color=1, constraint=false] // InputsVariable
 				WaterResponseConductance -> WaterStressConductance
 				WaterResponseExpansion -> WaterStressExpansion
 				{RIE PET} -> WaterDemand [style=dotted, colorscheme=set14, color=2]		
-				{Rainfall} -> WaterSupply [style=dotted, colorscheme=set14, color=2]
-				Temperature -> {RootGrowth} [style=dotted, colorscheme=set14, color=1]
 				{WaterCapacity RootingDepth SoilDensity} -> WaterSupply [style=dotted]
 				
 				// Module
@@ -230,7 +240,8 @@ digraph G {
 				
 				// Outputs
 				WaterStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=2]
-				WaterStressConductance -> {ThermalTime RUE} [style=dotted, colorscheme=set14, color=2]
+				WaterStressConductance -> RUE [style=dotted, colorscheme=set14, color=2]
+				WaterStressPhenology -> ThermalTime [style=dotted, colorscheme=set14, color=2]
 				WaterStress -> HarvestIndex [style=dotted, colorscheme=set14, color=2]
 				
 				{rank=same; WaterStressConductance; WaterStressExpansion; WaterStressMineralization}
@@ -243,11 +254,11 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
-				//Fertilization -> NitrogenSupply [style=dotted, colorscheme=set14, color=3]
-				Temperature -> Mineralization [style=dotted, colorscheme=set14, color=1]
-				MineralizationRate -> Mineralization [style=dotted]
-				Rainfall -> Mineralization [style=dotted, colorscheme=set14, color=2]
-				//WaterStressMineralization -> Mineralization [style=dotted, colorscheme=set14, color=2]
+				Fertilization -> NitrogenSupply [style=dotted, colorscheme=set14, color=3] // InputsVariable
+				Temperature -> Mineralization [style=dotted, colorscheme=set14, color=1] // InputsVariable
+				// Rainfall -> Mineralization [style=dotted, colorscheme=set14, color=2] // InputsVariable
+				MineralizationRate -> Mineralization [style=dotted] // InputsVariable
+				WaterStressMineralization -> Mineralization [style=dotted, colorscheme=set14, color=2, constraint=false]
 				CropBiomass -> NitrogenDemand [style=dotted, colorscheme=set14, color=3]
 				
 				// Module
@@ -268,7 +279,7 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
-				Temperature -> {TemperatureAirMean} [style=dotted, colorscheme=set14, color=1]
+				Temperature -> {TemperatureAirMean} [style=dotted, colorscheme=set14, color=1] // InputsVariable
 				
 				// Module
 				TemperatureAirMean -> {ThermalStressRUE ThermalStressAllocation ThermalStressMineralization}
@@ -286,7 +297,7 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
-				Radiation -> RadiationStress [style=dotted, colorscheme=set14, color=4]
+				Radiation -> RadiationStress [style=dotted, colorscheme=set14, color=4] // InputsVariable
 				PlantLeafArea -> RadiationStress [style=dotted, colorscheme=set14, color=4]
 				
 				// Module
