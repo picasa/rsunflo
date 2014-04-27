@@ -10,6 +10,7 @@ output:
   pdf_document:
     toc: yes
 bibliography: ./files/bibliography.bib
+csl: ./style/elsevier.csl
 ---
 
 
@@ -68,19 +69,48 @@ system(call)
 # Inputs
 
 ## Environment
+
 ### Climate
 ```{r InputsClimate, echo=FALSE, results='asis'}
 # data
 s <- select(sunflo$inputs, label=label.doc, description=label.en, unit)
 # table
-pandoc.table(s, style = "rmarkdown", split.tables="Inf", justify="left")
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 ```
+
 ### Soil
+```{r InputsSoil, echo=FALSE, results='asis'}
+# data
+s <- sunflo$parameters %.%
+  filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %.%
+  select(label=label.doc, description=label.en, value, unit, reference)
+# table
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+```
+
 ### Management
+```{r InputsManagement, echo=FALSE, results='asis'}
+# data
+s <- sunflo$parameters %.%
+  filter(category=="Conduite", template.default==1) %.%
+  select(label=label.doc, description=label.en, value, unit, reference)
+# table
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+```
+
 
 ## Genetics
 ### Species
 ### Cultivar
+```{r InputsCultivar, echo=FALSE, results='asis'}
+# data
+s <- sunflo$parameters %.%
+  filter(category=="Variete", template.default==1) %.%
+  select(label=label.doc, description=label.en, value, unit, reference)
+# table
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+```
+
 
 
 # Crop potential growth
@@ -88,11 +118,12 @@ pandoc.table(s, style = "rmarkdown", split.tables="Inf", justify="left")
 ### Inputs
 ```{r InputsPhenology, echo=FALSE, results='asis'}
 # data
-s <- filter(sunflo$parameters, module=="Phenology") %.%
+s <- sunflo$parameters %.% 
+  filter(module=="Phenology") %.%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-pandoc.table(s, style = "multiline", split.tables="Inf", justify="left")
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 ```
 
 ### Emergence
@@ -122,11 +153,19 @@ $ThermalStressPhenology$ Water stress effect on plant heating
 ### PhenoStages
 ```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2.5}
 # Data
-s <- filter(sunflo$parameters, module=="Phenology", !(label.doc %in% c("ElongationRate","SowingDepth"))) %.%
-  select(label=label.doc, value)
-s[s$label=="Germination",]$value <- -200+ s[s$label=="Germination",]$value
-s <- rbind(s, data.frame(label="Emergence", value=0))
+parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
+                "ThermalTimeSenescence", "ThermalTimeMaturity",
+                "Germination")
 
+s <- sunflo$parameters %.%
+  filter(module=="Phenology", label.doc %in% parameters) %.%
+  select(label=label.doc, value)
+
+# add emergence state
+s <- rbind(s, data.frame(label="Emergence", value=0))
+# change germination value according to emergence
+s[s$label=="Germination",]$value <- -200+ s[s$label=="Germination",]$value
+# compute start phase for plotting
 s <- mutate(
   s,
   phase=c("Vegetative","Floral Initiation","Flowering","Grain Filling","Germination","Elongation"),
@@ -150,6 +189,49 @@ print(p)
 
 
 ### LeafAppearance
+```{r LeafAppearance, echo=FALSE, fig.width=4, fig.height=4}
+# Function
+LeafInitiation <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=420){
+  ifelse(
+    i <= 6, i*phy_1,
+      ifelse(
+        i <= i_max,
+        (i-5) * phy_7 + a, NA
+      )
+  )
+}
+
+# Data
+s <- 1:30
+d <- data.frame(
+  x = s,
+  LeafInitiation = LeafInitiation(s),
+  LeafExpansion = LeafInitiation(s) + 1/0.01379
+)
+
+d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
+
+# Graph
+p <- ggplot(d, aes(x,y, color=Process)) + geom_line() +
+  theme_bw() + labs(x="Node", y="LeafAppearance") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(p)
+```
+
+$$
+  LeafInitiation_i = \left\{ 
+	\begin{array}{ll}
+	i \cdot Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
+	(i-5) \cdot Phyllotherm_7 + a & \textrm{if $i \leq LeafNumber$}
+	\end{array} \right.
+$$
+
+with $Phyllotherm_1=76.43$ (°C.d), $Phyllotherm_7=16.34$ (°C.d) and $a=400$ (°C.d)
+
+$$LeafExpansion_i=LeafInitiation_i + 1/a$$
+
+with $a=0.01379$, ratio between initiation and half-expansion time.
 
 ### LeafLongevity
 

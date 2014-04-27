@@ -85,6 +85,9 @@
 <div id="climate" class="section level3">
 <h3>Climate</h3>
 <table>
+<col width="27%"></col>
+<col width="43%"></col>
+<col width="12%"></col>
 <thead>
 <tr class="header">
 <th align="left">label</th>
@@ -94,62 +97,41 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">TemperatureAirMin</td>
-<td align="left">Minimum air temperature</td>
-<td align="left">°C</td>
+<td align="left"><p>TemperatureAirMin</p></td>
+<td align="left"><p>Minimum air temperature</p></td>
+<td align="left"><p>°C</p></td>
 </tr>
 <tr class="even">
-<td align="left">TemperatureAirMax</td>
-<td align="left">Maximum air temperature</td>
-<td align="left">°C</td>
+<td align="left"><p>TemperatureAirMax</p></td>
+<td align="left"><p>Maximum air temperature</p></td>
+<td align="left"><p>°C</p></td>
 </tr>
 <tr class="odd">
-<td align="left">Radiation</td>
-<td align="left">Global incident radiation</td>
-<td align="left">MJ.m-2</td>
+<td align="left"><p>Radiation</p></td>
+<td align="left"><p>Global incident radiation</p></td>
+<td align="left"><p>MJ.m-2</p></td>
 </tr>
 <tr class="even">
-<td align="left">PET</td>
-<td align="left">Reference evapotranspiration</td>
-<td align="left">mm</td>
+<td align="left"><p>PET</p></td>
+<td align="left"><p>Reference evapotranspiration</p></td>
+<td align="left"><p>mm</p></td>
 </tr>
 <tr class="odd">
-<td align="left">Rainfall</td>
-<td align="left">Rainfall</td>
-<td align="left">mm</td>
+<td align="left"><p>Rainfall</p></td>
+<td align="left"><p>Rainfall</p></td>
+<td align="left"><p>mm</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="soil" class="section level3">
 <h3>Soil</h3>
-</div>
-<div id="management" class="section level3">
-<h3>Management</h3>
-</div>
-</div>
-<div id="genetics" class="section level2">
-<h2>Genetics</h2>
-<div id="species" class="section level3">
-<h3>Species</h3>
-</div>
-<div id="cultivar" class="section level3">
-<h3>Cultivar</h3>
-</div>
-</div>
-</div>
-<div id="crop-potential-growth" class="section level1">
-<h1>Crop potential growth</h1>
-<div id="phenology" class="section level2">
-<h2>Phenology</h2>
-<div id="inputs-1" class="section level3">
-<h3>Inputs</h3>
 <table>
-<col width="26%"></col>
-<col width="35%"></col>
-<col width="9%"></col>
-<col width="8%"></col>
 <col width="20%"></col>
+<col width="29%"></col>
+<col width="9%"></col>
+<col width="24%"></col>
+<col width="16%"></col>
 <thead>
 <tr class="header">
 <th align="left">label</th>
@@ -161,53 +143,388 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ThermalTimeVegetative</td>
-<td align="left">Temperature sum to floral initiation</td>
-<td align="left">482</td>
-<td align="left">°Cd</td>
-<td align="left"><span class="citation">(J. Lecoeur et al. 2011)</span></td>
+<td align="left"><p>RootingDepth</p></td>
+<td align="left"><p>Potential rooting depth</p></td>
+<td align="left"><p>1800</p></td>
+<td align="left"><p>mm</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
 </tr>
 <tr class="even">
-<td align="left">ThermalTimeFlowering</td>
-<td align="left">Temperature sum from emergence to the beginning of flowering</td>
-<td align="left">836</td>
-<td align="left">°Cd</td>
-<td align="left"><span class="citation">(J. Lecoeur et al. 2011)</span></td>
+<td align="left"><p>WaterCapacity</p></td>
+<td align="left"><p>Water content at field capacity (0-30 cm)</p></td>
+<td align="left"><p>19.69</p></td>
+<td align="left"><p>%</p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left">ThermalTimeSenescence</td>
-<td align="left">Temperature sum from emergence to the beginning of grain filling</td>
-<td align="left">1083</td>
-<td align="left">°Cd</td>
-<td align="left"><span class="citation">(J. Lecoeur et al. 2011)</span></td>
-</tr>
-<tr class="even">
-<td align="left">ThermalTimeMaturity</td>
-<td align="left">Temperature sum from emergence to seed physiological maturity</td>
-<td align="left">1673</td>
-<td align="left">°Cd</td>
-<td align="left"><span class="citation">(J. Lecoeur et al. 2011)</span></td>
-</tr>
-<tr class="odd">
-<td align="left">SowingDepth</td>
-<td align="left">Sowing depth</td>
-<td align="left">30</td>
-<td align="left">mm</td>
+<td align="left"><p>WaterCapacity</p></td>
+<td align="left"><p>Water content at wilting point (0-30cm)</p></td>
+<td align="left"><p>9.69</p></td>
+<td align="left"><p>%</p></td>
 <td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left">Germination</td>
-<td align="left">Temperature sum from sowing to germination</td>
-<td align="left">86.2</td>
-<td align="left">°Cd</td>
-<td align="left"><span class="citation">(Villalobos et al. 1996)</span></td>
+<td align="left"><p>WaterCapacity</p></td>
+<td align="left"><p>Water content at field capacity (30 cm-rooting depth)</p></td>
+<td align="left"><p>19.69</p></td>
+<td align="left"><p>%</p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left">ElongationRate</td>
-<td align="left">Reciprocal of hypocotyl elongation rate</td>
-<td align="left">1.19</td>
-<td align="left">°Cd/mm</td>
-<td align="left"><span class="citation">(Villalobos et al. 1996)</span></td>
+<td align="left"><p>WaterCapacity</p></td>
+<td align="left"><p>Water content at wilting point (30 cm-rooting depth)</p></td>
+<td align="left"><p>9.69</p></td>
+<td align="left"><p>%</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>SoilDensity</p></td>
+<td align="left"><p>Soil bulk density (0-30cm)</p></td>
+<td align="left"><p>1.5</p></td>
+<td align="left"><p>g.cm-3</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>SoilDensity</p></td>
+<td align="left"><p>Soil bulk density (30 cm-rooting depth)</p></td>
+<td align="left"><p>1.5</p></td>
+<td align="left"><p>g.cm-3</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>StoneContent</p></td>
+<td align="left"><p>Stone content (0-rooting depth)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>[0 ; 1]</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>MineralizationRate</p></td>
+<td align="left"><p>Potential nitrogen mineralization rate</p></td>
+<td align="left"><p>0.5</p></td>
+<td align="left"><p>kg/ha/day (normalized)</p></td>
+<td align="left"><p><span class="citation">(Val<span>é</span> et al., 2007)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="management" class="section level3">
+<h3>Management</h3>
+<table>
+<col width="16%"></col>
+<col width="28%"></col>
+<col width="10%"></col>
+<col width="30%"></col>
+<col width="14%"></col>
+<thead>
+<tr class="header">
+<th align="left">label</th>
+<th align="left">description</th>
+<th align="left">value</th>
+<th align="left">unit</th>
+<th align="left">reference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p>SowingDate</p></td>
+<td align="left"><p>Sowing date</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>HarvestDate</p></td>
+<td align="left"><p>Harvest date</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>SowingDensity</p></td>
+<td align="left"><p>Plant density</p></td>
+<td align="left"><p>6.8</p></td>
+<td align="left"><p>pnt/m2</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Fertilization</p></td>
+<td align="left"><p>Fertilization (date 1)</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Fertilization</p></td>
+<td align="left"><p>Fertilization (amount 1)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>kg/ha eq. mineral nitrogen</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Fertilization</p></td>
+<td align="left"><p>Fertilization (date 2)</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Fertilization</p></td>
+<td align="left"><p>Fertilization (amount 2)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>kg/ha eq. mineral nitrogen</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (date 1)</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (amount 1)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (date 2)</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (amount 2)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (date 3)</p></td>
+<td align="left"></td>
+<td align="left"><p>dd/mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Irrigation</p></td>
+<td align="left"><p>Irrigation (amount 3)</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>mm</p></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="genetics" class="section level2">
+<h2>Genetics</h2>
+<div id="species" class="section level3">
+<h3>Species</h3>
+</div>
+<div id="cultivar" class="section level3">
+<h3>Cultivar</h3>
+<table>
+<col width="25%"></col>
+<col width="30%"></col>
+<col width="9%"></col>
+<col width="16%"></col>
+<col width="18%"></col>
+<thead>
+<tr class="header">
+<th align="left">label</th>
+<th align="left">description</th>
+<th align="left">value</th>
+<th align="left">unit</th>
+<th align="left">reference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p>ThermalTimeVegetative</p></td>
+<td align="left"><p>Temperature sum to floral initiation</p></td>
+<td align="left"><p>482</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>ThermalTimeFlowering</p></td>
+<td align="left"><p>Temperature sum from emergence to the beginning of flowering</p></td>
+<td align="left"><p>836</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>ThermalTimeSenescence</p></td>
+<td align="left"><p>Temperature sum from emergence to the beginning of grain filling</p></td>
+<td align="left"><p>1083</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>ThermalTimeMaturity</p></td>
+<td align="left"><p>Temperature sum from emergence to seed physiological maturity</p></td>
+<td align="left"><p>1673</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>LeafNumber</p></td>
+<td align="left"><p>Number of leaves at flowering</p></td>
+<td align="left"><p>29</p></td>
+<td align="left"><p>leaf</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>LeafProfile</p></td>
+<td align="left"><p>Rank of the largest leave of leaf profile at flowering</p></td>
+<td align="left"><p>17</p></td>
+<td align="left"><p>leaf</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>LeafSize</p></td>
+<td align="left"><p>Area of the largest leave of leaf profile at flowering</p></td>
+<td align="left"><p>448</p></td>
+<td align="left"><p>cm2</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>ExtinctionCoefficient</p></td>
+<td align="left"><p>Light extinction coefficient during vegetative growth</p></td>
+<td align="left"><p>0.88</p></td>
+<td align="left"><ul>
+<li></li>
+</ul></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>WaterResponseExpansion</p></td>
+<td align="left"><p>Threshold for leaf expansion response to water stress</p></td>
+<td align="left"><p>-4.42</p></td>
+<td align="left"><ul>
+<li></li>
+</ul></td>
+<td align="left"><p><span class="citation">(Casadebaig et al., 2008)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>WaterResponseConductance</p></td>
+<td align="left"><p>Threshold for stomatal conductance response to water stress</p></td>
+<td align="left"><p>-9.3</p></td>
+<td align="left"><ul>
+<li></li>
+</ul></td>
+<td align="left"><p><span class="citation">(Casadebaig et al., 2008)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>PotentialHarvestIndex</p></td>
+<td align="left"><p>Potential harvest index</p></td>
+<td align="left"><p>0.398</p></td>
+<td align="left"><ul>
+<li></li>
+</ul></td>
+<td align="left"><p><span class="citation">(Casadebaig et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>PotentialOilContent</p></td>
+<td align="left"><p>Potential seed oil content</p></td>
+<td align="left"><p>55.4</p></td>
+<td align="left"><p>% (dry matter)</p></td>
+<td align="left"><p><span class="citation">(Casadebaig et al., 2011)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="crop-potential-growth" class="section level1">
+<h1>Crop potential growth</h1>
+<div id="phenology" class="section level2">
+<h2>Phenology</h2>
+<div id="inputs-1" class="section level3">
+<h3>Inputs</h3>
+<table>
+<col width="25%"></col>
+<col width="33%"></col>
+<col width="10%"></col>
+<col width="9%"></col>
+<col width="21%"></col>
+<thead>
+<tr class="header">
+<th align="left">label</th>
+<th align="left">description</th>
+<th align="left">value</th>
+<th align="left">unit</th>
+<th align="left">reference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p>ThermalTimeVegetative</p></td>
+<td align="left"><p>Temperature sum to floral initiation</p></td>
+<td align="left"><p>482</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>ThermalTimeFlowering</p></td>
+<td align="left"><p>Temperature sum from emergence to the beginning of flowering</p></td>
+<td align="left"><p>836</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>ThermalTimeSenescence</p></td>
+<td align="left"><p>Temperature sum from emergence to the beginning of grain filling</p></td>
+<td align="left"><p>1083</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>ThermalTimeMaturity</p></td>
+<td align="left"><p>Temperature sum from emergence to seed physiological maturity</p></td>
+<td align="left"><p>1673</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Lecoeur et al., 2011)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>SowingDepth</p></td>
+<td align="left"><p>Sowing depth</p></td>
+<td align="left"><p>30</p></td>
+<td align="left"><p>mm</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Germination</p></td>
+<td align="left"><p>Temperature sum from sowing to germination</p></td>
+<td align="left"><p>86.2</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Villalobos et al., 1996)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>Phyllotherm_1</p></td>
+<td align="left"><p>Phyllotherm (leaf &lt;= 6)</p></td>
+<td align="left"><p>71.43</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Rey, 2003)</span></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>Phyllotherm_7</p></td>
+<td align="left"><p>Phyllotherm (leaf &gt; 7)</p></td>
+<td align="left"><p>16.34</p></td>
+<td align="left"><p>°Cd</p></td>
+<td align="left"><p><span class="citation">(Rey, 2003)</span></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>ElongationRate</p></td>
+<td align="left"><p>Reciprocal of hypocotyl elongation rate</p></td>
+<td align="left"><p>1.19</p></td>
+<td align="left"><p>°Cd/mm</p></td>
+<td align="left"><p><span class="citation">(Villalobos et al., 1996)</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -215,7 +532,7 @@
 <div id="emergence" class="section level3">
 <h3>Emergence</h3>
 <p><span class="math">\(Emergence = Germination + ElongationRate \cdot SowingDepth\)</span></p>
-<p>with : <span class="math">\(Germination = 86\)</span>, Thermal time for germination (°C.d) <span class="citation">(Casadebaig et al. 2011)</span> ; <span class="math">\(ElongationRate = 1.19\)</span>, Hypocotyl elongation rate (°Cd/mm) <span class="citation">(Villalobos et al. 1996)</span> ; <span class="math">\(SowingDepth = 30\)</span>, Sowing depth (mm).</p>
+<p>with : <span class="math">\(Germination = 86\)</span>, Thermal time for germination (°C.d) <span class="citation">(Casadebaig et al., 2011)</span> ; <span class="math">\(ElongationRate = 1.19\)</span>, Hypocotyl elongation rate (°Cd/mm) <span class="citation">(Villalobos et al., 1996)</span> ; <span class="math">\(SowingDepth = 30\)</span>, Sowing depth (mm).</p>
 </div>
 <div id="thermaltime" class="section level3">
 <h3>ThermalTime</h3>
@@ -228,7 +545,7 @@
     \end{array} 
     \right.
 \]</span></p>
-<p>with : <span class="math">\(T_m\)</span>, Daily mean air temperature (°C); <span class="math">\(T_b = 4.8\)</span>, Basal temperature (°C) see <span class="citation">(Granier and Tardieu 1998)</span>; <span class="math">\(ThermalStressPhenology\)</span> Water stress effect on plant heating</p>
+<p>with : <span class="math">\(T_m\)</span>, Daily mean air temperature (°C); <span class="math">\(T_b = 4.8\)</span>, Basal temperature (°C) see <span class="citation">(Granier and Tardieu, 1998)</span>; <span class="math">\(ThermalStressPhenology\)</span> Water stress effect on plant heating</p>
 </div>
 <div id="phenostages" class="section level3">
 <h3>PhenoStages</h3>
@@ -236,6 +553,17 @@
 </div>
 <div id="leafappearance" class="section level3">
 <h3>LeafAppearance</h3>
+<p><img src="data:image/png;base64,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" alt="plot of chunk LeafAppearance" /></p>
+<p><span class="math">\[
+  LeafInitiation_i = \left\{ 
+    \begin{array}{ll}
+    i \cdot Phyllotherm_1 &amp; \textrm{if $i \leq 6$} \\  
+    (i-5) \cdot Phyllotherm_7 + a &amp; \textrm{if $i \leq LeafNumber$}
+    \end{array} \right.
+\]</span></p>
+<p>with <span class="math">\(Phyllotherm_1=76.43\)</span> (°C.d), <span class="math">\(Phyllotherm_7=16.34\)</span> (°C.d) and <span class="math">\(a=400\)</span> (°C.d)</p>
+<p><span class="math">\[LeafExpansion_i=LeafInitiation_i + 1/a\]</span></p>
+<p>with <span class="math">\(a=0.01379\)</span>, ratio between initiation and half-expansion time.</p>
 </div>
 <div id="leaflongevity" class="section level3">
 <h3>LeafLongevity</h3>
@@ -265,7 +593,7 @@
 <h3>RUE</h3>
 </div>
 <div id="cropbiomass-monteith1977" class="section level3">
-<h3>CropBiomass <span class="citation">(Monteith 1977)</span></h3>
+<h3>CropBiomass <span class="citation">(Monteith, 1977)</span></h3>
 <p><span class="math">\[dCropBiomass = 0.48 \cdot Radiation \cdot RIE \cdot RUE \cdot dt\]</span></p>
 </div>
 </div>
@@ -278,7 +606,7 @@
 <div id="thermal-stress" class="section level2">
 <h2>Thermal stress</h2>
 <div id="thermalstressrue-villalobos1996" class="section level3">
-<h3>ThermalStressRUE <span class="citation">(Villalobos et al. 1996)</span></h3>
+<h3>ThermalStressRUE <span class="citation">(Villalobos et al., 1996)</span></h3>
 <p><img src="data:image/png;base64,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" alt="plot of chunk ThermalStressRUE" /></p>
 <p><span class="math">\[
 ThermalStressRUE = \left\{ 
@@ -293,7 +621,7 @@ ThermalStressRUE = \left\{
 <p>with <span class="math">\(T_b = 4.8\)</span>, base temperature (°C); <span class="math">\(T_{ol} = 20\)</span>, optimal lower temperature (°C); <span class="math">\(T_{ou} = 28\)</span>, optimal upper temperature (°C); <span class="math">\(T_c = 37\)</span>, critical temperature (°C)</p>
 </div>
 <div id="thermalstressmineralization-vale2007" class="section level3">
-<h3>ThermalStressMineralization <span class="citation">(Val<span>é</span>, Mary, and Justes 2007)</span></h3>
+<h3>ThermalStressMineralization <span class="citation">(Val<span>é</span> et al., 2007)</span></h3>
 <p><img src="data:image/png;base64,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" alt="plot of chunk ThermalStressMineralization" /></p>
 <p><span class="math">\[ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \cdot exp^{(-0.119 \cdot (T_m - T_b))}}\]</span></p>
 <p>with <span class="math">\(T_b = 15\)</span>, base temperature (°C); <span class="math">\(T_c = 36\)</span>, critical temperature (°C)</p>
@@ -325,19 +653,20 @@ ThermalStressRUE = \left\{
 <div id="radiation-stress" class="section level2">
 <h2>Radiation stress</h2>
 <div id="radiationstressexpansion-rey2003" class="section level3">
-<h3>RadiationStressExpansion <span class="citation">(Rey 2003)</span></h3>
+<h3>RadiationStressExpansion <span class="citation">(Rey, 2003)</span></h3>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYAAAAFQCAMAAACBJ1miAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAbtUlEQVR4nO2deWDTZP/An3ZHxy4YEwcMGEyuIYcwAZ0HKp6TS1E8UMYPXhGGvggTUbnkRVSYDFCBV0HHGPepCCIgIgJyvjgQHTJgAgJy7Cywrl37/JK0aZNeT542WRLyfP5ok6ffffMknzVtmiffAEiQFSB3B7QOESAzRIDMEAEyQwTIDBEgM0SAzBABMkMEyAwRIDNEgMwQATJDBMgMESAzRIDMEAEyQwTIDBEgM0EIOL4gj8NXeTgsWoQVLmXyRbl4ybGic3nhn+wVVcDRI9y5cqy/tdRgheMlN1uxoq/jRNvMNpzwaxbuXPaPnhFEABEgAC0L2HlnndZ59skXDRQXna8QAWiCF1AR/0nl5shdzHSXvMLCQldGIgBN8AK2N6UW+PR7zLLrnuG9RASgCV5A5TkqS7Ml9OQVMDC5xxZ6yvo5zUIiAIkoH8IFnf/PzDw3X1w013CUmjIDmif2VXC4XIFDWTlWuJTJS0vwkmNFX+WFzwhEwLVRTRZwpKe/75wkuyA0wb8Dah56vtIxeXAD9dB/uvMlIgBN8AI2JhQVFxeXw7V/wP3hX1duiD3ufIkI8MP10rMF27etWhe0gMnM7v5DmDgLwq9aRHTe4nqJCOAk+eePXd/kzhw/fNgzD6V2bBIJHDQhR8Lo6EAFVF889M1nEzKfe6RLUox9c0c17ZTac8CwzAk5ny9etWnb/qKSC0QAOhpTgOnUlvkTMx5pZ9/okW0fePpf42YsXLfzt/NVnuHktyAB0QIFWP/6Yf74QWkNqa2ub9S17+sffrl+n7dtzoMIEBCNFGD5feW0lzoZqA3fuNvz7/530wmz4OREgIBofwIqfvg4ozO16aO7DM7++ncT+TlaEOIIqPzxg2fb6EF4p5dnbDnvbCUCBBC8gH9WjmivBxFpbyw54ra7IQIEEJyAS6sy2wGQOPDTA9529USAAAIXYP7xrQ460OzVJSd9RRMBAghQgHHlgFgQ89QX5/xFEwECCERAyaI+ESAl64dqRDQRIABsATdW9gnX3ZV9SkA0ESAAPAFVmwbHgs45fnc8LogAAeAIODe5CWj29jHB8USAAIQL2D0gLOKF73HeMESAAAQKMOV2ASmzSxR+RswP6hZQMvVWffpWm+JPSfpBzQKujo+JGH7CHk0EoBFZALX5I0ezYyzVK+DIYQuHUgsOZqxocZNfficm4rWzztkqo5jJ3ag0cefEFvBrDYeyGhzMFqxwEZObPo03jDzDbTDiJceKrqzmzpFdEIRbb9dn8Ie4qncXpEIBf/YC9x92jyYC0Igj4Prb4UkrPaOJADSiCNicZJhww0s0EYBGBAFlGeC+417aiQAhBC/g+yZRn3l/YyhOQElmt1QGVHIVCTAO1/Uo8hWtNAH9DYPHMaCSq0fAgZaGHJ/bTXECYj4TmFwtAmzZYR1/9ROtNAFtvxOYXCUCrvbSjTb5i1aagBn9BG4cdQj4pVnd9f6jlSYgPy1l7IxsClRyVQjIj0z1OcbHEa00AUksqOQqEGD5NxiCGkGuOAGCUb6Akp5h89HRChRgKvZyyO6B4gWcaHnLDgHRihOwrpMOgPb+P7lolC5gV3wrXwdfvGilCVgP0vO25qeDDajkChewNuKeq4KilSbgzoH0ImzPdUMlV7aAT0P6CdmPKlBA1ArmaXk0KrmSBdjeAaMELkJxAtpMYJ7Gt7PPcgo2nbw/Jq3QFahgAdZh4H10nCNaaQKmhOVctF7MCZ3KzHEKNtlS3r00Jdl1kKNcAeYM3SfCo5UmwJIZAnQgdKR9E3EKNu2LrYY1DX52BipWwPUBIYuFRytOAITnNi7YxI7W5hRsyr+beuj5Jd2LUzQ/KVRAdd8wzzO/vlGgADfYgk1zHqUenqbL1TgKNu0t43CpDIeSUqxwnOSX0sPysbpyBasrJVjRl3nrKaBgU8Z0mM3icOgs2JSfRj08vJB6sG2jWafId4DlqbDVCihX4wD7HQB6uv0YxynYtDfOAq2NdzhjFfkZYBsUukYJ9YIcYAswuh+8cAo22VJmmucp/VvQ6/p8RRRschDYZwC1iBObrtinuQWbiu6tp/TjgHFgvjIqZjkIRMDZR4bALSEg7hAquQIFfAymQdUL6Jf4Nezx4Kkej6OSK0/ASv0b9JPKBcTlwEr9OvjfeFRyxQnYbniO2fQqF1D3c7g+pBQuiEIlV5qAX2MftF/nrnIBj3Tf0/UhWPKg2kbGFTfq5AhTuYCCBBC5G94W/i0qubIEVLRvesExqXIB8PrByxCuQZ/NU5SAmieinaPf1C5AKIoSMFr/jXNa5QJUOTp6PpjtmlG5ADWOjt5jGMKZU7kAFY6OPhnfg7uiKhegvtHR5rsa/s2bV7cA9Y2Ozgz7mTevcgGqGx2dC9zOwKtcgNpGRx+OeNmtReUCBKMMAVeaproPQL85BBSoYxdk6xt7wr1N5QKsS8ZmUaQ2RiVXhICPdZ6/WalcwCTQwZDQNSpui2cwHyUI+DVipGejygUkjYBLe8HLrTajkiugXlB5m87Xg02uuHpBYcvghVttcPY9SAGHzRxKzRLiK3n/un8GnftGZdApfFNRxZ0TJqDhZAgTjsA8FZwRywd53ppVvgsaFrcApg8527sVKrnsAo5HZXhtV7mAiqH9YEEkCFmGSi63AEtaUpnXaJULYCjfehqZXG4BU0J+9tZ8Ewgo3b1ip4Dr22QWsFM/yUe0ygVY364DAIh4C7kW8gq43uYOXzdbULmAqWDM0dJjbzKD/Pwir4BRzK2lvaJyAa3sx5aZrVHJZRWwWTfTZ7TKBcQz1yPBJXGo5HIKqGx+l+8MKhcwYACziJeeQiWXU0BGjJ9vaSoX8HvLx5f/vKZ/9MaDFP6SyyjgO90sP9EqFwC4+Esun4DyxB7+trHKBRRz8ZdcPgFDov/yF61yAQWO5+2o5LIJ+Ek33W+0ygWETqRrDF56GXm2WC4BN1rdZfEVyKByAasbt91jXRCXvAmVXC4BoyM8zgLzUbkAWDEqtK1hErrYjkwCDoX6+g2IRe0Cqt4LvyVhFXo58giwdO7grwwrjcoFbGvVYKn5Q8NjyCs05BEwLazAd5wdlQsAQ0qox+P3GdiGqexBz4sGiovOQFkEnI78NzJa5QJ22J+sc+3PB9+JZAV0ySssLHRllEVAemKlnzg7KhfgxrxXkxwCbHX5tx+SQ8BSIGDwvJoFjP8fhNWb6ToR33Ri2/o6BFwBA5N7cIZrySCgIvFJAdFqFgBy6Q29DdKDvtk2VkBB88VFc5nTIJZkmoH7jRyuGHGoqMAKZ5MPjzwmILq8Eid3eSlOdCVe8hLeegoo2ORPAEM6XY2whrmGbHoQI+Oqq9Exnsl366cLiTZhjV7DGxlnMWENu8MeGedPwEG6lm5/188wtb4Lqrmzna/TwDxuyl3Q2j/g/vCvKzfEum4FVesC5up2Coq+KQXQBZu+ahHRWcYP4fMxQ1Bxdm42Ab6obQEZ9f4RFq1qAVHx8XEgJj4+PkppAnYJroarZgGjOKCS164Ac7vuQrermgXgULsC5uh+ERqtegHcqol+qFUBV+MFfgJD1QtQZtXEobeUCI5WuQBFVk38X8gc4dEqF6DEqollae39n4fnoXIBSqya+IluN0a0ygUosGri1foDcMJVLkCBVROzIk7hhKtcgPKqJh4NfRsrudoFKO44oGeSwB+BHKhcgOKOA74D+bi3scKKVpoApR0HmG7rgX0fMaxopQlQ2nFATsiv2hKgsOOA0vjBuMlVLkBhxwFvRF/QmABlHQf8FjIdO7nKBQg/DiiwcSi34WCpERjYO+k6dnKz0OQM1ddwoq1mK0640cydE3xCxlxcJcBzbRRs2gzypUtuR3EFm2DebXpQOGgaUkEtvAOqU+4PILnK3wFLwMvfhhUuMSB/gK+Fz4C5+sMBJFf5Z8Dt1Nc+QyEcm4JKLr2AioQXA0mucgF1VjICVtZBJZdewJiovwNJrnIBd7zOCJjYEZVccgF/hk8IKLnKBSwAY38L/2lhpPyfAc82YJNqSoDt47oAgMhJ6G9BEgvYo5sXWHKVCygqqdy3eo/3eoQ8JBZg7Zzq3JCaElDvNYHJJRawEnwfYHKVC5jU4pqw5NIKMCU/EWhylQtY1jNpzEfy38LkwzDXpSDaEqCMW5hcjRsWcHKVCyizbxszcqUlFTAqhnsiXlMCgP2H6B9iUMmlFHAs9KPAk6tZwPK+fUHPvjStWqKSSymgTxLvzjzaEbB24EDQZyDNIOQdNCQUsAss4s1rRwBF97MCk0snwHpHV/5qakqAYKQTsNj9ciQNCTCtoY4/zz+T+AD6mmjJBFxPdK/aqx0BV7uAN6EtLXroHaGHUcklEzAt/KRbi3YEvFX/EIQHwBJY3el5ts1ZMevk/TFpha5YqQRcjPYoiqUdAW0nUg9TEqqpf0PH11BXxSxbyruXpiS7Vk4qAa/HXnJv0o4A+nwkvG8w9bAgwt7iqpi1L7Ya1jRw3bdFIgGFYR94tGlHQOPPISwJzaem/tOUbWPL1eTfTT30/JJ6qHmWZlwQ44KqTD5fejD5mkcbXvIbvpN7i8YaF1R9oxonHHtcUO9uJjhdd576Kt4h3V3AnEeph6fpkYKWVJp/HbzB4eoNHIzXfL2yHuR5NmImv44VXY4TfR0veRlvPQVUzDoQ2vqZ8N7QurU3cH4Pdb4D0qiHhxc6YyXZBdV0SPWyA9HOLgju7ZPy8mVYBeKWO5tYAXvjLNDaeIezXRIB83R7vbRqSIAdaxFnHdiKWbaUmeZ5En8LKm/wvNdmrOQ3gQAezopZRffWk/o4YJLB6wWpmhJQktmN+YyV4wKNv6PGem3XlID+hsFMVcpxqOQSCHipoffCxJoSEPOZwOTiCyjQ+6hKpikBbQVUZ2YQX8BDrc3ewzUlYEY/gddviS5gtc/K3JoSkJ+WMnaGHOOCqlr4vDZcUwJkGxeUE3LEszGQ5CoXIBiRBVyMGekzXGsCTMXoeyiJLmBYfd9l+bQlYF0nHQDt1yOTiyvg91A/t8fTlID1ID1va3462IBKLq6AR5P93J1KUwLuHEgvwvZcN1RyUQWsAd/4CdeUgKgVzNPyaFRyMQWYWvbwF64pAW3slyaOb4dKLqaAj/T/8xeuKQFTwnIuWi/mhE5FJRdRwJnIEX7DNSXAkhkCdCB0JPIHCREFDK7rMRKFh6YEQHhu44JN59DJxROwXz/Tf7jGBAhENAHWzh0QbzftCMiYDrNZUMlFE/AlQN0+XTsCQE/hP8aJVbCppFE6KkQ7BZuMN4RfpHekwMqhzIqDxeKafiOyGBWOl9xcgxNtuoYTXYOX3FjNnVPmRXpHQycjw7WzC5LhIr3HmqKvzNeOgNq/SG8VWIcO144AWNsX6V1r8oTfwECSq1yAg4La+Rr6XugxAeGaEmBdMjaLIrUxKrkYAk5GjBESrikBk0AHQ0LXqLgtnsF8xBDwcHNBq68pAUkj4NJe8HKr2vgQXg9WCArXlICwZfDCrTY4+x5U8uAFXE/qKSxcUwIaToYw4QjMq4X7B7wZ4X5BsA80JWBY3AKYPuRs71ao5EELKAx/R2C4pgRUDO0HCyJByDJU8mAF2HoI+wTGTq5yAQzlW08jkwcrYC7YKjRcewKEEKSAS3H9BYdrR0AtnpB5OfZvweHaEYBzQiY4ARvBF8LDtSPAKGRUroOgBFxrczfGZtKOAByCEvB2uJAf4QJLrmYB8RxQyYMRsDdkGk64dgTMnz9/Tt2mWTljk1pssrdwqjS9aKC46IwNQoCly+3VOPHaEUCRmUaX7DTdYx8syK3S1CWvsLDQlTEIAdP1O3DCtSUgMZd5yrWfD+BUabLVPcMLDFzA74bRePeU15SARu8zT46CTa4qTfAKGJjcgzlLYP2cZmGgAizdksuJAAeeAoZGrrFC6+o6rzJzripNsKD54qK5hqPUlBnQPLGvgsPlCsGMD9lWVi48HC85BV7y0hK85FjRV3nhAgo2UVQ+AGLaxICH7YNF3Ks0pb/vnAx0F/RHxEi8W5pr7B0AbTuys3J2O2Y4VZoO0leN9XddShegAEv3FkYiwAlqVARbpWntH3B/+NeVG2Jd97UIUMDkkF/w7imPk5xB5QLcRkU4qjTRBZu+ahHRmXOqPjABR8LfgESAi9oeFWHqmEL/3EQEsNT2qIhREcxvQEQASy2Pitipt3+LIgJYandUREXzVHtJJiKApXZHRWREOb5EEQEstToqYiVY4JgiAlhqc1TE8agX2UkigKUWz4iZuzdxVgQiAljcBVxYvsIIofH0oQ0PoJLjChgXssM5TQSwuAnYVxeAVuf76gEAelRyTAFb9JzqE0QAi5uAhxM2Hniwcf2PN35/pMozmA+egL/iHuVsFyKAxU1A/cn0PXzmC0qOJeBGx+alnFkigMV9YNZCCP8ROGYTS8Do0J+5s0QAi7uAXPrU4zZByXEErNbxS/IRASy1I+B4zFP8fhMBLLUioLJda7eXiQAWdwGhBkM4/UCBSi5YgLVXvRNuTUQAi5uA8RxQyQULeFu3xr2JCGCphZ8ivgDve7QRASxBCDhy2MKh1OKDvXX6mT0aPVv84jO5V/CSVxklTF5p4s6JLeDXGg5lNd4pbtSp3LPVbPER7h1fyb2Dl9xkxEuOFV1ZzZ2TYxdkvKORt+orZBfEIrGAmiejDnhrJwJYJBYwIsR7TW4igEVaAR8AH/fEIgJYJBWQq3vTx98SASxSCvgu7Flfm4IIYJFQwP6oR3zeFIMIYJFOwNH4u4w+/5YIYJFMwJ8JHUqhT4gAFqkEnEhsecHP3xIBLBIJOJl4m9/yo0QAizQCTjX1v/2JACeSCDjZLBlRfpcIYJFCwNFGLc+4B7tBBLBIIGB//bbnUX9LBLCIL2B7dGf/t0SiIQJYRBewJuI+AZuLCGARW8Cn+n5Cim4RASziCrCOAcMFbVoigAUpgFOwiTNJ4ynA2E+PrLVohwhgQQngFGzi1m6i8RBwplOkgNuRMBABLCgBnIJNnEkGdwF7EhruF9oxIoAFJYBTsMk1aTtF8xNPQNnHhjTk138nRAALSgCnYJNr0lGwaW8Zh1fA0EtlgikpFR5LgZEZO3nJFbzkWNGXeV0RVrCJD6dgk2vSto1mHe8dsHURIhMP8g5gQQngFGziTDKIek95/2hYAKdgEzvJQgSgEeE4gFOwyTHJQgSgkXtglk+IABYigAgQABHgDSIADREgIJoIQEMEeIMIQCOtgG8Ocdh1CIcDB7DC8ZLvP4gV/QtO9EG85Ht46/mByAImc8hqN3yyZAxuN0G65L3SpMs9+e7evFkvP9cHIYBHEUBW2g2cReCadMlf7SRdbthhBCqCCCAC0BABaIgArxABaG4SAYQAIQJkhgiQGSJAZkQS4DZqUVzc7mEpJlNnQek6zyRHdV4cAe6jFsXF7R6W4nHwnchZknXenhzZeXEEuI9aFBX3e1iKx7xXk2ZJ1nl7cmTnxRHAGcAoPq57WIpP31kSdp5Ojuy8OAI4AxjFx3UPS/Ght5FknaeTIzsv0jvA7Y6T4pPuWXlRDJh3gFSdp5Mz+Ou8OALcRy2Kivs9LMWE3kaSdZ5Ojuy8WN+C+KMWRcX9HpZi0neWhJ2nkyM7L9JxgNuoRXFxu4elmDB7Cak6zyRHdZ4cCcsMESAzRIDMEAEyQwTIjKQC5gPOz4Brlwv/Q8/Y+fH25/HM9YG3POo5woaKMIIMfhJ+g1Ae49zJ9yEwzp7duSrvzoOpYA4zeTUE/MZM9O8E/0gL7Its7QkY2Ff4H3rGOgWE5ubmLpyYUM+jIh0VcaMn94iHSsJvEApHwAV9dAtmLKJzVU4kmygB9zLTXwKXAPhcbgCLUqEA+51VNgKf75GAFsiDI2B26HzAvNmcqzJ8IoSpHXXMJdHpHTkCfmyDNWqURXIBSfnZKbHPlsDu1J6jzLawS2SHpdQrScsmxxVZJraOvp9aPba1GPw+IL7NNKtbbOUriYkj5/AFHAArIKwY3ji8xXtWTkRStquVSUI31ExNie76Nb1QR1donMuC/D7Rr3EEdO9zPXI0uyo0xuhjlIAhzT6lpsvD/sMRUNPIy8hPNNILuKfPpk/DM+HZPj2LamaC11YMAouplX24eWbJ0OgZK+6LuwjZ1mLQ8tn8TPAOP9b2QOTU3LvrsgLCr1y58s/Bh1oZIRwaN2npCLCUE0Fvb7aVSUI3jAwdv+IFsA46u0LjXBbk94l+zSXgFFgFn0u0QpeAbxOo//PUoWN6UNNLbtnBEQBfGB3INpJeQNsaCDO6MXsEY92xVOtLt1Erm3QNFumXUf9Fdb50thaDx6m1GxNZyovdAdZAWNWU9yEMGtO7gH707aE7jOVE0NubbWV2QVTDudAc6t88ndpEzq5A6FoWv08MLgHTYm/AtWAXdAnIehLSAvbqqNmnXtnFFTCzcyDbSHoB9PqNS2W2x36mv9/qzTBpDPUPpKum5v4udbYWA/ou3kfBbl5sdgz9H5jl/BDetm3b1rn1Hfv3C0sNWdAVkZTtamUFbGI2XZ7O5OoKpAU4lsXvE4NLQPsXjcbLkSOhS8CTr0NagLXJPHitzvc8AevqBPIhIL2AGdApYA0INxgMYaAYJn0E4YeObepsLQb0ecFSavfOjc1qQwfl8D8DsvXULuhIesMGTyZkQVcELYBtZQUs0NF6toK/XF2BtADHsvh9YnAK+M3+dkuocQnoOgnSAuCoB+HqetWUgPIy6BCwE1QGsI2kF0D/UzoE7AY/FdJUMa25IfS56tN/O1uL6V0JPAZ28mJzmP/vse7fgk7DisghBTbYNQu6Iqi0zlZWwEZm0+WDG66uQFqAY1n8PjE4BbwbsWPXrl0fge0uAd0cAnbpLz2fASkBT95BNTxOP6hAQGkd+rzTkkE2pvUoWE3tuhtMd7YWg/7UxJuGq7zYXfSmMiXxBXwPDlH/1GchvBKVBV0RVFpnq/MzIIT+zT+9PXQT4FgWv08MrABb8tP0U2X4Ky4Bvey7IGhtNDv6W1rAK/VMsKYZHajUXRC71oNabzdPjJy0alzE+45tMSAme3V67BnIthaD6EFLRoK3+LG2npFT8+5twRdwBGyAp0P6LJ7Tul5qgSuCSutsZZLQy8kMm+j4FsQTwC6L3yeax1rm0hzax3xOUBs93uwU8Kb9QxjC1+rFmGgBW8DTyzPAeqjcD2F2rTffFl1um92+TtvZNsfKmrKSo3vQxwGO1mKwsV9cy6k1brHGV5o0GrGJL6BK/wCES1tGpX23pVG2K4JO62ylk9ANlilto+zHATwB7LL4faJ5zL7rHzcqvIKZ/wpsdn0NvdVmF/ATeAHSAmBeSp0UZkiFAr+GYlIMDip+Wcbo33y8osQDMUzUIAAOn+DjhR0K/CkCE1UI+DPZx41xns8NKB8RgMu787w2Fyrx52gCGiJAZogAmSECZIYIkBkiQGaIAJkhAmSGCJAZIkBm/h+CR8uQYxpxOAAAAABJRU5ErkJggg==" alt="plot of chunk RadiationStressExpansion" /></p>
 <p><span class="math">\[RadiationStressExpansion = s \cdot a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}\]</span></p>
 <p>with <span class="math">\(s=2.5\)</span>, scaling parameter for density effect; <span class="math">\(a=-0.14\)</span>; <span class="math">\(b=1.13\)</span>; <span class="math">\(c=4.13\)</span>; <span class="math">\(d=2.09\)</span></p>
 <div class="references">
 <h1>References</h1>
-<p>Casadebaig, Pierre, Lydie Guilioni, Jeremie Lecoeur, Ang<span>é</span>lique Christophe, Luc Champolivier, and Philippe Debaeke. 2011. “SUNFLO, a Model to Simulate Genotype-Specific Performance of the Sunflower Crop in Contrasting Environments.” <em>Agricultural and Forest Meteorology</em> 151: 163–178. doi:<a href="http://dx.doi.org/10.1016/j.agrformet.2010.09.012">10.1016/j.agrformet.2010.09.012</a>.</p>
-<p>Granier, C., and F. Tardieu. 1998. “Is Thermal Time Adequate for Expressing the Effects of Temperature on Sunflower Leaf Development?” <em>Plant, Cell &amp; Environment</em> 21 (7): 695–703.</p>
-<p>Lecoeur, Jérémie, Richard Poir<span>é</span>-Lassus, Ang<span>é</span>lique Christophe, Benoit Pallas, Pierre Casadebaig, Philippe Debaeke, Felicity Vear, and Lydie Guilioni. 2011. “Quantifying Physiological Determinants of Genetic Variation for Yield Potential in Sunflower. SUNFLO: a Model-Based Analysis.” <em>Functional Plant Biology</em> 38 (3): 246–259. doi:<a href="http://dx.doi.org/10.1071/fp09189">10.1071/fp09189</a>.</p>
-<p>Monteith, J. L. 1977. “Climate and the Efficiency of Crop Production in Britain.” <em>Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences</em> 281 (November): 277–294.</p>
-<p>Rey, Hervé. 2003. “Utilisation de La Modélisation 3D Pour L’analyse Et La Simulation Du Développement Et de La Croissance Végétative d’une Plante de Tournesol En Conditions Environnementales Fluctuantes (Température Et Rayonnement).” PhD thesis, Ecole Nationale Supérieure Agronomique de Montpellier, spécialité sciences agronomiques, CIRAD-AMAP / INRA - LEPSE.</p>
-<p>Val<span>é</span>, M., B. Mary, and E. Justes. 2007. “Irrigation Practices May Affect Denitrification More Than Nitrogen Mineralization in Warm Climatic Conditions.” <em>Biology and Fertility of Soils</em> 43 (6): 641–651.</p>
-<p>Villalobos, F.J., A.J. Hall, J.T. Ritchie, and F. Orgaz. 1996. “OILCROP-SUN: a Development, Growth and Yield Model of the Sunflower Crop.” <em>Agronomy Journal</em> 88: 403–415.</p>
+<p>Casadebaig, P., Debaeke, P., Lecoeur, J., 2008. Thresholds for leaf expansion and transpiration response to soil water deficit in a range of sunflower genotypes. European Journal of Agronomy 28, 646–654.</p>
+<p>Casadebaig, P., Guilioni, L., Lecoeur, J., Christophe, A., Champolivier, L., Debaeke, P., 2011. SUNFLO, a model to simulate genotype-specific performance of the sunflower crop in contrasting environments. Agricultural and Forest Meteorology 151, 163–178.</p>
+<p>Granier, C., Tardieu, F., 1998. Is thermal time adequate for expressing the effects of temperature on sunflower leaf development? Plant, Cell &amp; Environment 21, 695–703.</p>
+<p>Lecoeur, J., Poir<span>é</span>-Lassus, R., Christophe, A., Pallas, B., Casadebaig, P., Debaeke, P., Vear, F., Guilioni, L., 2011. Quantifying physiological determinants of genetic variation for yield potential in sunflower. SUNFLO: a model-based analysis. Functional Plant Biology 38, 246–259.</p>
+<p>Monteith, J.L., 1977. Climate and the Efficiency of Crop Production in Britain. Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences 281, 277–294.</p>
+<p>Rey, H., 2003. Utilisation de la modélisation 3D pour l’analyse et la simulation du développement et de la croissance végétative d’une plante de tournesol en conditions environnementales fluctuantes (température et rayonnement). (PhD thesis). Ecole Nationale Supérieure Agronomique de Montpellier, spécialité sciences agronomiques, CIRAD-AMAP / INRA - LEPSE.</p>
+<p>Val<span>é</span>, M., Mary, B., Justes, E., 2007. Irrigation practices may affect denitrification more than nitrogen mineralization in warm climatic conditions. Biology and Fertility of Soils 43, 641–651.</p>
+<p>Villalobos, F., Hall, A., Ritchie, J., Orgaz, F., 1996. OILCROP-SUN: a development, growth and yield model of the sunflower crop. Agronomy Journal 88, 403–415.</p>
 </div>
 </div>
 </div>
