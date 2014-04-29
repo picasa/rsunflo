@@ -30,7 +30,7 @@ setwd("/home/casadebaig/Documents/Travail/2011_SUNFLO/dev/rsunflo/inst/doc/")
 # data
 db <- loadWorkbook(file="./files/parameterization.xlsx") 
 sunflo <- list(
-  inputs = readWorksheet(db, sheet="inputs"),
+  climate = readWorksheet(db, sheet="climate"),
   parameters = readWorksheet(db, sheet="parameters"),
   outputs = readWorksheet(db, sheet="outputs")
 )
@@ -44,7 +44,7 @@ fig_dpi = 100
 # Model structure
 ```{r structure, echo=FALSE, eval=FALSE}
 # Build model graph from R
-graph_ext <- "pdf"
+graph_ext <- "png"
 graph_nodes <- "-Nlabel= -Nshape=circle -Gdpi=150 -Earrowsize=2 -Epenwidth=4 -Estyle=dotted"
 
 # Simple graph : replace nodes names by points
@@ -73,7 +73,7 @@ system(call)
 ### Climate
 ```{r InputsClimate, echo=FALSE, results='asis'}
 # data
-s <- select(sunflo$inputs, label=label.doc, description=label.en, unit)
+s <- select(sunflo$climate, label=label.doc, description=label.en, unit)
 # table
 pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 ```
@@ -114,6 +114,7 @@ pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 
 
 # Crop potential growth
+
 ## Phenology
 ### Inputs
 ```{r InputsPhenology, echo=FALSE, results='asis'}
@@ -188,10 +189,23 @@ print(p)
 ```
 
 
-### LeafAppearance
-```{r LeafAppearance, echo=FALSE, fig.width=4, fig.height=4}
+
+## LeafArea
+### Inputs
+```{r InputsLeafArea, echo=FALSE, results='asis'}
+# data
+s <- sunflo$parameters %.% 
+  filter(module=="LeafArea") %.%
+  select(label=label.doc, description=label.en, value, unit, reference)
+
+# table
+pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+```
+
+### LeafInitiationTime, LeafExpansionTime, LeafSenescenceTime
+```{r LeafExpansionTime, echo=FALSE, fig.width=4, fig.height=4}
 # Function
-LeafInitiation <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=420){
+LeafInitiationTime <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=420){
   ifelse(
     i <= 6, i*phy_1,
       ifelse(
@@ -201,27 +215,36 @@ LeafInitiation <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=420){
   )
 }
 
+LeafExpansionDuration <- function(i, TLN=30, LLH=17, a=153, b=851.3, c=0.78){
+  a + b * exp(-((i - LLH)^2) / ((c * TLN)^2))
+}
+
 # Data
 s <- 1:30
 d <- data.frame(
   x = s,
-  LeafInitiation = LeafInitiation(s),
-  LeafExpansion = LeafInitiation(s) + 1/0.01379
+  Initiation = LeafInitiationTime(s)
+)
+
+d <- mutate(
+  d,
+  Expansion = Initiation + 1/0.01379,
+  Senescence = Expansion + LeafExpansionDuration(s)
 )
 
 d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
 
 # Graph
-p <- ggplot(d, aes(x,y, color=Process)) + geom_line() +
-  theme_bw() + labs(x="Node", y="LeafAppearance") +
+p <- ggplot(d, aes(x=y, y=x, color=Process)) + geom_path() +
+  theme_bw() + labs(x="ThermalTime", y="Node") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
 print(p)
 ```
 
 $$
-  LeafInitiation_i = \left\{ 
-	\begin{array}{ll}
+  LeafInitiationTime_i = \left\{ 
+  \begin{array}{ll}
 	i \cdot Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
 	(i-5) \cdot Phyllotherm_7 + a & \textrm{if $i \leq LeafNumber$}
 	\end{array} \right.
@@ -229,13 +252,30 @@ $$
 
 with $Phyllotherm_1=76.43$ (°C.d), $Phyllotherm_7=16.34$ (°C.d) and $a=400$ (°C.d)
 
-$$LeafExpansion_i=LeafInitiation_i + 1/a$$
+$$LeafExpansionTime_i=LeafInitiation_i + 1/a$$
 
 with $a=0.01379$, ratio between initiation and half-expansion time.
 
-### LeafLongevity
+```{r LeafSenescenceTime, echo=FALSE, fig.width=4, fig.height=3.5}
+# Data
+s <- 1:30
+d <- data.frame(
+  x = s,
+  y = LeafExpansionDuration(s)
+)
 
-## Leaf Area
+# Graph
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Node", y="LeafExpansionDuration")
+print(p)
+```
+
+$$LeafExpansionDuration_i = a + b \cdot exp^{\frac{-(i-PotentialLeafProfile)^2}{(c \cdot PotentialLeafNumber)^2}}$$
+
+with $a=153$ (°C.d), $b=851.3$ (°C.d), $c=0.78$
+
+$$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
+
+
 ### LeafProfile
 ### LeafGrowthRate, LeafSenescenceRate, LeafArea
 

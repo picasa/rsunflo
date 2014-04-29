@@ -22,7 +22,6 @@ digraph G {
     bgcolor=white
     node [shape=circle, label="", width=0.4]
     edge [arrowsize=2, penwidth=4, style="dotted", color=gray]
-
     
     // # Stupid alignment control ----
     InitialConditions -> ThermalTime [style="invis"] // Vertical alignment
@@ -32,9 +31,9 @@ digraph G {
     CultivarParameters [style=filled, fillcolor=black]
     ThermalTimeFlowering [style=filled, fillcolor=black]
     ThermalTimeMaturity [style=filled, fillcolor=black]
-    LeafNumber [style=filled, fillcolor=black]
-    LeafSize [style=filled, fillcolor=black]
-    LeafProfile [style=filled, fillcolor=black]
+    PotentialLeafNumber [style=filled, fillcolor=black]
+    PotentialLeafSize [style=filled, fillcolor=black]
+    PotentialLeafProfile [style=filled, fillcolor=black]
     ExtinctionCoefficient [style=filled, fillcolor=black]
     PotentialHarvestIndex [style=filled, fillcolor=black]
     PotentialOilContent [style=filled, fillcolor=black]
@@ -136,13 +135,10 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
-				Temperature -> ThermalTime [style=dotted, colorscheme=set14, color=1, constraint=false] // InputsVariable
-				LeafNumber -> LeafAppearance
+				Temperature -> ThermalTime [style=dotted, colorscheme=set14, constraint=false, color=1] // InputsVariable
 				
 				// Module
-				ThermalTime -> {LeafAppearance LeafLongevity}
-				LeafAppearance
-				LeafLongevity
+				ThermalTime
 				
 			}
 			
@@ -153,13 +149,19 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
-				{LeafProfile LeafSize} -> LeafGrowthRate
-				LeafAppearance -> LeafGrowthRate
-				LeafLongevity -> LeafSenescenceRate
+				ThermalTime -> {LeafExpansionRate LeafSenescenceRate} [constraint=false]
+				{Phyllotherm PotentialLeafNumber} -> LeafInitiationTime
+				{PotentialLeafProfile PotentialLeafSize} -> LeafExpansionRate
 
 				// Module				
-				LeafGrowthRate -> LeafArea
+				LeafInitiationTime -> LeafExpansionTime
+				LeafSenescenceTime
+				{rank=same; LeafExpansionTime; LeafSenescenceTime}
+				LeafExpansionTime -> LeafExpansionRate
+				LeafSenescenceTime -> LeafSenescenceRate
+				LeafExpansionRate -> LeafArea
 				LeafSenescenceRate -> LeafArea
+				//{rank=same; LeafExpansionTime; LeafSenescenceTime}
 			}
 	
 			// # CropInterception ----
@@ -185,7 +187,7 @@ digraph G {
 				
 				// Inputs
 				{ThermalTimeFlowering ThermalTimeMaturity} -> RUE
-				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4]  // InputsVariable
+				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4, constraint=false]  // InputsVariable
 				RIE -> CropBiomass 
 				
 				// Module
@@ -239,7 +241,7 @@ digraph G {
 				WaterStressConductance -> WaterStressPhenology
 				
 				// Outputs
-				WaterStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=2]
+				WaterStressExpansion -> LeafExpansionRate [style=dotted, colorscheme=set14, color=2]
 				WaterStressConductance -> RUE [style=dotted, colorscheme=set14, color=2]
 				WaterStressPhenology -> ThermalTime [style=dotted, colorscheme=set14, color=2]
 				WaterStress -> HarvestIndex [style=dotted, colorscheme=set14, color=2]
@@ -255,8 +257,7 @@ digraph G {
 				
 				// Inputs
 				Fertilization -> NitrogenSupply [style=dotted, colorscheme=set14, color=3] // InputsVariable
-				Temperature -> Mineralization [style=dotted, colorscheme=set14, color=1] // InputsVariable
-				// Rainfall -> Mineralization [style=dotted, colorscheme=set14, color=2] // InputsVariable
+				Temperature -> Mineralization [style=dotted, colorscheme=set14, color=1, constraint=false] // InputsVariable
 				MineralizationRate -> Mineralization [style=dotted] // InputsVariable
 				WaterStressMineralization -> Mineralization [style=dotted, colorscheme=set14, color=2, constraint=false]
 				CropBiomass -> NitrogenDemand [style=dotted, colorscheme=set14, color=3]
@@ -268,7 +269,7 @@ digraph G {
 				NitrogenStress -> {NitrogenStressRUE NitrogenStressExpansion}
 				
 				// Outputs
-				NitrogenStressExpansion -> LeafGrowthRate [style=dotted, colorscheme=set14, color=3]
+				NitrogenStressExpansion -> LeafExpansionRate [style=dotted, colorscheme=set14, color=3]
 				NitrogenStressRUE -> RUE [style=dotted, colorscheme=set14, color=3]
 		  }
 		  
@@ -301,7 +302,7 @@ digraph G {
 				PlantLeafArea -> RadiationStress [style=dotted, colorscheme=set14, color=4]
 				
 				// Module
-				RadiationStress -> LeafGrowthRate [style=dotted, colorscheme=set14, color=4]
+				RadiationStress -> LeafExpansionRate [style=dotted, colorscheme=set14, color=4]
 		  }			
 		}
 	}	
