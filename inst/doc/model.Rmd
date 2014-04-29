@@ -276,7 +276,29 @@ with $a=153$ (°C.d), $b=851.3$ (°C.d), $c=0.78$
 $$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
 
 
-### LeafProfile
+### PotentialLeafArea
+```{r PotentialLeafArea, echo=FALSE, fig.width=4, fig.height=3.5}
+PotentialLeafArea <- function(i, LLS=448, LLH=17, a=-2.05, b=0.049) {
+  LLS * exp(a*((i-LLH)/(LLH-1))^2 + b*((i-LLH)/(LLH-1))^3) 
+}
+
+# Data
+s <- 1:30
+d <- data.frame(
+  x = s,
+  y = PotentialLeafArea(s)
+)
+
+# Graph
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Node", y="PotentialLeafArea (cm2)")
+print(p)
+
+```
+
+$$PotentialLeafArea_i = PotentialLeafSize \cdot exp^{a \cdot (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b \cdot (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^3}$$
+
+with $a=-2.05$ and $b=0.049$, shape parameters; $PotentialLeafSize$ (cm2) and $PotentialLeafProfile$ (node), genotypic parameters.
+
 ### LeafGrowthRate, LeafSenescenceRate, LeafArea
 
 ## Light interception

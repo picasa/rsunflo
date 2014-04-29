@@ -143,18 +143,15 @@ digraph G {
 				
 				// Inputs
 				ThermalTime -> {LeafExpansionRate LeafSenescenceRate} [constraint=false]
-				{Phyllotherm PotentialLeafNumber} -> LeafInitiationTime
-				{PotentialLeafProfile PotentialLeafSize} -> LeafExpansionRate
+				Phyllotherm -> LeafInitiationTime
+				{PotentialLeafProfile PotentialLeafSize PotentialLeafNumber} -> PotentialLeafArea
 
 				// Module				
 				LeafInitiationTime -> LeafExpansionTime
-				LeafSenescenceTime
-				{rank=same; LeafExpansionTime; LeafSenescenceTime}
-				LeafExpansionTime -> LeafExpansionRate
+				{LeafExpansionTime PotentialLeafArea} -> LeafExpansionRate
 				LeafSenescenceTime -> LeafSenescenceRate
-				LeafExpansionRate -> LeafArea
-				LeafSenescenceRate -> LeafArea
-				//{rank=same; LeafExpansionTime; LeafSenescenceTime}
+				{LeafExpansionRate LeafSenescenceRate} -> LeafArea
+				{rank=same; LeafExpansionTime; LeafSenescenceTime}
 			}
 	
 			// # CropInterception ----
