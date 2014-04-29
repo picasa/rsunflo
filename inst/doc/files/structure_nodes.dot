@@ -156,6 +156,7 @@ digraph G {
 				// Module				
 				LeafInitiationTime -> LeafExpansionTime
 				{LeafExpansionTime PotentialLeafArea} -> LeafExpansionRate
+				PotentialLeafDuration -> LeafSenescenceTime
 				LeafSenescenceTime -> LeafSenescenceRate
 				{LeafExpansionRate LeafSenescenceRate} -> LeafArea
 				{rank=same; LeafExpansionTime; LeafSenescenceTime}
