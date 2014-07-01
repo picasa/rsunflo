@@ -344,10 +344,66 @@ $$LeafArea_i=\int LeafGrowthRate_i - \int LeafSenescenceRate_i$$
 
 ## Light interception
 ### LAI
+$$LAI = \sum_{i=1}^{LeafNumber} LeafArea_i$$
+
 ### RIE
+$$RIE = 1 - exp^{(-ExtinctionCoefficient * LAI)}$$
 
 ## Biomass production
 ### RUE
+```{r RUE, echo=FALSE, fig.width=4, fig.height=4}
+# Function
+PotentialRUE <- function(
+  t,
+  r0=1,
+  rmax=3,
+  ThermalTimeFlowering = 836,
+  ThermalTimeSenescence = 1083,
+  ThermalTimeMaturity = 1673,
+  a = 0.015,
+  b = 4.5
+  ) {
+  ifelse(
+    t < 300, r0,
+    ifelse(
+      t >= 300 & t < ThermalTimeFlowering, r0 + 2*(t-300)/(ThermalTimeFlowering-300),
+      ifelse(
+        t >= ThermalTimeFlowering & t < ThermalTimeSenescence-100, rmax,
+        ifelse(
+          t >= ThermalTimeSenescence-100 & t <  ThermalTimeMaturity,
+          a * exp(b*(1-((t-ThermalTimeSenescence)/(ThermalTimeMaturity-ThermalTimeSenescence)))), 0
+        )
+      )
+    )
+  )
+}
+
+# Graph
+s <- 0:2000
+d <- data.frame(
+  x = s,
+  y = PotentialRUE(s)
+)
+
+p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Thermal Time (°C.d)", y="PotentialRUE")
+print(p)
+
+```
+
+$$
+PotentialRUE = \left\{ 
+	\begin{array}{ll}
+	r_0 & \textrm{if $ThermalTime < 300 $} \\  
+	r_0 + 2 \cdot \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
+	r_{max} & \textrm{if $ThermalTimeFlowering < ThermalTime < ThermalTimeSenescence$}\\
+	a \cdot exp^{b \cdot (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
+  0 & \textrm{else}
+	\end{array}
+  \right.
+$$
+
+with $r_0=1$, vegetative RUE; $r_{max}=3$, maximum RUE; $a=0.015$, final RUE; $b=4.5$, slope of RUE decrease in grain filling stage.
+
 ### CropBiomass [@Monteith1977]
 $$dCropBiomass = 0.48 \cdot Radiation \cdot RIE \cdot RUE \cdot dt$$
 

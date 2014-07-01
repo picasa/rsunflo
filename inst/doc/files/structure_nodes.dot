@@ -138,7 +138,7 @@ digraph G {
 				Temperature -> ThermalTime [style=dotted, colorscheme=set14, constraint=false, color=1] // InputsVariable
 				
 				// Module
-				ThermalTime
+				ThermalTime 
 				
 			}
 			
@@ -185,6 +185,7 @@ digraph G {
 				pencolor=gray
 				
 				// Inputs
+				ThermalTime -> RUE [constraint=false]
 				{ThermalTimeFlowering ThermalTimeMaturity} -> RUE
 				Radiation -> CropBiomass [style=dotted, colorscheme=set14, color=4, constraint=false]  // InputsVariable
 				RIE -> CropBiomass 

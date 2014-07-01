@@ -65,8 +65,8 @@ wic <- function (obs, sim, ic) {
 }
 
 # Last : dernière valeur non nulle d'un vecteur
-#' @export last
-last <- function(x) {tail(x[x != 0], n = 1)}
+# @export last
+# last <- function(x) {tail(x[x != 0], n = 1)}
 
 # Not in
 #' @export '%ni%'
@@ -119,8 +119,8 @@ biplot_ammi <- function(m) {
 
 # Scatterplot pair matrix
 # https://github.com/mike-lawrence/ez/blob/master/R/ezCor.R
-#' @export pairs
-pairs <- 
+#' @export ggpairs
+ggpairs <- 
   function(
     data
     , r_size_lims = c(10,20)
