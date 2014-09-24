@@ -548,11 +548,12 @@ evaluate_error <- function(data, formula, output="numeric") {
     data,
     as.formula(formula), summarise, 
     rmse = rmse(simulated, observed),
+    rrmse = round(rmse(simulated, observed)/mean(observed, na.rm=TRUE)*100, 1),
     efficiency = efficience(simulated, observed),
     bias = biais(simulated, observed)
   )
   
-  # Labels pour l'erreur d'ajustement
+  # Labels ggplot2 pour l'erreur d'ajustement
   label <- ddply(
     error,
     as.formula(formula), summarise, 
@@ -573,11 +574,11 @@ evaluate_error <- function(data, formula, output="numeric") {
 
 # Graphes simulés / observés
 #' @export evaluate
-evaluate <- function(data, formula, color) {
+evaluate <- function(data, formula, color, scale="free", ...) {
   # Graphes
   ggplot(data=data, aes(x=observed, y=simulated)) + 
-    geom_point(aes_string(color=color)) +
-    facet_wrap(as.formula(formula), scale="free") +
+    geom_point(aes_string(color=color), ...) +
+    facet_wrap(as.formula(formula), scale=scale) +
     stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
     geom_text(
