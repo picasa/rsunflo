@@ -1,34 +1,41 @@
 ---
 title: "Documentation for the SUNFLO crop model"
+csl: ./style/elsevier.csl
 output:
+  pdf_document:
+    toc: yes
   html_document:
     fig_height: 10
     fig_width: 10
     theme: default
     toc: yes
     toc_depth: 2
-  pdf_document:
-    toc: yes
 bibliography: ./files/bibliography.bib
-csl: ./style/elsevier.csl
 ---
 
+\newpage
+\small
 
-
-```{r header, message=FALSE, warning=FALSE ,echo=FALSE}
-# TODO : manage to get consistent look between github markdown interpretation (sundown) and knitr html (rmarkdown)
+```{r header, message=FALSE, warning=FALSE, echo=FALSE}
 # TODO : made small parameters table linked subsets of the complete parameter table
 
 library(ggplot2)
 library(reshape2)
 library(dplyr)
-library(pander)
 library(XLConnect)
+library(knitr)
 
-setwd("/home/casadebaig/Documents/Travail/2011_SUNFLO/dev/rsunflo/inst/doc/")
+# path (! wd is changed in next chunk)
+opts_knit$set(root.dir = normalizePath('../../'))
 
+# options
+fig_dpi = 100
+```
+
+```{r data, message=FALSE, warning=FALSE, echo=FALSE}
 # data
-db <- loadWorkbook(file="./files/parameterization.xlsx") 
+db <- loadWorkbook(file="inst/doc/files/parameterization.xlsx") 
+
 sunflo <- list(
   climate = readWorksheet(db, sheet="climate"),
   parameters = readWorksheet(db, sheet="parameters"),
@@ -36,10 +43,7 @@ sunflo <- list(
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
-# options
-fig_dpi = 100
 ```
-
 
 # Model structure
 ```{r structure, echo=FALSE, eval=FALSE}
@@ -48,21 +52,21 @@ graph_ext <- "png"
 graph_nodes <- "-Nlabel= -Nshape=circle -Gdpi=150 -Earrowsize=2 -Epenwidth=4 -Estyle=dotted"
 
 # Simple graph : replace nodes names by points
-call <- paste0("dot -T ",graph_ext," -o ./files/structure_nodes.",graph_ext," ./files/structure_nodes.dot")
+call <- paste0("dot -T ",graph_ext," -o inst/doc/files/structure_nodes.",graph_ext," ./files/structure_nodes.dot")
 system(call)
 # system(paste(call, graph_nodes))
 
 # Complete graph
-call <- paste0("dot -T ",graph_ext," -o ./files/structure.",graph_ext," ./files/structure.dot")
+call <- paste0("dot -T ",graph_ext," -o inst/doc/files/structure.",graph_ext," ./files/structure.dot")
 system(call)
 
 ```
 
 ## Modules
-![structure](./files/structure_nodes.png) 
+![structure](files/structure_nodes.pdf) 
 
 ## Variables
-![structure](./files/structure.png) 
+![structure](files/structure.pdf) 
 
 
 
@@ -73,29 +77,29 @@ system(call)
 ### Climate
 ```{r InputsClimate, echo=FALSE, results='asis'}
 # data
-s <- select(sunflo$climate, label=label.doc, description=label.en, unit)
+s <- sunflo$climate %>% select(label=label.doc, description=label.en, unit)
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 ### Soil
 ```{r InputsSoil, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %.%
-  filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %.%
+s <- sunflo$parameters %>%
+  filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 ### Management
 ```{r InputsManagement, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %.%
-  filter(category=="Conduite", template.default==1) %.%
+s <- sunflo$parameters %>%
+  filter(category=="Conduite", template.default==1) %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 
@@ -104,11 +108,11 @@ pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 ### Cultivar
 ```{r InputsCultivar, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %.%
-  filter(category=="Variete", template.default==1) %.%
+s <- sunflo$parameters %>%
+  filter(category=="Variete", template.default==1) %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 
@@ -119,12 +123,12 @@ pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
 ### Inputs
 ```{r InputsPhenology, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %.% 
-  filter(module=="Phenology") %.%
+s <- sunflo$parameters %>% 
+  filter(module=="Phenology") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 ### Emergence
@@ -158,8 +162,8 @@ parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
                 "ThermalTimeSenescence", "ThermalTimeMaturity",
                 "Germination")
 
-s <- sunflo$parameters %.%
-  filter(module=="Phenology", label.doc %in% parameters) %.%
+s <- sunflo$parameters %>%
+  filter(module=="Phenology", label.doc %in% parameters) %>%
   select(label=label.doc, value)
 
 # add emergence state
@@ -194,12 +198,12 @@ print(p)
 ### Inputs
 ```{r InputsLeafArea, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %.% 
-  filter(module=="LeafArea") %.%
+s <- sunflo$parameters %>% 
+  filter(module=="LeafArea") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-pandoc.table(s, style = "grid", split.tables="Inf", justify="left")
+kable(s, padding=0)
 ```
 
 ### LeafInitiationTime, LeafExpansionTime, LeafSenescenceTime

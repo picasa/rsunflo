@@ -98,7 +98,7 @@ design <- function(design, file, template="default", format="websim", user="casa
         websim = {
           
           # Mise en forme des champs de date, duration.
-          p <- mutate(
+          p <- plyr::mutate(
             design,
             id = paste(carol, genotype, sep="_"),
             file = paste(user,"/meteo/", carol, ".txt", sep=""),
@@ -117,8 +117,6 @@ design <- function(design, file, template="default", format="websim", user="casa
             water_date_2 = format(water_date_2, "%d/%m"),
             water_date_3 = format(water_date_3, "%d/%m"),
           )
-          
-          
           
           # Mise en forme du fichier 
           # Entetes depuis fichier csv websim

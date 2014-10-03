@@ -4,8 +4,10 @@
 # Dépendances
 library(XLConnect)
 library(plyr)
-library(rsunflo)
+library(dplyr)
 library(reshape2)
+#library(tidyr)
+library(rsunflo)
 library(ggplot2)
 ```
 
@@ -21,7 +23,7 @@ g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
 p <- expand.grid(carol=d$carol, genotype=g$genotype)
-p <- join(join(p, d), g)
+p <- p %>% join(d) %>% join(g)
 
 # Ecriture au format websim
 design(p, file="inst/doc/files/design_websim.xls", format="websim", user="casadebaig")
@@ -37,7 +39,7 @@ g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
 p <- expand.grid(carol=d$carol, genotype=g$genotype)
-p <- join(join(p, d), g)
+p <- p %>% join(d) %>% join(g)
 
 # Mise en forme au format rsunflo
 DurationSoil = 5 # durée (j) de la période de simulation sans culture
@@ -47,7 +49,7 @@ p <- mutate(
   begin = as.numeric(as.Date(begin)) + 2440588,
   end = as.numeric(as.Date(crop_harvest)) + 2440588 + DurationSoil,
   duration = end - begin,
-  file = paste("DB/reseaux/",carol,".txt",sep="")
+  file = paste("DB/test/",carol,".txt",sep="")
 )
 ```
 
@@ -63,17 +65,23 @@ library(rvle)
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 design <- as.list(p)
 
-# Test
-shape(results(run(sunflo)), view = "timed")
-shape(play(sunflo, design, unit=1), view="timed")
-display(shape(play(sunflo, design, unit=1), view="timed"))
+# Paramétrisation par défaut
+sunflo %>% run() %>% results() %>% shape(view="timed")
 
-# Simulation
-d <- mlply(
-  design$id,
-  function(x){failwith(NULL, shape)(play(sunflo, design, unit=x), view="timed")}
-)
-# Filter(is.null, d)
-d <- ldply(compact(d))
+# Paramétrisation issue du plan d'expérience (1 unité de simulation)
+sunflo %>% play(design, unit=1) %>% shape(view="timed")
+
+# Sortie graphique
+sunflo %>% play(design, unit=1) %>% shape(view="timed") %>% display()
+
+# Multi-simulation du plan d'expérience (parallélisation possible : require(doMC), ?mlply)
+model <- function(x){sunflo %>% play(design, unit=x) %>% shape(view="timed")}
+output <- mlply(design$id, failwith(NULL, model))
+
+# Agregation (1 unité -> une matrice)
+output_timed <- output %>% compact() %>% ldply()
+
+# Calcul d'indicateurs (1 unité -> un vecteur)
+output_indicators <- output %>% compact() %>% ldply(indicate)
 ```
 

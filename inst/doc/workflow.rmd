@@ -1,18 +1,22 @@
 ---
 title: "Notice d'utilisation du modèle SUNFLO"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     toc_depth: 2
-  pdf_document:
-    toc: yes
 bibliography: ./files/bibliography.bib
+csl: ./style/elsevier.csl
 ---
+
+\newpage
 
 Cette notice présente les principales étapes nécessaires pour réaliser une expérimentation numérique avec le modèle SUNFLO.
 Selon les questions abordées (démonstration, simulation de réseaux d'essais multilocaux, exploration, ...) le type de plan d'expérience conçu et les outils logiciels utilisés varient considérablement.   
 
 Différentes procédures sont proposées selon le volume de simulation : 
+
 * utilisation locale via une interface graphique (1-10 simulations : [GVLE](#utilisation-locale-via-une-interface-graphique-1-10))
 * utilisation distance via une interface web (10-500 simulations : [websim](#utilisation-distance-via-une-interface-web-10-500))
 * utilisation locale via un langage de script (10-1M simulations: [rsunflo](#utilisation-locale-via-un-langage-de-script-10-1m))
@@ -138,16 +142,16 @@ Le plan (fichier [design.xlsx](design.xlsx)) a été initialement créé avec un
 ```R
 # Import des données
 ## Essais (n=2)
-d <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="essais")
+d <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="essais")
 ## Genotypes (n=3)
-g <- readWorksheetFromFile(file="inst/doc/design.xlsx", sheet="genotype")
+g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
 p <- expand.grid(carol=d$carol, genotype=g$genotype)
-p <- join(join(p, d), g)
+p <- p %>% join(d) %>% join(g)
 
 # Ecriture au format websim
-design(p, file="inst/doc/design_websim.xls", format="websim", user="casadebaig")
+design(p, file="inst/doc/files/design_websim.xls", format="websim", user="casadebaig")
 ```
 
 
@@ -178,18 +182,24 @@ Le package `plyr` est utilisé pour itérer les simulations sur l'ensemble des l
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 design <- as.list(p)
 
-# Test
-shape(results(run(sunflo)), view = "timed")
-shape(play(sunflo, design, unit=1), view="timed")
-display(shape(play(sunflo, design, unit=1), view="timed"))
+# Paramétrisation par défaut
+sunflo %>% run() %>% results() %>% shape(view="timed")
 
-# Simulation
-d <- mlply(
-  design$id,
-  function(x){failwith(NULL, shape)(play(sunflo, design, unit=x), view="timed")}
-)
-# Filter(is.null, d)
-d <- ldply(compact(d))
+# Paramétrisation issue du plan d'expérience (1 unité de simulation)
+sunflo %>% play(design, unit=1) %>% shape(view="timed")
+
+# Sortie graphique
+sunflo %>% play(design, unit=1) %>% shape(view="timed") %>% display()
+
+# Multi-simulation du plan d'expérience (parallélisation possible : require(doMC), ?mlply)
+model <- function(x){sunflo %>% play(design, unit=x) %>% shape(view="timed")}
+output <- mlply(design$id, failwith(NULL, model))
+
+# Agregation (1 unité -> une matrice)
+output_timed <- output %>% compact() %>% ldply()
+
+# Calcul d'indicateurs (1 unité -> un vecteur)
+output_indicators <- output %>% compact() %>% ldply(indicate)
 ```
 
 ## Variables de sorties et indicateurs
@@ -268,3 +278,5 @@ OC|cycle|Teneur en huile|max(OC)|%
 L'import des données dans R permet de profiter de ses outils statistiques. 
 Pour une question plus orientée vers le développement, l'analyse des données peut s'envisager dans l'outil web de simulation. Le framework de websim peut ainsi être installé pour servir de support à la construction d'un outil d'aide à la décision.
 
+
+# References
