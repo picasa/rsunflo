@@ -85,3 +85,21 @@ output_timed <- output %>% compact() %>% ldply()
 output_indicators <- output %>% compact() %>% ldply(indicate)
 ```
 
+
+```{r simulation_debug, eval=FALSE}
+library(rvle)
+
+# Modèle et plan
+sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
+
+# load reference simulation (SUNFLO v1.2, VLE 1.0.3)
+load("inst/doc/files/output_ref.rdata")
+
+# run current model
+output_new <- sunflo %>% run() %>% results() %>% shape(view="timed")
+
+# test
+identical(output_ref, output_new)
+
+```
+
