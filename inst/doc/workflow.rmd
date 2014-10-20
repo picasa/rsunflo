@@ -19,31 +19,32 @@ Différentes procédures sont proposées selon le volume de simulation :
 
 * utilisation locale via une interface graphique (1-10 simulations : [GVLE](#utilisation-locale-via-une-interface-graphique-1-10))
 * utilisation distance via une interface web (10-500 simulations : [websim](#utilisation-distance-via-une-interface-web-10-500))
-* utilisation locale via un langage de script (10-1M simulations: [rsunflo](#utilisation-locale-via-un-langage-de-script-10-1m))
+* utilisation locale via un langage de script (10-1M simulations: [rsunflo](#utilisation-locale-via-un-langage-de-script-10-1e6))
 
 Pour chacune des ces procédures, 4 étapes successives sont nécessaires : 
 
-1. rassembler les données d'entrées et de paramétrage ([paramétrage](#paramtrage))
-2. concevoir le plan de l'expérimentation numérique ([planification](#planification))
-3. réaliser les simulations ([simulation](#simulation))
-4. organiser les sorties et analyser les données ([analyse](#analyse))
+1. **Paramétrage** : rassembler les données d'entrées et de paramétrage 
+2. **Planification** : concevoir le plan de l'expérimentation numérique 
+3. **Simulation** : réaliser les simulations 
+4. **Analyse** : organiser les sorties et analyser les données 
 
 ![workflow](files/workflow.png)
 **Procédures d'utilisation** : Les traits gris représentent les différentes procédures d'utilisation des outils logiciels. Les cadres gris nécessitent une installation locale des logiciels mentionnés, le cadre bleu permet une utilisation distante, via une interface web. Les chevrons représentent des logiciels et les rectangles, des packages. Les formes arrondies représentent des jeux de données.
 
+\newpage
 
 # Paramétrage
 L'utilisation par défaut de sunflo nécessite 42 paramètres et 5 variables d'entrées répartis en 4 volets : variétes, pédoclimat, conduite de culture et initialisation. Si une partie de ces informations n'est pas renseignée, la simulation échoue.  
 Les outils de multi-simulation (rsunflo, websim) fonctionnent avec un ensemble {données d'entrée, version du modèle, type de sorties} fixé.  
-L'interface *websim* permet de créer différentes version d'un même modèle informatique utilisant [*VLE+RECORD*](http://www.vle-project.org/wiki/Main_Page). A chaque usage correspond donc une version *ad hoc*,  nommée *patrons de simulation* dans *websim*. Bien que ces patrons peuvent être créés par les utilisateurs dans l'interface, trois patrons sont utilisables pour SUNFLO :
+L'interface *websim* (accessible [ici](htp://147.99.107.104/sunflo)) permet de créer différentes version d'un même modèle informatique utilisant [*VLE+RECORD*](http://www.vle-project.org/wiki/Main_Page). A chaque usage correspond donc une version *ad hoc*,  nommée *profils d'utilisation* dans *websim*. Bien que ces profils peuvent être créés par les utilisateurs dans l'interface, trois profils sont accessibles pour SUNFLO :
 
-modèle | patron |                 usage                        | paramètres
--------|--------|----------------------------------------------|-----------
-SUNFLO | varieto|version par défaut, evaluation variétale      | 42
-SUNFLO | gem    |version simplifiée, experimentation numérique | 21
-SUNFLO | genotype|paramétrage variétal uniquement |12
+modèle | profil   |                 usage                        | paramètres  | VLE
+-------|----------|----------------------------------------------|-------------|-----
+SUNFLO | web      |version par défaut, evaluation variétale      | 42          | sunflo_web.vpz
+SUNFLO | gem      |version simplifiée, experimentation numérique | 21          | sunflo_GEM.vpz
+SUNFLO | genotype |paramétrage variétal uniquement               | 12          | sunflo_simple.vpz
 
-Ce mode d'emploi se base sur le patron *varieto*. Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des patrons de simulation, le détail du paramétrage et propose des valeurs par défaut. 
+Ce mode d'emploi se base sur le profil *web*. Le fichier [parameterization.xlsx](parameterization.xlsx) détaille le contenu des profils de simulation, le détail du paramétrage et propose des valeurs par défaut. 
 
 ## Variété
 nom | label | unité | référence
@@ -83,7 +84,8 @@ mineralization|Vitesse potentielle de minéralisation|kg/ha/jour normalise|[@Val
 
 ### Données climatiques
 Sunflo utilise des données climatiques disponibles dans des fichiers texte. Chaque fichier représente une année avec l'enregistrement de 5 variables (colonnes) au pas de temps journalier (lignes).  
-La fonction `rsunflo::climate` permet de créer ces fichiers depuis les principaux formats (meteo-france, INRA climatik). Sinon, un exemple de fichier climatique formaté pour sunflo est disponible sur websim.
+La fonction `rsunflo::climate` permet de créer ces fichiers depuis les principaux formats (meteo-france, INRA climatik). Sinon, un exemple de fichier climatique formaté pour sunflo est disponible sur websim.  
+Les fichiers créés doivent être accessible par le simulateur. Pour rsunflo vérifier que ces fichiers soient dans un sous repertoire du paquet sunflo, sur le système de fichier local. Pour Websim, ces fichiers peuvent être envoyés via l'interface utilisateur, sur la page `Fichiers | Déposer`.
 
 nom | label | unité
 ----|-------|-----
@@ -127,12 +129,13 @@ water_initial_2|Humidité massique initiale dans l'horizon inférieur  (30 cm - 
 
 **table des paramètres : initialisation**
 
+\newpage
 
 # Planification
-Cette étape consiste à concevoir une plan d'expérience numérique et à en préparer une représentation informatique (fichier ou objet) en vue de la simulation. Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longueur de ce vecteur est déterminée par le patron de simulation utilisé (par défaut, 42).  
+Cette étape consiste à concevoir une plan d'expérience numérique et à en préparer une représentation informatique (fichier ou objet) en vue de la simulation. Ce plan se présente comme une matrice, chaque simulation (ligne) est représentée par un vecteur de paramètres (colonnes). La longueur de ce vecteur est déterminée par le profil de simulation utilisé (par défaut, 42).  
 Ce plan peut être créé manuellement (séquentiellement, ligne après ligne) ou bien automatiquement, en combinant de manière définie les niveaux de différents facteurs étudiés.   
 La première solution correspond souvent à la simulation d'expérimentations réelles (MET). Dans ce cas, l'utilisation d'un tableur pour créer un fichier est préférable. Les entêtes des colonnes du fichier sont les noms des paramètres présentés dans les tableaux précédents.  
-La deuxième solution est utilisée plutôt pour l'exploration du modèle, les plans créés peuvent être des combinaisons factorielles de paramètres (s'ils sont peu nombreux) ou des plans issus de méthodes d'analyse de sensibilité.  
+La deuxième solution est utilisée plutôt pour l'exploration du modèle, les plans créés peuvent être des combinaisons factorielles de paramètres (s'ils sont peu nombreux) ou des plans issus de méthodes d'échantillonnage.  
 
 Dans tout les cas, les plans créés peuvent être utilisés soit avec le simulateur local (rsunflo) ou distant (websim). Si ce dernier est utilisé, le format du fichier du plan est crucial (type et format des colonnes). La fonction `rsunflo::design` permet de convertir le fichier créé vers le format de websim (cf. aide de websim).
 
@@ -154,9 +157,10 @@ p <- p %>% join(d) %>% join(g)
 design(p, file="inst/doc/files/design_websim.xls", format="websim", user="casadebaig")
 ```
 
+\newpage
 
 # Simulation
-Une fois le plan conçu et créé au format adapté au simulateur utilisé, les simulations sont effectuées en série. Les variables de sorties sont celles définies dans le patron de simulation. Selon la vue utilisée lors de la simulation, les sorties sont disponibles à chaque pas de temps (vue dynamique) ou bien seulement à la fin de la simulation (vue statique). Les deux tables suivantes résument le contenu de ces vues.
+Une fois le plan conçu et créé au format adapté au simulateur utilisé, les simulations sont effectuées en série. Les variables de sorties sont celles définies dans le profil de simulation. Selon la vue utilisée lors de la simulation, les sorties sont disponibles à chaque pas de temps (vue dynamique) ou bien seulement à la fin de la simulation (vue statique). Les deux tables suivantes résument le contenu de ces vues.
 
 ## Utilisation locale via une interface graphique (1-10)
 Cette utilisation ne fonctionne pas avec un plan d'expérience défini. Elle est donc adaptée à un faible nombre de simulation, car il faut changer chaque paramètre séquentiellement dans l'interface graphique GVLE. Cette solution permet par contre de facilement changer les variables de sorties observées lors de la simulation. L'utilisation de l'interface GVLE n'est pas documentée pour sunflo (cf. notices de l'équipe RECORD).
@@ -164,10 +168,10 @@ Cette utilisation ne fonctionne pas avec un plan d'expérience défini. Elle est
 ## Utilisation distance via une interface web (10-500)
 L'interface web *websim* permet, outre la création manuelle de simulations, d'automatiser le processus de simulation quand un fichier de plan d'expérience est disponible.  
 
-1. `Patrons de simulation | Utiliser` : choix du patron de simulation ([lien direct](http://147.99.107.100/sunflo/choose_pattern_to_use/8/))
-2. `Simulations | Gerer via des tableaux` : lecture du fichier de plan et création des simulations correspondantes
+1. `Profils de simulation | Utiliser` : choix du patron de simulation ([lien direct](http://147.99.107.104/sunflo/choose_pattern_to_use/8/))
+2. `Simulations | Créer via des tableaux` : lecture du fichier de plan et création des simulations correspondantes
 3. `Plan d'expérience | Gerer` : assemblage et simulation du contenu du plan
-4. `Plan d'expérience | Acceder aux fichiers` : export des résultas (format excel, un fichier par simulation).
+4. `Plan d'expérience | Télécharger les résultats` : export des résultas (format excel, un fichier par simulation).
 
 ## Utilisation locale via un langage de script (10-1E6)
 L'utilisation de sunflo via R est plus abstraite que l'utilisation d'interfaces utilisateurs, mais constitue à la fois une procédure parfaitement reproductible et plus rapide (facteur ~10) pour réaliser des expérimentations numériques.  
@@ -242,7 +246,7 @@ OC|Teneur en huile|%, grain 0% humidité
 **table des variables de sortie statique**
 
 
-
+\newpage
 
 # Analyse
 ## Assemblage et traitements post-simulation  

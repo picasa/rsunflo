@@ -16,8 +16,7 @@ Documentation :
 To install the development version of `rsunflo` please use the `devtools` package:
 
     # install.packages("devtools")
-    library(devtools)
-    install_github("rsunflo", "picasa")
+    devtools::install_github("picasa/rsunflo")
 
 To clone the repository
 
