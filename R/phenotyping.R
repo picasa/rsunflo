@@ -66,11 +66,24 @@ phenostage <- function(flowering) {
 
 # Modèle de surface de feuille = f(Longeur, Largeur) cm
 #' @export leaf_size
-leaf_size <- function(length, width, a=0.736, b=-8.86, c=0.684){
-	ifelse(length * width < (b/(c - a)),
-		c * length * width,
-		a * length * width + b
-	)
+leaf_size <- function(length, width, a0=0.7, a=0.736, b=-8.86, c=0.684, shape="simple"){
+  
+  switch(
+    shape,
+    
+    # default to simple linear model, c.f Heliaphen_platform repository
+    simple = {
+      area <- a0 * length * width
+    },
+    
+    bilinear = {
+      area <- ifelse(length * width < (b/(c - a)),
+                     c * length * width,
+                     a * length * width + b
+      )
+    }
+  )
+  return(area)
 }
 
 
