@@ -15,6 +15,7 @@ csl: ./style/elsevier.csl
 
 library(ggplot2)
 library(reshape2)
+library(tidyr)
 library(dplyr)
 library(XLConnect)
 library(knitr)
@@ -337,7 +338,7 @@ p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
 print(p)
-
+ggsave(p, file="inst/doc/files/figures/LeafGrowthRate.pdf", height=3, width=3, units="in")
 ```
 
 $$
@@ -370,10 +371,32 @@ $$LeafArea_i=\int LeafGrowthRate_i - \int LeafSenescenceRate_i$$
 # Light interception
 
 ## LAI
-$$LAI = \sum_{i=1}^{LeafNumber} LeafArea_i$$
+$$LAI = SowingDensity \cdot \sum_{i=1}^{LeafNumber} LeafArea_i$$
 
 ## RIE
-$$RIE = 1 - exp^{(-ExtinctionCoefficient * LAI)}$$
+$$RIE = 1 - exp^{(-ExtinctionCoefficient \cdot LAI)}$$
+
+```{r RIE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# Function
+RIE <- function(LAI, k) {1 - exp(-k * LAI)}
+
+# Graph
+s <- seq(0,5, by=0.1)
+d <- data.frame(
+  x = s,
+  low = RIE(s, k=0.7),
+  high = RIE(s, k=0.9)
+)
+
+d <- gather(d, k, y, low:high)
+
+# Graph
+p <- ggplot(d, aes(x, y, color=k)) + geom_path() +
+  theme_bw() + labs(x="Leaf Area Index (LAI)", y="RIE") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+print(p)
+ggsave(p, file="inst/doc/files/figures/RIE.pdf", height=3, width=3, units="in")
+```
 
 
 \newpage
@@ -438,13 +461,13 @@ d <- data.frame(
 
 p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Thermal Time (°C.d)", y="PotentialRUE")
 print(p)
-
+ggsave(p, file="inst/doc/files/figures/PotentialRUE.pdf", height=3, width=3, units="in")
 ```
 
 \vspace{2cm}
 
 ## CropBiomass [@Monteith1977]
-$$dCropBiomass = 0.48 \cdot Radiation \cdot RIE \cdot RUE \cdot dt$$
+$$dCropBiomass = Radiation \cdot 0.48 \cdot RIE \cdot RUE \cdot dt$$
 
 ## CropPerformance
 
