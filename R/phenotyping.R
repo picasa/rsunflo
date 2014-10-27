@@ -1,5 +1,8 @@
 # Tools for phenotyping and genotypic parameterisation
 
+# Climate ####
+# 1 watt/day = 86400 joule
+
 # Soil ####
 
 # Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
