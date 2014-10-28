@@ -16,7 +16,7 @@ climate <- function(x,
     # Format site, date, [mesures]
     date={
       # Ajout des colonnes utilisées par RECORD
-      x <- mutate(
+      x <- plyr::mutate(
         x,
         JourJ = yday(date),
         Annee = year(date),
