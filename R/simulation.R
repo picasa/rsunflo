@@ -18,10 +18,10 @@ climate <- function(x,
       # Ajout des colonnes utilisées par RECORD
       x <- mutate(
         x,
-        JourJ = as.numeric(format(date, "%j")),
-        Annee = as.numeric(format(date, "%Y")),
-        Mois = as.numeric(format(date, "%m")),
-        Jour = as.numeric(format(date, "%d")), 
+        JourJ = yday(date),
+        Annee = year(date),
+        Mois = month(date),
+        Jour = day(date), 
       )
       
       # Mise en forme du fichier de sortie
