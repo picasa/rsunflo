@@ -548,7 +548,8 @@ evaluate_error <- function(data, formula, output="numeric") {
     rmse = rmse(simulated, observed),
     rrmse = round(rmse(simulated, observed)/mean(observed, na.rm=TRUE)*100, 1),
     efficiency = efficience(simulated, observed),
-    bias = biais(simulated, observed)
+    bias = biais(simulated, observed),
+    n=sum(complete.cases(simulated, observed))
   )
   
   # Labels ggplot2 pour l'erreur d'ajustement
