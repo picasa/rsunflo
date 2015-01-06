@@ -40,6 +40,8 @@ sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",val
 
 ```
 
+\footnotesize
+
 # Model overview
 ```{r structure, echo=FALSE, eval=FALSE}
 # Build model graph from R
@@ -58,13 +60,17 @@ system(call)
 ```
 
 \begin{figure*}
-  \includegraphics[scale=1.5]{files/structure_nodes.pdf}
+  \includegraphics[scale=2]{files/structure_nodes.pdf}
 \end{figure*}
-
 
 # Inputs
 ```{r InputsParameters, echo=FALSE, results='asis'}
-s <- sunflo$parameter %>% filter(count==1) %>% select(category, label.doc) %>% group_by(category) %>% summarise(n=n())
+s <- sunflo$parameter %>%
+  filter(count==1) %>%
+  select(category, label.doc) %>%
+  group_by(category) %>%
+  summarise(n=n())
+
 n_total <- sum(s$n)
 ```
 
@@ -187,6 +193,16 @@ print(p)
 # ggsave(p, file="./figure/PhenoStage.png", height=2.5, width=8, units="in", dpi=fig_dpi)
 ```
 
+In the software model, phenostages are computed as integers $\in [0,7]$ corresponding to duration between key stages:
+
+* **0**, begining of simulation - sowing (bare soil)
+* **1**, sowing (A0) - emergence (A2)
+* **2**, emergence (A2) - floral initiation (E1)
+* **3**, floral initiation (E1) - flowering (F1)
+* **4**, flowering (F1) - onset of senescence (M0)
+* **5**, onset of senescence (M0) - maturity (M3)
+* **6**, maturity (M3) - harvest
+* **7**, harvest - end of simulation (bare soil)
 
 \newpage
 

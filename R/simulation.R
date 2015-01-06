@@ -347,22 +347,31 @@ indicate <- function(x, view="timed") {
     
     timed = {
       # Définition des périodes d'intégration
+      # semis - levee
+      SE <- x$PhenoStage == 1
       # levée - fin maturité
       EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
       # levée - floraison
-      #EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
+      EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
       # initiation florale - début maturité
-      #FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
+      FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
       # floraison - début maturité
-      #FM <- x$PhenoStage == 4
+      FM <- x$PhenoStage == 4
+      # floraison - fin maturité
+      GF <- (x$PhenoStage == 4 | x$PhenoStage == 5)
       # début maturité - fin maturité
-      #MH <- x$PhenoStage == 5
+      MH <- x$PhenoStage == 5
       
       # Calcul des indicateurs
       o <- data.frame(
         # Graphes
         # xm <- melt(x, id.vars=c("time","TTA2"))
         # xyplot(value ~ time | variable, data=xm, type="l", scale="free")
+        
+        # Phenologie
+        DSE = sum(SE),
+        DEF = sum(EF),
+        DGF = sum(GF),
         
         # Ressources environnementales
         SGR = sum(x$GR[EH] * 0.48), # PAR
