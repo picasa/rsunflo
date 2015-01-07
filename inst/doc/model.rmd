@@ -131,7 +131,7 @@ kable(s, padding=0)
 ```
 
 ## Emergence
-$Emergence = Germination + ElongationRate \cdot SowingDepth$
+$Emergence = Germination + ElongationRate * SowingDepth$
 
 with:
 
@@ -144,7 +144,7 @@ $$
   ThermalTime_d=
 	\left\{ 
 	\begin{array}{ll}
-	\int_0^d (T_m - T_b) \cdot (1 + WaterStressPhenology) \cdot dt & \textrm{if $T_m > T_b$} \\  
+	\int_0^d (T_m - T_b) * (1 + WaterStressPhenology)  & \textrm{if $T_m > T_b$} \\  
 	0 & \textrm{else}
 	\end{array} 
 	\right.
@@ -154,7 +154,7 @@ with:
 
 * $T_m$, Daily mean air temperature (°C); 
 * $T_b = 4.8$, Basal temperature (°C) [@Granier1998]; 
-* $ThermalStressPhenology$ Water stress effect on plant heating
+* $ThermalStressPhenology$, Water stress effect on plant heating
 
 ## PhenoStages
 ```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2.5, fig.fullwidth=TRUE}
@@ -162,6 +162,8 @@ with:
 parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
                 "ThermalTimeSenescence", "ThermalTimeMaturity",
                 "Germination")
+
+list_phase <- c("Vegetative","Floral Initiation","Flowering","Grain Filling","Germination","Elongation")
 
 s <- sunflo$parameters %>%
   filter(module=="Phenology", label.doc %in% parameters) %>%
@@ -172,14 +174,11 @@ s <- rbind(s, data.frame(label="Emergence", value=0))
 # change germination value according to emergence
 s[s$label=="Germination",]$value <- -200+ s[s$label=="Germination",]$value
 # compute start phase for plotting
-s <- mutate(
-  s,
-  phase=c("Vegetative","Floral Initiation","Flowering","Grain Filling","Germination","Elongation"),
+s <- s %>% mutate(
+  phase=factor(list_phase, levels=list_phase),
   start=c(0, 482, 836, 1083, -200, -200+86.2),
   end=value
 )
-
-s <- mutate(s, phase=factor(phase, levels=phase))
 
 # plot
 p <- ggplot(s) +
@@ -237,19 +236,16 @@ LeafExpansionDuration <- function(i, TLN=30, LLH=17, y0=851.3, a=153, b=0.78){
 }
 
 # Data
-s <- 1:30
-d <- data.frame(
-  x = s,
-  Initiation = LeafInitiationTime(s)
-)
+i <- 1:30
 
-d <- mutate(
-  d,
-  Expansion = Initiation + 1/0.01379,
-  Senescence = Expansion + LeafExpansionDuration(s)
-)
+d <- data_frame(x=i) %>% 
+  mutate(
+    Initiation = LeafInitiationTime(x),
+    Expansion = Initiation + 1/0.01379,
+    Senescence = Expansion + LeafExpansionDuration(x)
+  ) %>%
+  gather(Process, y, -x)
 
-d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
 
 # Graph
 p <- ggplot(d, aes(x=y, y=x, color=Process)) + geom_path() +
@@ -262,8 +258,8 @@ print(p)
 $$
   LeafInitiationTime_i = \left\{ 
   \begin{array}{ll}
-	i \cdot Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
-	(i-5) \cdot Phyllotherm_7 + a & \textrm{if $i \leq LeafNumber$}
+	i * Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
+	(i-5) * Phyllotherm_7 + a & \textrm{if $i \leq LeafNumber$}
 	\end{array} \right.
 $$
 
@@ -279,20 +275,24 @@ with $a=0.01379$.
 
 
 ## LeafExpansionDuration
-```{r LeafExpansionDuration, echo=FALSE, fig.width=4, fig.height=3.5, fig.margin=TRUE}
+```{r LeafExpansionDuration, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Data
-s <- 1:30
-d <- data.frame(
-  x = s,
-  y = LeafExpansionDuration(s)
-)
+i <- 1:30
+
+d <- data_frame(x=i) %>%
+  mutate(LeafExpansionDuration = LeafExpansionDuration(x)) %>%
+  gather(Process, y, -x)
 
 # Graph
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Node", y="LeafExpansionDuration")
+p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+  theme_bw() + labs(x="Node", y="LeafExpansionDuration") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
+
 ```
 
-$$LeafExpansionDuration_i = a + PotentialLeafDuration \cdot exp^{\frac{-(i-PotentialLeafProfile)^2}{(c \cdot PotentialLeafNumber)^2}}$$
+$$LeafExpansionDuration_i = a + PotentialLeafDuration * exp^{\frac{-(i-PotentialLeafProfile)^2}{(c * PotentialLeafNumber)^2}}$$
 
 with: 
 
@@ -304,26 +304,30 @@ $$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
 
 
 ## PotentialLeafArea
-```{r PotentialLeafArea, echo=FALSE, fig.width=4, fig.height=3.5, fig.margin=TRUE}
+```{r PotentialLeafArea, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# Function
 PotentialLeafArea <- function(i, LLS=448, LLH=17, a=-2.05, b=0.049) {
   LLS * exp(a*((i-LLH)/(LLH-1))^2 + b*((i-LLH)/(LLH-1))^3) 
 }
 
 # Data
-s <- 1:30
-d <- data.frame(
-  x = s,
-  y = PotentialLeafArea(s)
-)
+i <- 1:30
+
+d <- data_frame(x=i) %>%
+  mutate(PotentialLeafArea = PotentialLeafArea(x)) %>%
+  gather(Process, y, -x)
 
 # Graph
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Node", y="PotentialLeafArea (cm2)")
+p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+  theme_bw() + labs(x="Node", y="PotentialLeafArea") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
 
 ```
 
 $$
-PotentialLeafArea_i = PotentialLeafSize \cdot exp^{a \cdot (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b \cdot
+PotentialLeafArea_i = PotentialLeafSize * exp^{a * (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b *
 (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^3}
 $$
 
@@ -340,13 +344,14 @@ LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
 }
 
 # Data
-s <- 0:2000
-d <- data.frame(
-  x = s,
-  Expansion = LeafGrowthRate(t=s, te=500, Ae=300, Teff=(25-4.8)),
-  Senescence = LeafGrowthRate(t=s, te=1500, Ae=300, Teff=(25-4.8))
-)
-d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
+t <- 0:2000
+
+d <- data_frame(x=t) %>% 
+  mutate(
+    Expansion = LeafGrowthRate(x, te=500, Ae=300, Teff=(25-4.8)),
+    Senescence = LeafGrowthRate(x, te=1500, Ae=300, Teff=(25-4.8))
+  ) %>%
+  gather(Process, y, -x)
 
 # Graph
 p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
@@ -354,19 +359,19 @@ p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
 print(p)
-ggsave(p, file="inst/doc/files/figures/LeafGrowthRate.pdf", height=3, width=3, units="in")
+# ggsave(p, file="inst/doc/files/figures/LeafGrowthRate.pdf", height=3, width=3, units="in")
 ```
 
 $$
 \begin{split}
-LeafGrowthRate_i = (T_m - T_b) \cdot PotentialLeafArea_i \cdot a \cdot \\
+LeafGrowthRate_i = (T_m - T_b) * PotentialLeafArea_i * a * \\
 \frac{exp^{-a(ThermalTime-LeafExpansionTime_i)}}{(1+exp^{-a(ThermalTime-LeafExpansionTime_i)})^2}
 \end{split}
 $$
 
 $$
 \begin{split}
-LeafSenescenceRate_i = (T_m - T_b) \cdot LeafArea_i \cdot a \cdot \\
+LeafSenescenceRate_i = (T_m - T_b) * LeafArea_i * a * \\
 \frac{exp^{-a(ThermalTime-LeafSenescenceTime_i)}}{(1+exp^{-a(ThermalTime-LeafSenescenceTime_i)})^2}
 \end{split}
 $$
@@ -387,31 +392,32 @@ $$LeafArea_i=\int LeafGrowthRate_i - \int LeafSenescenceRate_i$$
 # Light interception
 
 ## LAI
-$$LAI = SowingDensity \cdot \sum_{i=1}^{LeafNumber} LeafArea_i$$
+$$LAI = SowingDensity * \sum_{i=1}^{LeafNumber} LeafArea_i$$
 
 ## RIE
-$$RIE = 1 - exp^{(-ExtinctionCoefficient \cdot LAI)}$$
+$$RIE = 1 - exp^{(-ExtinctionCoefficient * LAI)}$$
 
 ```{r RIE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 RIE <- function(LAI, k) {1 - exp(-k * LAI)}
 
 # Graph
-s <- seq(0,5, by=0.1)
-d <- data.frame(
-  x = s,
-  low = RIE(s, k=0.7),
-  high = RIE(s, k=0.9)
-)
+lai <- seq(0,5, by=0.1)
 
-d <- gather(d, k, y, low:high)
+d <- data_frame(x=lai) %>%
+  mutate(
+    low = RIE(x, k=0.7),
+    high = RIE(x, k=0.9)
+  ) %>%
+  gather(k, y, -x)
 
 # Graph
 p <- ggplot(d, aes(x, y, color=k)) + geom_path() +
   theme_bw() + labs(x="Leaf Area Index (LAI)", y="RIE") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
-ggsave(p, file="inst/doc/files/figures/RIE.pdf", height=3, width=3, units="in")
+#ggsave(p, file="inst/doc/files/figures/RIE.pdf", height=3, width=3, units="in")
 ```
 
 
@@ -426,9 +432,9 @@ $$
 PotentialRUE = \left\{ 
 	\begin{array}{ll}
 	r_0 & \textrm{if $ThermalTime < 300 $} \\  
-	r_0 + 2 \cdot \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
+	r_0 + 2 * \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
 	r_{max} & \textrm{if $ThermalTimeFlowering < ThermalTime < ThermalTimeSenescence$}\\
-	a \cdot exp^{b \cdot (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
+	a * exp^{b * (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
   0 & \textrm{else}
 	\end{array}
   \right.
@@ -469,21 +475,24 @@ PotentialRUE <- function(
 }
 
 # Graph
-s <- 0:2000
-d <- data.frame(
-  x = s,
-  y = PotentialRUE(s)
-)
+t <- 0:2000
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Thermal Time (°C.d)", y="PotentialRUE")
+d <- data_frame(x=t) %>% 
+  mutate(PotentialRUE=PotentialRUE(x)) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+  theme_bw() + labs(x="Thermal Time (°C.d)", y="PotentialRUE") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
-ggsave(p, file="inst/doc/files/figures/PotentialRUE.pdf", height=3, width=3, units="in")
+#ggsave(p, file="inst/doc/files/figures/PotentialRUE.pdf", height=3, width=3, units="in")
 ```
 
 \vspace{2cm}
 
 ## CropBiomass [@Monteith1977]
-$$dCropBiomass = Radiation \cdot 0.48 \cdot RIE \cdot RUE \cdot dt$$
+$$dCropBiomass = Radiation * 0.48 * RIE * RUE * dt$$
 
 ## CropPerformance
 
@@ -492,7 +501,7 @@ $$dCropBiomass = Radiation \cdot 0.48 \cdot RIE \cdot RUE \cdot dt$$
 
 # Thermal stress
 ## ThermalStressRUE [@Villalobos1996]
-```{r ThermalStressRUE, echo=FALSE, fig.width=4, fig.height=3.5, fig.margin=TRUE}
+```{r ThermalStressRUE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   ifelse(
@@ -510,13 +519,16 @@ ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
 }
 
 # Graph
-s <- seq(0,45,by=0.2)
-d <- data.frame(
-  x = s,
-  y = ThermalStressRUE(s)
-)
+t <- seq(0,45,by=0.2)
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressRUE")
+d <- data_frame(x=t) %>% 
+  mutate(ThermalStressRUE=ThermalStressRUE(x)) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+  theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressRUE") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
 # ggsave(p, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
@@ -525,9 +537,9 @@ print(p)
 $$
 ThermalStressRUE = \left\{ 
   \begin{array}{ll}
-  T_m \cdot \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
+  T_m * \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
   1 & \textrm{if $T_{ol} < T_m < T_{ou}$} \\
-  T_m \cdot \frac{1}{T_{ou} - tc} - \frac{tc}{T_{ou} - tc} & \textrm{if $T_{ou} < T_m < tc$} \\
+  T_m * \frac{1}{T_{ou} - tc} - \frac{tc}{T_{ou} - tc} & \textrm{if $T_{ou} < T_m < tc$} \\
   0 & \textrm{else}
 	\end{array}
   \right.
@@ -543,25 +555,29 @@ with:
 
 
 ## ThermalStressMineralization [@Vale2007]
-```{r ThermalStressMineralization, echo=FALSE, fig.width=4, fig.height=3.5, fig.margin=TRUE}
+```{r ThermalStressMineralization, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 ThermalStressMineralization <- function(tm, tb=15, tc=36) {
   tc/(1 + (tc - 1) * exp(-0.119 * (tm - tb)))
 }
 
 ## Graph
-s <- seq(0,45,by=0.2)
-d <- data.frame(
-  x = s,
-  y = ThermalStressMineralization(s)
-)
+t <- seq(0,45,by=0.2)
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressMineralization")
+d <- data_frame(x=t) %>% 
+  mutate(ThermalStressMineralization=ThermalStressMineralization(x)) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+  theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressMineralization") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 print(p)
+
 # ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \cdot exp^{(-0.119 \cdot (T_m - T_b))}}$$
+$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) * exp^{(-0.119 * (T_m - T_b))}}$$
 
 with: 
 
@@ -574,6 +590,59 @@ with:
 
 # Water stress
 
+## WaterDemand
+
+$$WaterDemand = K_c * PET * RIE$$
+
+with $K_c = 1.2$, crop coefficient
+
+## WaterSupply
+```{r WaterSupply, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# Function
+WaterStressConductivity <- function(t) {sqrt(t+1) - sqrt(t)}
+
+# Graph
+t <- seq(0,30, by=0.1) 
+
+d <- data_frame(x=t) %>%
+  mutate(SoilConductivity = WaterStressConductivity(x)) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+  labs(x="Dry Days (d)", y="SoilConductivity") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(p)
+
+```
+
+$$WaterSupply = Rainfall + Irrigation - Transpiration - Evaporation - Drainage$$
+
+$$Transpiration = WaterDemand * WaterStressConductance$$
+
+$$Evaporation = (1 - RIE) * PET * SoilConductivity$$
+
+$$SoilConductivity = \sqrt{x + 1} - \sqrt{x}$$
+
+with 
+
+$$
+  dx/dt =
+  \left\{ 
+	\begin{array}{ll}
+	1  & \textrm{if $Rainfall + Irrigation <= 4$} \\  
+	0 & \textrm{else}
+	\end{array} 
+	\right.
+$$
+
+## WaterStress
+$$WaterStress = \frac{WaterAvailable}{WaterTotal}$$
+
+$$WaterAvailable = WaterSupply$$
+
+$$WaterTotal = (WaterSoilCapacity - WaterSoilWilting) * SoilDensity * (1 - StoneContent) * RootingDepth$$
+
 ## WaterStressExpansion, WaterStressConductance
 ```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
@@ -582,13 +651,14 @@ WaterStressProcess <- function(ftsw, a=-5) {
 }
 
 ## Graph
-s <- seq(0,1, by=0.01)
-d <- data.frame(
-  x = s,
-  Expansion = WaterStressProcess(s, a=-4.42),
-  Conductance = WaterStressProcess(s, a=-9.3)
-)
-d <- melt(d, id.vars="x", value.name = "y", variable.name="Process")
+ftsw <- seq(0,1, by=0.01)
+
+d <- data_frame(x=ftsw) %>%
+  mutate(
+    Expansion = WaterStressProcess(x, a=-4.42),
+    Conductance = WaterStressProcess(x, a=-9.3)
+  ) %>%
+  gather(Process, y, -x)
 
 p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
   labs(x="WaterStress (FTSW)", y="WaterStressProcess") +
@@ -598,17 +668,17 @@ print(p)
 # ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \cdot WaterStress)}}$$ 
+$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a * WaterStress)}}$$ 
 
 with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
 
 
 ## WaterStressPhenology
-$$WaterStressPhenology = a \cdot (1 - WaterStressConductance)$$
+$$WaterStressPhenology = a * (1 - WaterStressConductance)$$
 with $a=0.1$, scaling parameter for water-stress plant heating
 
 ## WaterStressMineralization
-$$WaterStressMineralization = 1 - (1 - y_0) \cdot (1 - RelativeWaterContent_{layer1})$$
+$$WaterStressMineralization = 1 - (1 - y_0) * (1 - RelativeWaterContent_{layer1})$$
 
 \newpage
 
@@ -620,32 +690,52 @@ $$WaterStressMineralization = 1 - (1 - y_0) \cdot (1 - RelativeWaterContent_{lay
 # Radiation stress
 ## RadiationStressExpansion [@Rey2003]
 
-```{r RadiationStressExpansion, echo=FALSE, fig.width=4, fig.height=3.5, fig.margin=TRUE}
+```{r RadiationStressExpansion, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.09) {
   s * (a + (b/(1 + exp((c - nipar)/d))))
 }
 
 ## Graph
-s <- seq(0,15,by=0.1)
-d <- data.frame(
-  x = s,
-  y = RadiationStressExpansion(nipar=s)
-)
+ipar <- seq(0,15,by=0.1)
 
-p <- ggplot(d, aes(x,y)) + geom_line() + theme_bw() +
-  labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion")
+d <- data_frame(x=ipar) %>%
+  mutate(Expansion = RadiationStressExpansion(x)) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+  labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
 
 print(p)
 # ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$RadiationStressExpansion = s \cdot a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
+$$RadiationStressExpansion = s * a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
 
 with:
 
 * $s=2.5$, scaling parameter for density effect;
 * $a=-0.14$; $b=1.13$; $c=4.13$; $d=2.09$
+
+\newpage
+
+
+
+# Outputs
+
+## Timed variables
+
+```{r OutputsTimed, echo=FALSE, results='asis'}
+# data
+s <- sunflo$outputs %>% select(label=label.doc, description=label.en, unit)
+# table
+kable(s, padding=0)
+```
+
+
+## Indicators
+
 
 \newpage
 
