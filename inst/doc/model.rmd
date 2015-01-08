@@ -5,11 +5,6 @@ bibliography: ./files/bibliography.bib
 csl: ./style/elsevier.csl
 ---
 
-\small
-\tableofcontents
-
-\newpage
-
 ```{r header, message=FALSE, warning=FALSE, echo=FALSE}
 # TODO : made small parameters table linked subsets of the complete parameter table
 
@@ -34,15 +29,25 @@ db <- loadWorkbook(file="inst/doc/files/parameterization.xlsx")
 sunflo <- list(
   climate = readWorksheet(db, sheet="climate"),
   parameters = readWorksheet(db, sheet="parameters"),
-  outputs = readWorksheet(db, sheet="outputs")
+  outputs = readWorksheet(db, sheet="outputs"),
+  indicators = readWorksheet(db, sheet="indicators")
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
 ```
 
-\footnotesize
+\begin{figure*}
+  \includegraphics[scale=2]{files/structure_nodes.pdf}
+\end{figure*}
 
-# Model overview
+\newpage
+
+\footnotesize
+\tableofcontents
+
+\newpage
+
+
 ```{r structure, echo=FALSE, eval=FALSE}
 # Build model graph from R
 graph_ext <- "png"
@@ -59,9 +64,6 @@ system(call)
 
 ```
 
-\begin{figure*}
-  \includegraphics[scale=2]{files/structure_nodes.pdf}
-\end{figure*}
 
 # Inputs
 ```{r InputsParameters, echo=FALSE, results='asis'}
@@ -105,6 +107,7 @@ kable(s, padding=0)
 ## Species
 ```{r InputsSpecies, echo=FALSE, results='asis'}
 ```
+
 
 ## Cultivar
 ```{r InputsCultivar, echo=FALSE, results='asis'}
@@ -641,7 +644,7 @@ $$WaterStress = \frac{WaterAvailable}{WaterTotal}$$
 
 $$WaterAvailable = WaterSupply$$
 
-$$WaterTotal = (WaterSoilCapacity - WaterSoilWilting) * SoilDensity * (1 - StoneContent) * RootingDepth$$
+$$WaterTotal = SoilWaterCapacity * SoilDensity * (1 - StoneContent) * RootingDepth$$
 
 ## WaterStressExpansion, WaterStressConductance
 ```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
@@ -728,13 +731,21 @@ with:
 
 ```{r OutputsTimed, echo=FALSE, results='asis'}
 # data
-s <- sunflo$outputs %>% select(label=label.doc, description=label.en, unit)
+s <- sunflo$outputs %>% select(symbol=name.rsunflo.en, label=label.doc, description=label.en, unit)
 # table
 kable(s, padding=0)
 ```
 
+\newpage
 
 ## Indicators
+
+```{r OutputsIndicators, echo=FALSE, results='asis'}
+# data
+s <- sunflo$indicators %>% select(level, factor, symbol=name.rsunflo.en, description=label.en, unit, formula)
+# table
+kable(s, padding=0)
+```
 
 
 \newpage

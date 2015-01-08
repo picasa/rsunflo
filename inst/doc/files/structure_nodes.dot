@@ -80,7 +80,7 @@ digraph G {
 				fontsize=35
 				pencolor=gray
 				
-				WaterCapacity [style=filled, colorscheme=set14, fillcolor=2] 
+				SoilWaterCapacity [style=filled, colorscheme=set14, fillcolor=2] 
 				RootingDepth [style=filled, colorscheme=set14, fillcolor=2]
 				SoilDensity [style=filled, colorscheme=set14, fillcolor=2]
 				MineralizationRate [style=filled, colorscheme=set14, fillcolor=3]
@@ -231,7 +231,7 @@ digraph G {
 				WaterResponseConductance -> WaterStressConductance
 				WaterResponseExpansion -> WaterStressExpansion
 				{RIE PET} -> WaterDemand [style=dotted, colorscheme=set14, color=2]		
-				{WaterCapacity RootingDepth SoilDensity} -> WaterSupply [style=dotted]
+				{SoilWaterCapacity RootingDepth SoilDensity} -> WaterSupply [style=dotted]
 				
 				// Module
 				RootGrowth -> WaterSupply
