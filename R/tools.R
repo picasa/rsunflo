@@ -213,7 +213,7 @@ ggpairs <-
     z=z[z$x_lab!=z$y_lab,]
     names(z_cor)=c('cor','p','rsq','x_lab','y_lab')
     z_cor=z_cor[z_cor$x_lab!=z_cor$y_lab,]
-    diag = melt(data,measure.vars=names(data))
+    diag = reshape2::melt(data,measure.vars=names(data))
     names(diag)[1] = 'x_lab'
     diag$y_lab = diag$x_lab
     dens = ddply(

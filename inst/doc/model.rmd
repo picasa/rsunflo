@@ -112,11 +112,16 @@ kable(s, padding=0)
 ## Cultivar
 ```{r InputsCultivar, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %>%
+s_en <- sunflo$parameters %>%
   filter(category=="Variete", template.default==1) %>%
   select(label=label.doc, description=label.en, value, unit, reference)
+
+s_fr <- sunflo$parameters %>%
+  filter(category=="Variete", template.default==1) %>%
+  select(symbol=name.rsunflo.en, label=label.doc, description=label.fr, value, unit, reference)
+
 # table
-kable(s, padding=0)
+kable(s_en, padding=0)
 ```
 
 

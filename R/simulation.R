@@ -343,25 +343,26 @@ shape <- function(x, view) {
 #' @export indicate
 indicate <- function(x, view="timed") {
   
+  # Définition des périodes d'intégration
+  # semis - levee
+  SE <- x$PhenoStage == 1
+  # levée - fin maturité
+  EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
+  # levée - floraison
+  EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
+  # initiation florale - début maturité
+  FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
+  # floraison - début maturité
+  FM <- x$PhenoStage == 4
+  # floraison - fin maturité
+  GF <- (x$PhenoStage == 4 | x$PhenoStage == 5)
+  # début maturité - fin maturité
+  MH <- x$PhenoStage == 5
+  
+  
   switch(view,
     
     timed = {
-      # Définition des périodes d'intégration
-      # semis - levee
-      SE <- x$PhenoStage == 1
-      # levée - fin maturité
-      EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
-      # levée - floraison
-      EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
-      # initiation florale - début maturité
-      FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
-      # floraison - début maturité
-      FM <- x$PhenoStage == 4
-      # floraison - fin maturité
-      GF <- (x$PhenoStage == 4 | x$PhenoStage == 5)
-      # début maturité - fin maturité
-      MH <- x$PhenoStage == 5
-      
       # Calcul des indicateurs
       o <- data.frame(
         # Graphes
@@ -394,6 +395,8 @@ indicate <- function(x, view="timed") {
         
         # Contraintes thermiques
         SFTRUE = sum(1 - x$FTRUE[EH]),
+        NHT = sum(x$TM[EH] > 28),
+        NLT = sum(x$TM[EH] < 20),
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
@@ -415,21 +418,7 @@ indicate <- function(x, view="timed") {
       ) 
     },
          
-    diagvar = {
-       # Définition des périodes d'intégration
-       # levée - fin maturité
-       EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
-       # semis - levée
-       SE <- (x$PhenoStage == 1)
-       # levée - floraison
-       EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
-       # initiation florale - début maturité
-       FIM <- (x$PhenoStage == 3 | x$PhenoStage == 4)
-       # floraison - début maturité
-       FM <- x$PhenoStage == 4
-       # début maturité - fin maturité
-       MH <- x$PhenoStage == 5
-           
+    diagvar = {       
        # Calcul des indicateurs
        o <- data.frame(
          # Ressources environnementales
@@ -514,28 +503,13 @@ indicate <- function(x, view="timed") {
 }
 
 
-# Dynamique de FTSW sur la période de culture
-#' @export indicate_ftsw
-indicate_ftsw <- function(x) {
-  
-  # Période de culture (levée - maturité)
-  crop = (x$PhenoStage >1 & x$PhenoStage <6)
-  
-  # Variable dynamique
-  o <- data.frame(
-    t = 1:length(crop[crop==TRUE]),
-    ftsw = x$FTSW[crop]
-  )
-  return(o)
-}
-
 # Visualisation  des simulations
 #' @export display
 display <- function(x, view="timed") {
   switch(
     view,
     timed = {
-      d <- melt(x, id.vars=c("time", "TTA2"))
+      d <- reshape2::melt(x, id.vars=c("time", "TTA2"))
       ggplot(d, aes(x=time, y=value)) +
         geom_line() +
         facet_wrap(~ variable, scale="free") +
