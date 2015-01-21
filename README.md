@@ -9,20 +9,22 @@ A set of tools for working with the SUNFLO crop model at different steps.
 
 Documentation : 
 
-* [user manual](inst/doc/workflow.rmd) for a description of the workflow for simulation and model parameterization [(pdf)](inst/doc/workflow.pdf)
-* [model manual](inst/doc/model.rmd) for a more detailed documentation of the sunflo algorithm [(pdf)](inst/doc/model.pdf)
+* user manual : description of the workflow for simulation and model parameterization [(pdf)](inst/doc/documentation_user.pdf)
+* model manual : graphic documentation of the sunflo algorithm [(pdf)](inst/doc/documentation_model.pdf)
 
 ### Installation
 To run simulation with the SUNFLO crop model and this R package, two softwares (VLE and R) and two packages (sunflo and rsunflo) need to be installed.
 
 1. install the development version of `rsunflo` or clone the rsunflo repository
 
-    # install.packages("devtools")
-    devtools::install_github("picasa/rsunflo")
+``` r
+# install.packages("devtools")
+devtools::install_github("picasa/rsunflo")
+```
 
-2. install the VLE simulation platform
+2. install the `VLE` simulation platform : [VLE project on github](https://github.com/vle-forge/vle)
 
-3. install the SUNFLO crop model for VLE simulation platform
+3. install the `SUNFLO` crop model for VLE simulation platform : [RECORD project model library](http://www6.inra.fr/record/Bibliotheque-de-modeles/Modeles-du-domaine-des-agro-ecosystemes)
 
 
 ### References
