@@ -12,6 +12,7 @@ Maintainer: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
 Imports:
     reshape2,
     plyr,
+    dplyr,
     lubridate,
     ggplot2
 Suggests:

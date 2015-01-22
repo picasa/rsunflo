@@ -737,6 +737,7 @@ with:
 ```{r OutputsTimed, echo=FALSE, results='asis'}
 # data
 s <- sunflo$outputs %>% select(symbol=name.rsunflo.en, label=label.doc, description=label.en, unit)
+
 # table
 kable(s, padding=0)
 ```
@@ -747,7 +748,10 @@ kable(s, padding=0)
 
 ```{r OutputsIndicators, echo=FALSE, results='asis'}
 # data
-s <- sunflo$indicators %>% select(level, factor, symbol=name.rsunflo.en, description=label.en, unit, formula)
+s <- sunflo$indicators %>%
+  filter(verbose=="crop") %>%
+  select(level, factor, symbol=name.rsunflo.en, description=label.en, unit, formula)
+
 # table
 kable(s, padding=0)
 ```

@@ -341,13 +341,15 @@ shape <- function(x, view) {
 
 # Fonction de synthèse des covariables (1 valeur par usm)
 #' @export indicate
-indicate <- function(x, view="timed") {
+indicate <- function(x, integration="crop", Tb=4.8) {
   
   # Définition des périodes d'intégration
   # semis - levee
   SE <- x$PhenoStage == 1
   # levée - fin maturité
   EH <- (x$PhenoStage > 1 & x$PhenoStage < 6)
+  # levée - debut maturité
+  EM <- (x$PhenoStage > 1 & x$PhenoStage < 5)
   # levée - floraison
   EF <- (x$PhenoStage == 2 | x$PhenoStage == 3)
   # initiation florale - début maturité
@@ -355,14 +357,14 @@ indicate <- function(x, view="timed") {
   # floraison - début maturité
   FM <- x$PhenoStage == 4
   # floraison - fin maturité
-  GF <- (x$PhenoStage == 4 | x$PhenoStage == 5)
+  FH <- (x$PhenoStage == 4 | x$PhenoStage == 5)
   # début maturité - fin maturité
   MH <- x$PhenoStage == 5
   
   
-  switch(view,
+  switch(integration,
     
-    timed = {
+    crop = {
       # Calcul des indicateurs
       o <- data.frame(
         # Graphes
@@ -370,9 +372,11 @@ indicate <- function(x, view="timed") {
         # xyplot(value ~ time | variable, data=xm, type="l", scale="free")
         
         # Phenologie
-        DSE = sum(SE),
-        DEF = sum(EF),
-        DGF = sum(GF),
+        D_SE = sum(SE),
+        D_EF = sum(EF),
+        D_FM = sum(FM),
+        D_MH = sum(MH),
+        TT = sum((x$TM[EH] - Tb)[(x$TM[EH] - Tb) > 0]),
         
         # Ressources environnementales
         SGR = sum(x$GR[EH] * 0.48), # PAR
@@ -390,7 +394,7 @@ indicate <- function(x, view="timed") {
         # Contraintes azotées
         # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
         SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote 
-        SNAB = diff(range(x$NAB[EH])),  # quantité totale d'azote absorbé 
+        SNAB = last(x$NAB[EH]),  # quantité totale d'azote absorbé 
         SFNRUE = sum(1 - x$FNRUE[EH]),
         
         # Contraintes thermiques
@@ -400,7 +404,7 @@ indicate <- function(x, view="timed") {
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
-        DSF = sum(x$LAI[EH]), 
+        LAD = sum(x$LAI[EH]), 
         
         # Rayonnement intercepté (PAR)
         SIR = sum(x$RIE[EH] * x$GR[EH] * 0.48),
@@ -412,90 +416,115 @@ indicate <- function(x, view="timed") {
         STDM = max(x$TDM[EH]),
         
         # Performances
-        TT = max(x$TTA2[EH]),
         GY = max(x$GY),
         OC = max(x$OC)
       ) 
     },
          
-    diagvar = {       
+    phase = {       
        # Calcul des indicateurs
        o <- data.frame(
+         
+         # Phenologie
+         D_SE = sum(SE),
+         D_EF = sum(EF),
+         D_FM = sum(FM),
+         D_MH = sum(MH),
+         
          # Ressources environnementales
+         # Somme de rayonnement
+         SGR = sum(x$GR[EH]),
+         SGR_EF = sum(x$GR[EF]),
+         SGR_FM = sum(x$GR[FM]),
+         SGR_MH = sum(x$GR[MH]),
+         
          # Cumul de précipitations
-         P_TOT = sum(x$RR[EH]),
-         P_VEG = sum(x$RR[EF]),
-         P_FLO = sum(x$RR[FM]),
-         P_REM = sum(x$RR[MH]),
+         SRR = sum(x$RR[EH]),
+         SRR_EF = sum(x$RR[EF]),
+         SRR_FM = sum(x$RR[FM]),
+         SRR_MH = sum(x$RR[MH]),
          
          # Déficit hydrique climatique : sum(P-ETP)
-         PE_TOT = sum((x$RR-x$ETP)[EH]),
-         PE_VEG = sum((x$RR-x$ETP)[EF]),
-         PE_FLO = sum((x$RR-x$ETP)[FM]),
-         PE_REM = sum((x$RR-x$ETP)[MH]),
+         SCWD = sum((x$RR-x$ETP)[EH]),
+         SCWD_EF = sum((x$RR-x$ETP)[EF]),
+         SCWD_FM = sum((x$RR-x$ETP)[FM]),
+         SCWD_MH = sum((x$RR-x$ETP)[MH]),
          
          # Déficit hydrique édaphique : mean(ETR/ETM)
-         DH_TOT = mean(x$ETRETM[EH]),
-         DH_VEG = mean(x$ETRETM[EF]),
-         DH_FLO = mean(x$ETRETM[FM]),
-         DH_REM = mean(x$ETRETM[MH]),
+         METR = mean(x$ETRETM[EH]),
+         METR_EF = mean(x$ETRETM[EF]),
+         METR_FM = mean(x$ETRETM[FM]),
+         METR_MH = mean(x$ETRETM[MH]),
          
-         # Déficit hydrique édaphique qualitatif : length(ETR/ETM < 0.6)
-         ISH_TOT = length(x$ETRETM[EH & x$ETRETM < 0.6]),
-         ISH_VEG = length(x$ETRETM[EF & x$ETRETM < 0.6]), 
-         ISH_FLO = length(x$ETRETM[FM & x$ETRETM < 0.6]),
-         ISH_REM = length(x$ETRETM[MH & x$ETRETM < 0.6]),
+         # Déficit hydrique édaphique qualitatif : sum(ETR/ETM < 0.6)
+         NETR = sum(x$ETRETM[EH] < 0.6),
+         NETR_EF = sum(x$ETRETM[EF] < 0.6), 
+         NETR_FM = sum(x$ETRETM[FM] < 0.6),
+         NETR_MH = sum(x$ETRETM[MH] < 0.6),
          
          # Déficit hydrique édaphique quantitatif : sum(1-FTSW)
-         FTSW_TOT = sum(1 - x$FTSW[EH]),
-         FTSW_VEG = sum(1 - x$FTSW[EF]), 
-         FTSW_FLO = sum(1 - x$FTSW[FM]),
-         FTSW_REM = sum(1 - x$FTSW[MH]),
+         SFTSW = sum(1 - x$FTSW[EH]),
+         SFTSW_EF = sum(1 - x$FTSW[EF]), 
+         SFTSW_FM = sum(1 - x$FTSW[FM]),
+         SFTSW_MH = sum(1 - x$FTSW[MH]),
          
-         # Somme de température (base 6°C)
-         ST_TOT = sum((x$TM[EH] - 6)[(x$TM[EH] - 6) > 0]),
-         ST_VEG = sum((x$TM[EF] - 6)[(x$TM[EF] - 6) > 0]),
-         ST_FLO = sum((x$TM[FM] - 6)[(x$TM[FM] - 6) > 0]),
-         ST_REM = sum((x$TM[MH] - 6)[(x$TM[MH] - 6) > 0]),
+         # Contraintes hydriques
+         SFHTR = sum(1 - x$FHTR[EH]),
+         SFHRUE = sum(1 - x$FHRUE[EH]), 
          
-         # Somme de rayonnement
-         SR_TOT = sum(x$GR[EH]),
-         SR_VEG = sum(x$GR[EF]),
-         SR_FLO = sum(x$GR[FM]),
-         SR_REM = sum(x$GR[MH]),
+         # Somme de température 
+         TT = sum((x$TM[EH] - Tb)[(x$TM[EH] - Tb) > 0]),
+         TT_SE = sum((x$TM[SE] - Tb)[(x$TM[SE] - Tb) > 0]),
+         TT_EF = sum((x$TM[EF] - Tb)[(x$TM[EF] - Tb) > 0]),
+         TT_FM = sum((x$TM[FM] - Tb)[(x$TM[FM] - Tb) > 0]),
+         TT_MH = sum((x$TM[MH] - Tb)[(x$TM[MH] - Tb) > 0]),       
          
-         # Somme de température à la levée (semis - levée)
-         ST_A2 = sum((x$TM[SE] - 6)[(x$TM[SE] - 6) > 0]),
+         # Contraintes thermiques
+         SFTRUE = sum(1 - x$FTRUE[EH]),
+         # Chaud
+         NHT = sum(x$TM[EH] > 28),
+         NHT_EF = sum(x$TM[EF] > 28),
+         NHT_FM = sum(x$TM[FM] > 28),
+         NHT_MH = sum(x$TM[MH] > 28),
+         # Froid
+         NLT = sum(x$TM[EH] < 20),
+         NLT_EF = sum(x$TM[EF] < 20),
+         NLT_FM = sum(x$TM[FM] < 20),
+         NLT_MH = sum(x$TM[MH] < 20),
          
-         # Température basse en debut de cycle (jours Tmin < 15)
-         BT_VEG = length(x$TN[EF][x$TN[EF] < 15]),
-         
-         # Température haute en fin de cycle
-         HT_REM = length(x$TX[FM][x$TX[FM] > 32]),
-         
-         # Azote absorbé avant maturité (Nabs / Rendement ?)
-         N_TOT = max(x$NAB[EF | FM]),
+         # Contraintes azotées
+         # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
+         SNAB = last(x$NAB[EH]),  # quantité totale d'azote absorbé 
+         SNAB_EM = max(x$NAB[EM]),
+         SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote 
+         SFNRUE = sum(1 - x$FNRUE[EH]),      
          
          # INN à la floraison
-         INN_F1 = x$NNI[FM][1],
+         NNI_F = x$NNI[FM][1],
          
          # Nombre de jours INN < 0.8 jusqu'à M0
-         ISN_M0 = length(x$NNI[EF | FM][x$NNI[EF | FM] < 0.8]),
-         IEN_M0 = length(x$NNI[EF | FM][(x$NNI[EF | FM] > 1.2) & (x$NNI[EF | FM] < 2)]),
+         NNNID_EM = sum(x$NNI[EM] < 0.8),
+         NNNIE_EM = sum((x$NNI[EM] > 1.2) & (x$NNI[EM] < 2)),
          
          # Indice foliaire maximum
-         IF_MAX = max(x$LAI),
+         LAI = max(x$LAI),
          
          # Durée de surface foliaire : sum(x$LAI)
-         DSF = sum(x$LAI[EH]),
+         LAD = sum(x$LAI[EH]),
+         
+         # Rayonnement intercepté (PAR)
+         SIR = sum(x$RIE[EH] * x$GR[EH] * 0.48),
+         
+         # Photosynthèse
+         MRUE = mean(x$RUE[EH]),
          
          # Biomasse
-         PS_TOT = max(x$TDM[EH]),
-         PS_F1 = x$TDM[FM][1],
+         STDM = max(x$TDM[EH]),
+         STDM_F = x$TDM[FM][1],
          
          # Performance
-         RDT_SIM = max(x$GY),
-         TH_SIM = max(x$OC)
+         GY = max(x$GY),
+         OC = max(x$OC)
        ) 
      }         
   )
