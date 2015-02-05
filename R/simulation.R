@@ -444,6 +444,12 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          SRR_FM = sum(x$RR[FM]),
          SRR_MH = sum(x$RR[MH]),
          
+         # Cumul d'évapotranspiration potentielle
+         SETP = sum(x$ETP[EH]),
+         SETP_EF = sum(x$ETP[EF]),
+         SETP_FM = sum(x$ETP[FM]),
+         SETP_MH = sum(x$ETP[MH]),
+         
          # Déficit hydrique climatique : sum(P-ETP)
          SCWD = sum((x$RR-x$ETP)[EH]),
          SCWD_EF = sum((x$RR-x$ETP)[EF]),
@@ -468,9 +474,17 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          SFTSW_FM = sum(1 - x$FTSW[FM]),
          SFTSW_MH = sum(1 - x$FTSW[MH]),
          
-         # Contraintes hydriques
+         # Effet de la contrainte hydrique sur la photosynthèse : sum(1-FHRUE)
+         SFHRUE = sum(1 - x$FHRUE[EH]),
+         SFHRUE_EF = sum(1 - x$FHRUE[EF]), 
+         SFHRUE_FM = sum(1 - x$FHRUE[FM]),
+         SFHRUE_MH = sum(1 - x$FHRUE[MH]),
+         
+         # Effet de la contrainte hydrique sur la transpiration : sum(1-FHTR)
          SFHTR = sum(1 - x$FHTR[EH]),
-         SFHRUE = sum(1 - x$FHRUE[EH]), 
+         SFHTR_EF = sum(1 - x$FHTR[EF]), 
+         SFHTR_FM = sum(1 - x$FHTR[FM]),
+         SFHTR_MH = sum(1 - x$FHTR[MH]),
          
          # Somme de température 
          TT = sum((x$TM[EH] - Tb)[(x$TM[EH] - Tb) > 0]),
@@ -481,6 +495,10 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          
          # Contraintes thermiques
          SFTRUE = sum(1 - x$FTRUE[EH]),
+         SFTRUE_EF = sum(1 - x$FTRUE[EF]), 
+         SFTRUE_FM = sum(1 - x$FTRUE[FM]),
+         SFTRUE_MH = sum(1 - x$FTRUE[MH]),
+         
          # Chaud
          NHT = sum(x$TM[EH] > 28),
          NHT_EF = sum(x$TM[EF] > 28),
@@ -494,11 +512,25 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          
          # Contraintes azotées
          # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
-         SNAB = last(x$NAB[EH]),  # quantité totale d'azote absorbé 
+         # Azote absorbé
+         SNAB = max(x$NAB[EH]),
+         SNAB_EF = max(x$NAB[EF]),
+         SNAB_FM = max(x$NAB[FM]),
          SNAB_EM = max(x$NAB[EM]),
-         SNNI = sum(1 - x$NNI[EH & x$NNI <1]), #  déficit d'azote 
-         SFNRUE = sum(1 - x$FNRUE[EH]),      
+         SNAB_MH = max(x$NAB[MH]),
          
+         # Indice de nutrition azoté (deficit azoté)
+         SNNI = sum(1 - x$NNI[EH & x$NNI <1]),
+         SNNI_EF = sum(1 - x$NNI[EF & x$NNI <1]),
+         SNNI_FM = sum(1 - x$NNI[FM & x$NNI <1]),
+         SNNI_MH = sum(1 - x$NNI[MH & x$NNI <1]),
+         
+         # Effet contrainte azoté sur la photosynthèse
+         SFNRUE = sum(1 - x$FNRUE[EH]),
+         SFNRUE_EF = sum(1 - x$FNRUE[EF]),
+         SFNRUE_FM = sum(1 - x$FNRUE[FM]),
+         SFNRUE_MH = sum(1 - x$FNRUE[MH]),
+      
          # INN à la floraison
          NNI_F = x$NNI[FM][1],
          
@@ -514,6 +546,9 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          
          # Rayonnement intercepté (PAR)
          SIR = sum(x$RIE[EH] * x$GR[EH] * 0.48),
+         SIR_EF = sum(x$RIE[EF] * x$GR[EF] * 0.48),
+         SIR_FM = sum(x$RIE[FM] * x$GR[FM] * 0.48),
+         SIR_MH = sum(x$RIE[MH] * x$GR[MH] * 0.48),
          
          # Photosynthèse
          MRUE = mean(x$RUE[EH]),
