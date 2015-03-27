@@ -42,6 +42,19 @@ sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",val
 
 \newpage
 
+# Abstract
+SUNFLO is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time, environment (soil and climate), management practice and genetic diversity [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
+
+This model is based on a conceptual framework initially proposed by @Monteith1977 and now shared by a large familly of crop models [REF].
+In this framework, the crop dry biomass growth rate ($dDM/dt$) is calculated as an ordinary differential equation [EQ1] function of incident photosynthetically active radiation ($PAR$, $MJ.m^{-2}$), light interception efficiency ($1-exp^{-k \cdot LAI}$) and radiation use efficiency ($RUE$, $g.MJ^{-1}$).
+The light interception efficiency is based on Beer-Lambert's law as a function of leaf area index ($LAI$) and light extinction coefficient ($k$). The radiation use efficiency concept [@Monteith1994] is used to represent photosynthesis at the crop scale.
+
+[EQ1] $$ dDM/dt = RUE \cdot (1-exp^{-k \cdot LAI}) \cdot PAR $$
+
+Broad scale processes of this framework, the dynamics of $LAI$, photosynthesis ($RUE$) and biomass allocation to grains were split into finer processes (e.g leaf expansion and senescence, response functions to environmental stresses) to reveal genotypic specificity and to allow the emergence of genotype x environment interactions. Globally, the SUNFLO crop model has about 50 equations and 64 parameters (43 plant-related traits and 21 environment-related).
+
+\newpage
+
 \footnotesize
 \tableofcontents
 
@@ -547,7 +560,7 @@ ThermalStressRUE = \left\{
   \begin{array}{ll}
   T_m * \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
   1 & \textrm{if $T_{ol} < T_m < T_{ou}$} \\
-  T_m * \frac{1}{T_{ou} - tc} - \frac{tc}{T_{ou} - tc} & \textrm{if $T_{ou} < T_m < tc$} \\
+  T_m * \frac{1}{T_{ou} - T_c} - \frac{T_c}{T_{ou} - T_c} & \textrm{if $T_{ou} < T_m < T_c$} \\
   0 & \textrm{else}
 	\end{array}
   \right.
