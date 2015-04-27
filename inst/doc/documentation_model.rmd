@@ -3,6 +3,7 @@ title: "Documentation for the SUNFLO crop model"
 output: rmarkdown::tufte_handout
 bibliography: ./files/bibliography.bib
 csl: ./style/elsevier.csl
+classoption: a4paper
 ---
 
 ```{r header, message=FALSE, warning=FALSE, echo=FALSE}
@@ -117,10 +118,12 @@ s <- sunflo$parameters %>%
 kable(s, padding=0)
 ```
 
+
+\newpage
+
 ## Species
 ```{r InputsSpecies, echo=FALSE, results='asis'}
 ```
-
 
 ## Cultivar
 ```{r InputsCultivar, echo=FALSE, results='asis'}
