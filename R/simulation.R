@@ -620,7 +620,7 @@ evaluate_error <- function(data, formula, output="numeric") {
 
 # Graphes simulés / observés
 #' @export evaluate
-evaluate <- function(data, formula, color, scale="free", ...) {
+evaluate <- function(data, formula, color, scale="free", size_label=4, ...) {
   # Graphes
   ggplot(data=data, aes(x=observed, y=simulated)) + 
     geom_point(aes_string(color=color), ...) +
@@ -630,7 +630,7 @@ evaluate <- function(data, formula, color, scale="free", ...) {
     geom_text(
       data=evaluate_error(data, formula, output="label"),
       aes(x=Inf, y=-Inf, label=label),
-      colour="black", hjust=1.1, vjust=-1, size=4
+      colour="black", hjust=1.1, vjust=-1, size=size_label
     ) +
     theme_bw() + labs(x="Observed data", y="Simulated data")
 }
