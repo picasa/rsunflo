@@ -8,6 +8,7 @@ output:
     toc_depth: 2
 bibliography: ./files/bibliography.bib
 csl: ./style/elsevier.csl
+classoption: a4paper
 ---
 
 \newpage

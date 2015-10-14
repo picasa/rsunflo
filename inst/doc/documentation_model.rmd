@@ -8,12 +8,11 @@ classoption: a4paper
 
 ```{r header, message=FALSE, warning=FALSE, echo=FALSE}
 # TODO : made small parameters table linked subsets of the complete parameter table
-
-library(ggplot2)
-library(reshape2)
+library(readxl)
 library(tidyr)
 library(dplyr)
-library(XLConnect)
+library(ggplot2)
+# library(DiagrammeR)
 library(knitr)
 
 # path (! wd is changed in next chunk)
@@ -25,13 +24,13 @@ fig_dpi = 100
 
 ```{r data, message=FALSE, warning=FALSE, echo=FALSE}
 # data
-db <- loadWorkbook(file="inst/doc/files/parameterization.xlsx") 
+list_parameter <- "inst/doc/files/parameterization.xlsx"
 
 sunflo <- list(
-  climate = readWorksheet(db, sheet="climate"),
-  parameters = readWorksheet(db, sheet="parameters"),
-  outputs = readWorksheet(db, sheet="outputs"),
-  indicators = readWorksheet(db, sheet="indicators")
+  climate = read_excel(list_parameter, sheet="climate"),
+  parameters = read_excel(list_parameter, sheet="parameters"),
+  outputs = read_excel(list_parameter, sheet="outputs"),
+  indicators = read_excel(list_parameter, sheet="indicators")
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
@@ -42,6 +41,7 @@ sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",val
 \end{figure*}
 
 \newpage
+
 
 # Abstract
 SUNFLO is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time, environment (soil and climate), management practice and genetic diversity [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
@@ -62,21 +62,6 @@ Broad scale processes of this framework, the dynamics of $LAI$, photosynthesis (
 \newpage
 
 
-```{r structure, echo=FALSE, eval=FALSE}
-# Build model graph from R
-graph_ext <- "png"
-graph_nodes <- "-Nlabel= -Nshape=circle -Gdpi=150 -Earrowsize=2 -Epenwidth=4 -Estyle=dotted"
-
-# Simple graph : replace nodes names by points
-call <- paste0("dot -T ",graph_ext," -o inst/doc/files/structure_nodes.",graph_ext," ./files/structure_nodes.dot")
-system(call)
-# system(paste(call, graph_nodes))
-
-# Complete graph
-call <- paste0("dot -T ",graph_ext," -o inst/doc/files/structure.",graph_ext," ./files/structure.dot")
-system(call)
-
-```
 
 
 # Inputs
@@ -105,7 +90,7 @@ s <- sunflo$parameters %>%
   filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 # table
-kable(s, padding=0)
+kable(s, padding=0, digits=1)
 ```
 
 ## Management
@@ -113,7 +98,7 @@ kable(s, padding=0)
 # data
 s <- sunflo$parameters %>%
   filter(category=="Conduite", template.default==1) %>%
-  select(label=label.doc, description=label.en, value, unit, reference)
+  select(label=label.doc, description=label.en, unit)
 # table
 kable(s, padding=0)
 ```
@@ -137,7 +122,7 @@ s_fr <- sunflo$parameters %>%
   select(symbol=name.rsunflo.en, label=label.doc, description=label.fr, value, unit, reference)
 
 # table
-kable(s_en, padding=0)
+kable(s_en, padding=0, digits=2)
 ```
 
 
@@ -151,7 +136,7 @@ s <- sunflo$parameters %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-kable(s, padding=0)
+kable(s, padding=0, digits=1)
 ```
 
 ## Emergence
@@ -237,7 +222,7 @@ s <- sunflo$parameters %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-kable(s, padding=0)
+kable(s, padding=0, digits=1)
 ```
 
 \vspace{2cm}
@@ -245,7 +230,7 @@ kable(s, padding=0)
 ## LeafInitiationTime, LeafExpansionTime, LeafSenescenceTime
 ```{r LeafInitiationTime, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
-LeafInitiationTime <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=420){
+LeafInitiationTime <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=6*71.43){
   ifelse(
     i <= 6, i*phy_1,
       ifelse(
@@ -283,7 +268,7 @@ $$
   LeafInitiationTime_i = \left\{ 
   \begin{array}{ll}
 	i * Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
-	(i-5) * Phyllotherm_7 + a & \textrm{if $i \leq LeafNumber$}
+	(i-5) * Phyllotherm_7 + 6*Phyllotherm_1 & \textrm{if $i \leq LeafNumber$}
 	\end{array} \right.
 $$
 
@@ -291,7 +276,6 @@ with:
 
 * $Phyllotherm_1=76.43$ (°C.d)
 * $Phyllotherm_7=16.34$ (°C.d)
-* $a=400$ (°C.d)
 
 $$LeafExpansionTime_i=LeafInitiation_i + 1/a$$
 
@@ -360,7 +344,7 @@ with:
 * $PotentialLeafSize$ (cm2) and $PotentialLeafProfile$ (node), genotypic parameters.
 
 
-## LeafGrowthRate, LeafSenescenceRate, LeafArea
+## LeafExpansionRate, LeafSenescenceRate, LeafArea
 ```{r LeafGrowthRate, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
@@ -388,7 +372,7 @@ print(p)
 
 $$
 \begin{split}
-LeafGrowthRate_i = (T_m - T_b) * PotentialLeafArea_i * a * \\
+LeafExpansionRate_i = (T_m - T_b) * PotentialLeafArea_i * a * \\
 \frac{exp^{-a(ThermalTime-LeafExpansionTime_i)}}{(1+exp^{-a(ThermalTime-LeafExpansionTime_i)})^2}
 \end{split}
 $$
@@ -408,7 +392,7 @@ with:
 
 The illustration uses $i=10$ as values for $PotentialLeafArea_i$, $LeafExpansionTime_i$ and $LeafSenescenceTime_i$
 
-$$LeafArea_i=\int LeafGrowthRate_i - \int LeafSenescenceRate_i$$
+$$LeafArea_i=\int LeafExpansionRate_i - \int LeafSenescenceRate_i$$
 
 
 \newpage
