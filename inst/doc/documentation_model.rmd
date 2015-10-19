@@ -692,6 +692,57 @@ $$WaterStressMineralization = 1 - (1 - y_0) * (1 - RelativeWaterContent_{layer1}
 
 # Nitrogen stress
 
+## NitrogenDemand
+
+```{r NitrogenDemand, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# Function
+NitrogenContent <- function(biomass, a=4.53, b=0.42) {
+  pmin(a, a*biomass^-b)
+}
+
+## Graph
+biomass <- seq(0,10, by=0.01)
+
+d <- data_frame(x=biomass) %>%
+  mutate(
+    Critical = NitrogenContent(x, a=4.53, b=0.42),
+    Maximum = NitrogenContent(x, a=6.49, b=0.44)
+  ) %>%
+  gather(Process, y, -x)
+
+p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+  labs(x="CropBiomass (t.ha-1)", y="NitrogenContent (%)") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(p)
+```
+
+$$ NitrogenContent =	min(a, a \times CropBiomass^{-b})$$
+
+with: 
+
+* $CropBiomass$, Daily shoot biomass ($t.ha^{-1}$); 
+* $a=4.53$ and $b=0.42$ defining $NitrogenContentCritical$ [@Debaeke2012a]; 
+* $a=6.49$ and $b=0.44$ defining $NitrogenContentMaximum$ [@Debaeke2012a]; 
+
+$$NitrogenDemand = NitrogenCritical = NitrogenCriticalContent*CropBiomass$$
+
+## NitrogenSupply
+
+$$NitrogenSupply = NitrogenAbsorbed = NitrogenAbsorbedMassFlow + NitrogenAbsorbedTransport$$
+
+$$NitrogenAbsorbedMassFlow = TranspirationRate_l \times SoilNitrogen$$
+
+## NitrogenStress
+
+$$NitrogenStress = NitrogenSupply/NitrogenDemand = NNI $$ Vitesse d'extraction d'eau par les racine dans C1 (mm/j)
+
+## NitrogenStressExpansion
+
+## NitrogenStressRUE
+
+
+
 
 \newpage
 
