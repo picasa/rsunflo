@@ -344,7 +344,7 @@ with:
 * $PotentialLeafSize$ (cm2) and $PotentialLeafProfile$ (node), genotypic parameters.
 
 
-## LeafExpansionRate, LeafSenescenceRate, LeafArea
+## LeafExpansionRate, LeafSenescenceRate
 ```{r LeafGrowthRate, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
@@ -392,15 +392,19 @@ with:
 
 The illustration uses $i=10$ as values for $PotentialLeafArea_i$, $LeafExpansionTime_i$ and $LeafSenescenceTime_i$
 
+
+## LeafArea, PlantLeafArea
+
 $$LeafArea_i=\int LeafExpansionRate_i - \int LeafSenescenceRate_i$$
 
+$$PlantLeafArea = \sum_{i=1}^{LeafNumber} LeafArea_i$$
 
 \newpage
 
 # Light interception
 
 ## LAI
-$$LAI = SowingDensity * \sum_{i=1}^{LeafNumber} LeafArea_i$$
+$$LAI = SowingDensity * PlantLeafArea$$
 
 ## RIE
 $$RIE = 1 - exp^{(-ExtinctionCoefficient * LAI)}$$

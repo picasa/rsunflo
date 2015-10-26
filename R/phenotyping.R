@@ -3,6 +3,54 @@
 # Climate ####
 # 1 watt/day = 86400 joule
 
+# compute reference evapotranspiration according to Penman-Monteith formula and [@Wallach2006] assumption
+#' @export et_penman_monteith
+et_penman_monteith <- function(tmin, tmax, tdew, rad, wind, lat, lon, elevation, day) {
+  
+  # From [@Wallach2006]
+  # Inputs
+  # RAD      Daily Insolation Incident On A Horizontal Surface (MJ/m^2/day) 
+  # TMIN     Minimum Air Temperature At 2 m Above The Surface Of The Earth (degrees C) 
+  # TMAX     Maximum Air Temperature At 2 m Above The Surface Of The Earth (degrees C) 
+  # TDEW     Dew/Frost Point Temperature At 2 m (degrees C) 
+  # WIND     Wind Speed At 10 m Above The Surface Of The Earth (m/s)
+  # DAY      Day of year
+  
+  # Output
+  # ET      Daily Reference evapotranspiration (mm/day)
+  
+  latitude <- unique(lat)*pi/180
+  
+  # psychometric Constant
+  PSC <- 0.665*10^-3*101.3*((293-0.0065*unique(elevation))/293)^5.26;
+  
+  # wind speed at 2m
+  ws2 <- wind*4.87/log(67.8*10-5.42)
+  es <- ((0.6108 * exp(17.27*tmax/(tmax+237.3)))+(0.6108*exp(17.27*tmin/(tmin+237.3))))/2
+  slope <- (0.6108*exp(17.27*((tmax+tmin)/2)/(((tmax+tmin)/2)+237.3))*4098)/((tmax+tmin)/2+237.3)^2
+  
+  # humidity
+  ea <- 0.6108*exp(17.27*tdew/(tdew+237.3));
+  
+  # radiation
+  SWR <- (1-0.23)*rad
+  IRDES <- 1+0.033*cos(2*pi*day/365.25)
+  SD <- 0.409*sin(2*pi*day/365.25-1.39)
+  SSA <- acos(-tan(latitude)*tan(SD))
+  extra <- 24*60*0.082/pi*IRDES*(SSA*sin(latitude)*sin(SD)+cos(latitude)*cos(SD)*sin(SSA))
+  CSR <- (0.75+2*10^-5*unique(elevation))*extra
+  RRAD <- rad/CSR
+  
+  # evapotranspiration
+  LWR <- 4.903*10^-9*((tmax+273.16)^4+(tmin+273.16)^4)/2*(0.34-0.14*sqrt(ea))*(1.35*RRAD-0.35)
+  NRAD <- SWR-LWR;
+  ET <- (0.408*slope*NRAD+PSC*(900/((tmax+tmin)/2+273))*ws2*(es-ea))/(slope+PSC*(1+0.34*ws2))
+  
+  return(ET)
+  
+}
+
+
 # Soil ####
 
 # Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
