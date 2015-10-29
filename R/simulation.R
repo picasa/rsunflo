@@ -401,6 +401,8 @@ indicate <- function(x, integration="crop", Tb=4.8) {
         SFTRUE = sum(1 - x$FTRUE[EH]),
         NHT = sum(x$TM[EH] > 28),
         NLT = sum(x$TM[EH] < 20),
+        SHT = sum(1 - curve_thermal_high(x$TM[EH])),
+        SLT = sum(1 - curve_thermal_low(x$TM[EH])),
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
@@ -504,11 +506,20 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          NHT_EF = sum(x$TM[EF] > 28),
          NHT_FM = sum(x$TM[FM] > 28),
          NHT_MH = sum(x$TM[MH] > 28),
+         SHT = sum(1 - curve_thermal_high(x$TM[EH])),
+         SHT_EF = sum(1 - curve_thermal_high(x$TM[EF])),
+         SHT_FM = sum(1 - curve_thermal_high(x$TM[FM])),
+         SHT_MH = sum(1 - curve_thermal_high(x$TM[MH])),
+         
          # Froid
          NLT = sum(x$TM[EH] < 20),
          NLT_EF = sum(x$TM[EF] < 20),
          NLT_FM = sum(x$TM[FM] < 20),
          NLT_MH = sum(x$TM[MH] < 20),
+         SLT = sum(1 - curve_thermal_low(x$TM[EH])),
+         SLT_EF = sum(1 - curve_thermal_low(x$TM[EF])),
+         SLT_FM = sum(1 - curve_thermal_low(x$TM[FM])),
+         SLT_MH = sum(1 - curve_thermal_low(x$TM[MH])),
          
          # Contraintes azotées
          # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison

@@ -51,6 +51,7 @@ et_penman_monteith <- function(tmin, tmax, tdew, rad, wind, lat, lon, elevation,
 }
 
 
+
 # Soil ####
 
 # Fonction de pédotransfert : estimer la capacité de rétention en eau volumique depuis une analyse de sol
@@ -208,6 +209,22 @@ curve_conductance <- function(x, a) {
 curve_expansion <- function(x, a) {
   t = (2 /(1 + exp(a * x))) -1
   return(t)
+}
+
+# Function for computing quantitative low temperature stress index
+#' @export curve_thermal_low
+curve_thermal_low <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
+  ifelse(tm > tb & tm < tol, tm * (1/(tol - tb)) - (tb/(tol - tb)),
+         ifelse(tm <= tb, 0, 1)
+  )
+}
+
+# Function for computing quantitative high temperature stress index
+#' @export curve_thermal_high
+curve_thermal_high <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
+  ifelse(tm > tou & tm < tc, tm * (1/(tou - tc)) - (tc/(tou-tc)),
+         ifelse(tm >= tc, 0, 1)
+  )
 }
 
 # Fonction bi-linéaire
