@@ -183,28 +183,30 @@ Le package `plyr` est utilisé pour itérer les simulations sur l'ensemble des l
 
 ### Exemple
 ```R
+# chargement du plan d'experience
+design <- readRDS("inst/doc/files/design.rds")
+
 # Modèle et plan
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
-design <- as.list(p)
+design_vle <- as.list(design)
 
 # Paramétrisation par défaut
-sunflo %>% run() %>% results() %>% shape(view="timed")
-
-# Paramétrisation issue du plan d'expérience (1 unité de simulation)
-sunflo %>% play(design, unit=1) %>% shape(view="timed")
+sunflo %>% run() %>% results() %>% shape(view="timed") 
 
 # Sortie graphique
-sunflo %>% play(design, unit=1) %>% shape(view="timed") %>% display()
+sunflo %>% play(design_vle, unit=1) %>% shape(view="timed") %>% display()
 
 # Multi-simulation du plan d'expérience (parallélisation possible : require(doMC), ?mlply)
-model <- function(x){sunflo %>% play(design, unit=x) %>% shape(view="timed")}
-output <- mlply(design$id, failwith(NULL, model))
+model <- function(id){sunflo %>% play(design_vle, unit=match(id, design_vle$id)) %>% shape(view="timed")}
+
+list_simulation <- design %>% select(id) 
+output <- plyr::mlply(list_simulation, failwith(NULL, model))
 
 # Agregation (1 unité -> une matrice)
-output_timed <- output %>% compact() %>% ldply()
+output_timed <- output %>% compact() %>% ldply(.id="id")
 
 # Calcul d'indicateurs (1 unité -> un vecteur)
-output_indicators <- output %>% compact() %>% ldply(indicate)
+output_indicators <- output %>% compact() %>% ldply(indicate, .id="id")
 ```
 
 ## Variables de sorties et indicateurs
