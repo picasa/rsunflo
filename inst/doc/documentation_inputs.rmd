@@ -1,0 +1,31 @@
+---
+output: 
+  html_document:
+    keep_md: true
+bibliography: ./files/bibliography.bib
+csl: ./style/plos.csl
+---
+
+```{r header, message=FALSE, warning=FALSE, echo=FALSE}
+library(readxl)
+library(tidyr)
+library(dplyr)
+library(knitr)
+
+# path (! wd is changed in next chunk)
+opts_knit$set(root.dir = normalizePath('../../'))
+```
+
+# Inputs
+
+```{r table_inputs, message=FALSE, warning=FALSE, echo=FALSE}
+inputs <- read_excel("inst/doc/files/parameterization_default.xlsx", sheet="metadata")
+
+table_inputs <- inputs %>%
+  select(category=category.en, symbol=name.rsunflo.en, description=label.en, unit, reference)
+
+table_inputs %>% kable()
+
+```
+
+# References 
