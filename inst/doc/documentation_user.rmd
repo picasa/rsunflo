@@ -13,6 +13,8 @@ classoption: a4paper
 
 \newpage
 
+# Interfaces
+
 Cette notice présente les principales étapes nécessaires pour réaliser une expérimentation numérique avec le modèle SUNFLO.
 Selon les questions abordées (démonstration, simulation de réseaux d'essais multilocaux, exploration, ...) le type de plan d'expérience conçu et les outils logiciels utilisés varient considérablement.   
 
