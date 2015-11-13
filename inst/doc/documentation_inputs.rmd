@@ -24,7 +24,7 @@ inputs <- read_excel("inst/doc/files/parameterization_default.xlsx", sheet="meta
 table_inputs <- inputs %>%
   select(category=category.en, symbol=name.rsunflo.en, description=label.en, unit, reference)
 
-table_inputs %>% kable()
+table_inputs %>% kable(format="markdown")
 
 ```
 
