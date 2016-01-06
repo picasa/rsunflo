@@ -600,7 +600,7 @@ display <- function(x, view="timed") {
 evaluate_error <- function(data, formula, output="numeric") {
   
   # Calcul de l'erreur d'ajustement
-  error <- ddply(
+  error <- plyr::ddply(
     data,
     as.formula(formula), summarise, 
     rmse = rmse(simulated, observed),
@@ -611,7 +611,7 @@ evaluate_error <- function(data, formula, output="numeric") {
   )
   
   # Labels ggplot2 pour l'erreur d'ajustement
-  label <- ddply(
+  label <- plyr::ddply(
     error,
     as.formula(formula), summarise, 
     label = paste(

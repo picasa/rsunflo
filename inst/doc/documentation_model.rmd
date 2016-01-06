@@ -140,7 +140,7 @@ kable(s, padding=0, digits=1)
 ```
 
 ## Emergence
-$Emergence = Germination + ElongationRate * SowingDepth$
+$Emergence = Germination + ElongationRate \times SowingDepth$
 
 with:
 
@@ -153,7 +153,7 @@ $$
   ThermalTime_d=
 	\left\{ 
 	\begin{array}{ll}
-	\int_0^d (T_m - T_b) * (1 + WaterStressPhenology)  & \textrm{if $T_m > T_b$} \\  
+	\int_0^d (T_m - T_b) \times (1 + WaterStressPhenology)  & \textrm{if $T_m > T_b$} \\  
 	0 & \textrm{else}
 	\end{array} 
 	\right.
@@ -267,8 +267,8 @@ print(p)
 $$
   LeafInitiationTime_i = \left\{ 
   \begin{array}{ll}
-	i * Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
-	(i-5) * Phyllotherm_7 + 6*Phyllotherm_1 & \textrm{if $i \leq LeafNumber$}
+	i \times Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
+	(i-5) \times Phyllotherm_7 + 6 \times Phyllotherm_1 & \textrm{if $i \leq LeafNumber$}
 	\end{array} \right.
 $$
 
@@ -300,13 +300,14 @@ print(p)
 
 ```
 
-$$LeafExpansionDuration_i = a + PotentialLeafDuration * exp^{\frac{-(i-PotentialLeafProfile)^2}{(c * PotentialLeafNumber)^2}}$$
+
+$$LeafExpansionDuration_i = a + b \times exp^{\frac{-(i-PotentialLeafProfile)^2}{(c \times PotentialLeafNumber)^2}}$$
 
 with: 
 
-* $PotentialLeafDuration=851.3$ (°C.d)
-* $a=153$ (°C.d)
-* $b=0.78$
+* $a = PotentialLeafDurationMin = 153$ (°C.d)
+* $b = PotentialLeafDurationMax = 851.3$ (°C.d)
+* $c = PotentialLeafDurationWidth = 0.78$
 
 $$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
 
@@ -335,7 +336,7 @@ print(p)
 ```
 
 $$
-PotentialLeafArea_i = PotentialLeafSize * exp^{a * (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b *
+PotentialLeafArea_i = PotentialLeafSize \times exp^{a \times (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b \times
 (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^3}
 $$
 
@@ -372,14 +373,14 @@ print(p)
 
 $$
 \begin{split}
-LeafExpansionRate_i = (T_m - T_b) * PotentialLeafArea_i * a * \\
+LeafExpansionRate_i = (T_m - T_b) \times PotentialLeafArea_i \times a \times \\
 \frac{exp^{-a(ThermalTime-LeafExpansionTime_i)}}{(1+exp^{-a(ThermalTime-LeafExpansionTime_i)})^2}
 \end{split}
 $$
 
 $$
 \begin{split}
-LeafSenescenceRate_i = (T_m - T_b) * LeafArea_i * a * \\
+LeafSenescenceRate_i = (T_m - T_b) \times LeafArea_i \times a \times \\
 \frac{exp^{-a(ThermalTime-LeafSenescenceTime_i)}}{(1+exp^{-a(ThermalTime-LeafSenescenceTime_i)})^2}
 \end{split}
 $$
@@ -404,10 +405,10 @@ $$PlantLeafArea = \sum_{i=1}^{LeafNumber} LeafArea_i$$
 # Light interception
 
 ## LAI
-$$LAI = SowingDensity * PlantLeafArea$$
+$$LAI = SowingDensity \times PlantLeafArea$$
 
 ## RIE
-$$RIE = 1 - exp^{(-ExtinctionCoefficient * LAI)}$$
+$$RIE = 1 - exp^{(-ExtinctionCoefficient \times LAI)}$$
 
 ```{r RIE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
@@ -444,9 +445,9 @@ $$
 PotentialRUE = \left\{ 
 	\begin{array}{ll}
 	r_0 & \textrm{if $ThermalTime < 300 $} \\  
-	r_0 + 2 * \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
+	r_0 + 2 \times \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
 	r_{max} & \textrm{if $ThermalTimeFlowering < ThermalTime < ThermalTimeSenescence$}\\
-	a * exp^{b * (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
+	a \times exp^{b \times (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
   0 & \textrm{else}
 	\end{array}
   \right.
@@ -504,7 +505,7 @@ print(p)
 \vspace{2cm}
 
 ## CropBiomass [@Monteith1977]
-$$dCropBiomass = Radiation * 0.48 * RIE * RUE * dt$$
+$$dCropBiomass = Radiation \times 0.48 \times RIE \times RUE \cdot dt$$
 
 ## CropPerformance
 
@@ -549,9 +550,9 @@ print(p)
 $$
 ThermalStressRUE = \left\{ 
   \begin{array}{ll}
-  T_m * \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
+  T_m \times \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
   1 & \textrm{if $T_{ol} < T_m < T_{ou}$} \\
-  T_m * \frac{1}{T_{ou} - T_c} - \frac{T_c}{T_{ou} - T_c} & \textrm{if $T_{ou} < T_m < T_c$} \\
+  T_m \times \frac{1}{T_{ou} - T_c} - \frac{T_c}{T_{ou} - T_c} & \textrm{if $T_{ou} < T_m < T_c$} \\
   0 & \textrm{else}
 	\end{array}
   \right.
@@ -589,7 +590,7 @@ print(p)
 # ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) * exp^{(-0.119 * (T_m - T_b))}}$$
+$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \times exp^{(-0.119 \times (T_m - T_b))}}$$
 
 with: 
 
@@ -604,7 +605,7 @@ with:
 
 ## WaterDemand
 
-$$WaterDemand = K_c * PET * RIE$$
+$$WaterDemand = K_c \times PET \times RIE$$
 
 with $K_c = 1.2$, crop coefficient
 
@@ -630,9 +631,9 @@ print(p)
 
 $$WaterSupply = Rainfall + Irrigation - Transpiration - Evaporation - Drainage$$
 
-$$Transpiration = WaterDemand * WaterStressConductance$$
+$$Transpiration = WaterDemand \times WaterStressConductance$$
 
-$$Evaporation = (1 - RIE) * PET * SoilConductivity$$
+$$Evaporation = (1 - RIE) \times PET \times SoilConductivity$$
 
 $$SoilConductivity = \sqrt{x + 1} - \sqrt{x}$$
 
@@ -653,7 +654,7 @@ $$WaterStress = \frac{WaterAvailable}{WaterTotal}$$
 
 $$WaterAvailable = WaterSupply$$
 
-$$WaterTotal = SoilWaterCapacity * SoilDensity * (1 - StoneContent) * RootingDepth$$
+$$WaterTotal = SoilWaterCapacity \times SoilDensity \times (1 - StoneContent) \times RootingDepth$$
 
 ## WaterStressExpansion, WaterStressConductance
 ```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
@@ -680,17 +681,17 @@ print(p)
 # ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a * WaterStress)}}$$ 
+$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \times WaterStress)}}$$ 
 
 with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
 
 
 ## WaterStressPhenology
-$$WaterStressPhenology = a * (1 - WaterStressConductance)$$
+$$WaterStressPhenology = a \times (1 - WaterStressConductance)$$
 with $a=0.1$, scaling parameter for water-stress plant heating
 
 ## WaterStressMineralization
-$$WaterStressMineralization = 1 - (1 - y_0) * (1 - RelativeWaterContent_{layer1})$$
+$$WaterStressMineralization = 1 - (1 - y_0) \times (1 - RelativeWaterContent_{layer1})$$
 
 \newpage
 
@@ -729,7 +730,7 @@ with:
 * $a=4.53$ and $b=0.42$ defining $NitrogenContentCritical$ [@Debaeke2012a]; 
 * $a=6.49$ and $b=0.44$ defining $NitrogenContentMaximum$ [@Debaeke2012a]; 
 
-$$NitrogenDemand = NitrogenCritical = NitrogenCriticalContent*CropBiomass$$
+$$NitrogenDemand = NitrogenCritical = NitrogenCriticalContent \times CropBiomass$$
 
 ## NitrogenSupply
 
@@ -774,7 +775,7 @@ print(p)
 # ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$RadiationStressExpansion = s * a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
+$$RadiationStressExpansion = s \times a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
 
 with:
 
