@@ -47,6 +47,8 @@ vle --remote install meteo
 git clone https://github.com/vle-forge/rvle.git
 cd rvle/
 git checkout -b v1.1.2 v1.1.2
+cd rvle
+./autogen.sh
 cd ..
 R CMD INSTALL rvle
 ```
