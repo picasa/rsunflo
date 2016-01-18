@@ -28,13 +28,20 @@ interpolate_leaf_area <- function(x){
     # linear interpolation
     s <- with(x, approxfun(leaf, area))
     g <- with(x, approxfun(leaf, area_total))
+    # TODO code senescence interpolation
     
-    #return
     r <- data.frame(
       leaf=1:n,
       area=s(1:n),
       area_total=g(1:n)
-    )
+    ) %>% 
+    left_join(x %>% select(leaf, senescence))
+    
+    # TODO : improve syntax
+    r$area[which(r$senescence==2)+1] <- 0
+    r$area_total[which(r$senescence==2)+1] <- 0
+    
+    # return
     return(r)
   } 
 }
