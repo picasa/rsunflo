@@ -18,3 +18,4 @@ Imports:
 Suggests:
     rvle
 License: GPL
+RoxygenNote: 5.0.1
