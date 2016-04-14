@@ -12,7 +12,7 @@ library(readxl)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
-# library(DiagrammeR)
+library(DiagrammeR)
 library(knitr)
 
 # path (! wd is changed in next chunk)
@@ -34,6 +34,10 @@ sunflo <- list(
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
+```
+
+```{r data_graph, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+graph <- grViz("inst/files/structure_nodes.gv")
 ```
 
 \begin{figure*}
@@ -264,6 +268,8 @@ p <- ggplot(d, aes(x=y, y=x, color=Process)) + geom_path() +
 print(p)
 ```
 
+The rate of leaf appearance depends on air temperature and two phyllochrons as preformed lower leaves appear at a lower rate [@Rey2003]
+
 $$
   LeafInitiationTime_i = \left\{ 
   \begin{array}{ll}
@@ -276,6 +282,8 @@ with:
 
 * $Phyllotherm_1=76.43$ (°C.d)
 * $Phyllotherm_7=16.34$ (°C.d)
+
+Thermal time to 50% of final leaf area was defined as a function of the thermal time required for leaf appearance.
 
 $$LeafExpansionTime_i=LeafInitiation_i + 1/a$$
 
