@@ -618,6 +618,9 @@ evaluate_error <- function(data, formula, output="numeric") {
     rrmse = round(rmse(simulated, observed)/mean(observed, na.rm=TRUE)*100, 1),
     efficiency = efficience(simulated, observed),
     bias = biais(simulated, observed),
+    r=format(cor(simulated, observed, method="pearson"), digits=2),
+    p=format(cor.test(simulated, observed, method="pearson")$p.value, digits=2),
+    r2=format(cor(simulated, observed, method="pearson")^2, digits=2),
     n=sum(complete.cases(simulated, observed))
   )
   
