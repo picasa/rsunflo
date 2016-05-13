@@ -287,6 +287,17 @@ shape <- function(x, view) {
   
 	switch(view,
 		
+	   debug = {
+	     # Nettoyage des noms de colonne
+	     x <- x[[1]]
+	     colnames(x) <- sub(".*\\.","", colnames(x))
+	     
+	     # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
+	     # to JDN as.numeric(as.Date(x, format= "%m/%d/%Y")) + 2440588
+	     # delta = julian(x = 01, d = 01, y = 1970, origin = c(month=11, day=24, year=-4713))
+	     x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
+	   },
+	       
 		timed = {
 		  # Nettoyage des noms de colonne
       x <- x[[1]]
