@@ -41,41 +41,18 @@ modelmaker_management <- function(x) {
 
 # Statistical indicators and function ####
 
-# Calculer r² entre observé et simulé
-#' @export rsq
-rsq <- function (sim, obs, digits=2) {
-  round(cor(sim, obs, na.rm=TRUE)^2, digits=digits)
-}
-
-# Calculer un biais
-#' @export biais
-biais <- function (sim, obs, digits=2) {
-  round(mean(na.omit(sim - obs)), digits=digits)
-}
-
 # Calculer RMSE
 #' @export  rmse
-rmse <- function(sim, obs, digits=2) {
-	round(sqrt(mean(na.omit(sim - obs)^2)), digits=digits)
+rmse <- function(obs, sim) {
+  sqrt(mean(na.omit(obs - sim)^2))
 }
 
-# Calculer l'Efficience du modèle
-#' @export efficience
-efficience <- function (sim, obs, digits=2) {
-  round(1 - (sum((na.omit(sim - obs))^2)/sum((na.omit(obs) - mean(obs, na.rm=TRUE))^2)), digits=digits)
-}
 
-# Savoir combien de variété sont dans l'intervalle de confiance observé
-#' @export wic
-wic <- function (obs, sim, ic) {
-  d=(sim <= obs + ic) & (sim >= obs - ic)
-  o=length(d[d==T])/length(ic)
-  return(round(o, 3)) 
+# Calculer l'efficience du modèle
+#' @export efficiency
+efficiency <- function (obs, sim) {
+  1 - (sum((na.omit(obs- sim))^2)/sum((na.omit(obs) - mean(obs, na.rm=TRUE))^2))
 }
-
-# Last : dernière valeur non nulle d'un vecteur
-# @export last
-# last <- function(x) {tail(x[x != 0], n = 1)}
 
 # Not in
 #' @export '%ni%'

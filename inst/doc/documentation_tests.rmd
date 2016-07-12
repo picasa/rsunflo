@@ -57,7 +57,7 @@ saveRDS(design, "inst/doc/files/design.rds")
 
 
 ## Simulation
-### Simulation avec le paquet rsunflo
+
 ```{r simulation_rsunflo}
 # Dependances
 library(rvle)
@@ -106,6 +106,23 @@ output_new <- sunflo %>% run() %>% results() %>% shape(view="timed")
 
 # test
 identical(output_ref, output_new)
-
 ```
 
+
+## Analyse
+```{r analysis, eval=FALSE}
+# test model evaluation and visualization
+
+data_test <- data_frame(
+  model=c(rep(LETTERS[1:2],each=500)),
+  simulated=rnorm(1000),
+  observed=rnorm(1000)
+)
+
+data_test %>% group_by(model) %>% do(evaluate_error(.))
+
+data_test %>% evaluate_plot(~ model, color="model")
+
+data_test %>% evaluate_residuals(~ model, color="model")
+
+```

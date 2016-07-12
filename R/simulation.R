@@ -169,111 +169,111 @@ play <- function(model, design, unit, template="default")
   
   switch(template,
          
-    # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée (n=42)
-    default = {
-      r <- results(
-        run(
-          model,
-          begin  							                = design[["begin"]][unit],
-          duration					              		= design[["duration"]][unit],
-          CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-          CONFIG_SimuInit.rh1                 = design[["nitrogen_initial_1"]][unit],
-          CONFIG_SimuInit.rh2                 = design[["nitrogen_initial_2"]][unit],
-          CONFIG_SimuInit.Hini_C1             = design[["water_initial_1"]][unit],
-          CONFIG_SimuInit.Hini_C2             = design[["water_initial_2"]][unit],
-          CONFIG_SimuInit.dateLevee_casForcee = ifelse(format(design[["crop_emergence"]][unit], "%m") == "01",
-                                                      "00/00", format(design[["crop_emergence"]][unit], "%d/%m")
-                                                ),
-          CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
-          CONFIG_Sol.Vp  		                  = design[["mineralization"]][unit],
-          CONFIG_Sol.Hcc_C1 		              = design[["field_capacity_1"]][unit],
-          CONFIG_Sol.Hcc_C2 		              = design[["field_capacity_2"]][unit],
-          CONFIG_Sol.Hpf_C1 		              = design[["wilting_point_1"]][unit],
-          CONFIG_Sol.Hpf_C2 		              = design[["wilting_point_2"]][unit],
-          CONFIG_Sol.da_C1 		 	              = design[["soil_density_1"]][unit],
-          CONFIG_Sol.da_C2 		    	          = design[["soil_density_2"]][unit],
-          CONFIG_Sol.TC 		                  = design[["stone_content"]][unit],
-          CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
-          CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
-          CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
-          CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_ferti_2        = format(design[["nitrogen_date_2"]][unit], "%d/%m"),
-          CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
-          CONFIG_Conduite.apport_ferti_2      = design[["nitrogen_dose_2"]][unit],
-          CONFIG_Conduite.date_irrig_1        = format(design[["water_date_1"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_irrig_2        = format(design[["water_date_2"]][unit], "%d/%m"),
-          CONFIG_Conduite.date_irrig_3        = format(design[["water_date_3"]][unit], "%d/%m"),
-          CONFIG_Conduite.apport_irrig_1     	= design[["water_dose_1"]][unit],
-          CONFIG_Conduite.apport_irrig_2      = design[["water_dose_2"]][unit],
-          CONFIG_Conduite.apport_irrig_3      = design[["water_dose_3"]][unit],
-          CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
-          CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-          CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
-          CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-          CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-          CONFIG_Variete.ext     			        = design[["K"]][unit],
-          CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-          CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-          CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-          CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-          CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-          CONFIG_Variete.thp   				        = design[["OC"]][unit]
-        )
-      ) 
-    },
-    
-    # gem : profondeur de sol, conduite extensive, tout paramètres variétaux (n=21)
-    gem = {
-      r <- results(
-        run(
-          model,
-          begin    						                = design[["begin"]][unit],
-          duration					              		= design[["duration"]][unit],
-          CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-          CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
-          CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
-          CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
-          CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
-          CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
-          CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
-          CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
-          CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-          CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
-          CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-          CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-          CONFIG_Variete.ext     			        = design[["K"]][unit],
-          CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-          CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-          CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-          CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-          CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-          CONFIG_Variete.thp   				        = design[["OC"]][unit]
-        )
-      ) 
-    },
-
-  # genotype : année, paramètres variétaux réduits ()
-   genotype = {
-     r <- results(
-       run(
-         model,
-         begin      					                = design[["begin"]][unit],
-         CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-         CONFIG_Variete.date_TT_E1  		      = 0.576 * design[["TDF1"]][unit],
-         CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-         CONFIG_Variete.date_TT_M0  			    = 246.5 + design[["TDF1"]][unit],
-         CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-         CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-         CONFIG_Variete.ext     			        = design[["K"]][unit],
-         CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-         CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-         CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-         CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-         CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-         CONFIG_Variete.thp   				        = design[["OC"]][unit]
-       )
-     ) 
-   }
+         # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée (n=42)
+         default = {
+           r <- results(
+             run(
+               model,
+               begin  							                = design[["begin"]][unit],
+               duration					              		= design[["duration"]][unit],
+               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
+               CONFIG_SimuInit.rh1                 = design[["nitrogen_initial_1"]][unit],
+               CONFIG_SimuInit.rh2                 = design[["nitrogen_initial_2"]][unit],
+               CONFIG_SimuInit.Hini_C1             = design[["water_initial_1"]][unit],
+               CONFIG_SimuInit.Hini_C2             = design[["water_initial_2"]][unit],
+               CONFIG_SimuInit.dateLevee_casForcee = ifelse(format(design[["crop_emergence"]][unit], "%m") == "01",
+                                                            "00/00", format(design[["crop_emergence"]][unit], "%d/%m")
+               ),
+               CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
+               CONFIG_Sol.Vp  		                  = design[["mineralization"]][unit],
+               CONFIG_Sol.Hcc_C1 		              = design[["field_capacity_1"]][unit],
+               CONFIG_Sol.Hcc_C2 		              = design[["field_capacity_2"]][unit],
+               CONFIG_Sol.Hpf_C1 		              = design[["wilting_point_1"]][unit],
+               CONFIG_Sol.Hpf_C2 		              = design[["wilting_point_2"]][unit],
+               CONFIG_Sol.da_C1 		 	              = design[["soil_density_1"]][unit],
+               CONFIG_Sol.da_C2 		    	          = design[["soil_density_2"]][unit],
+               CONFIG_Sol.TC 		                  = design[["stone_content"]][unit],
+               CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
+               CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
+               CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
+               CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
+               CONFIG_Conduite.date_ferti_2        = format(design[["nitrogen_date_2"]][unit], "%d/%m"),
+               CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
+               CONFIG_Conduite.apport_ferti_2      = design[["nitrogen_dose_2"]][unit],
+               CONFIG_Conduite.date_irrig_1        = format(design[["water_date_1"]][unit], "%d/%m"),
+               CONFIG_Conduite.date_irrig_2        = format(design[["water_date_2"]][unit], "%d/%m"),
+               CONFIG_Conduite.date_irrig_3        = format(design[["water_date_3"]][unit], "%d/%m"),
+               CONFIG_Conduite.apport_irrig_1     	= design[["water_dose_1"]][unit],
+               CONFIG_Conduite.apport_irrig_2      = design[["water_dose_2"]][unit],
+               CONFIG_Conduite.apport_irrig_3      = design[["water_dose_3"]][unit],
+               CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
+               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+               CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
+               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+               CONFIG_Variete.ext     			        = design[["K"]][unit],
+               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+               CONFIG_Variete.thp   				        = design[["OC"]][unit]
+             )
+           ) 
+         },
+         
+         # gem : profondeur de sol, conduite extensive, tout paramètres variétaux (n=21)
+         gem = {
+           r <- results(
+             run(
+               model,
+               begin    						                = design[["begin"]][unit],
+               duration					              		= design[["duration"]][unit],
+               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
+               CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
+               CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
+               CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
+               CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
+               CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
+               CONFIG_Conduite.apport_ferti_1     	= design[["nitrogen_dose_1"]][unit],
+               CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
+               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+               CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
+               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+               CONFIG_Variete.ext     			        = design[["K"]][unit],
+               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+               CONFIG_Variete.thp   				        = design[["OC"]][unit]
+             )
+           ) 
+         },
+         
+         # genotype : année, paramètres variétaux réduits ()
+         genotype = {
+           r <- results(
+             run(
+               model,
+               begin      					                = design[["begin"]][unit],
+               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
+               CONFIG_Variete.date_TT_E1  		      = 0.576 * design[["TDF1"]][unit],
+               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
+               CONFIG_Variete.date_TT_M0  			    = 246.5 + design[["TDF1"]][unit],
+               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
+               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
+               CONFIG_Variete.ext     			        = design[["K"]][unit],
+               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
+               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
+               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
+               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
+               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
+               CONFIG_Variete.thp   				        = design[["OC"]][unit]
+             )
+           ) 
+         }
   )
   
   # Retour 
@@ -606,73 +606,96 @@ display <- function(x, view="timed") {
 
 # Analysis ####
 
-# Calculer erreur de prédiction
+# compute metrics for goodness of fit [@Wallach2014]
+# TODO : use data argument and non standard evaluation ?
 #' @export evaluate_error
-evaluate_error <- function(data, formula, output="numeric") {
+evaluate_error <- function(data, observed="observed", simulated="simulated", output="numeric") {
   
-  # Calcul de l'erreur d'ajustement
-  error <- plyr::ddply(
-    data,
-    as.formula(formula), summarise, 
-    rmse = rmse(simulated, observed),
-    rrmse = round(rmse(simulated, observed)/mean(observed, na.rm=TRUE)*100, 1),
-    efficiency = efficience(simulated, observed),
-    bias = biais(simulated, observed),
-    r=format(cor(simulated, observed, method="pearson"), digits=2),
-    p=format(cor.test(simulated, observed, method="pearson")$p.value, digits=2),
-    r2=format(cor(simulated, observed, method="pearson")^2, digits=2),
-    n=sum(complete.cases(simulated, observed))
-  )
-  
-  # Labels ggplot2 pour l'erreur d'ajustement
-  label <- plyr::ddply(
-    error,
-    as.formula(formula), summarise, 
+  metrics <- data %>% 
+    filter(complete.cases(.)) %>% 
+    select_(observed=observed, simulated=simulated) %>%
+    summarise(
+      
+      # general metrics
+      n = n(),
+      mean_observed = mean(observed),
+      mean_simulated = mean(simulated),
+      bias = mean_observed - mean_simulated,
+      bias_squared = bias^2,
+      SSE = sum((observed - simulated)^2),
+      MSE = SSE/n,
+      RMSE = MSE^0.5,
+      RRMSE = RMSE/mean_observed,
+      MAE = mean(abs(observed - simulated)),
+      RMAE = MAE/mean(abs(observed)),
+      RMAEP = mean(abs(observed - simulated)/abs(observed)),
+      EF = 1 - sum((observed - simulated)^2)/sum((observed - mean_observed)^2),
+      index_willmott = 1 - sum((observed - simulated)^2)/sum((abs(simulated - mean(observed)) + abs(observed - mean(observed)))^2),
+      
+      # MSE decomposition
+      SDSD = (sd(simulated) - sd(observed))^2 * (n - 1)/n,
+      LCS = 2 * sd(observed) * sd(simulated) * (1 - cor(observed, simulated)) * (n - 1)/n,
+      NU = (1 - (cov(observed, simulated)/var(simulated)))^2 * var(simulated) * (n - 1)/n,
+      LC = (1 - cor(observed, simulated)^2) * var(observed) * (n - 1)/n,
+      
+      # correlation index
+      r_pearson=cor(simulated, observed, method="pearson"),
+      p_pearson=cor.test(simulated, observed, method="pearson")$p.value,
+      r_kendall=cor(simulated, observed, method="kendall"),
+      p_kendall=cor.test(simulated, observed, method="kendall")$p.value,
+      r_squared=cor(simulated, observed, method="pearson")^2
+    )
+   
+  labels <- data.frame(
     label = paste(
-      "rmse =", rmse,
+      "RMSE =", format(metrics$RMSE, digits=2),
       ";",
-      "bias =",bias
+      "bias =", format(metrics$bias, digits=2)
     )
   )
   
   switch(
     output,
-    numeric = {return(error)},
-    label = {return(label)}
+    numeric = {return(metrics)},
+    label = {return(labels)}
   )
 }
 
 
-# Graphes simulés / observés
-#' @export evaluate
-evaluate <- function(data, formula, color, scale="free", size_label=4, ...) {
-  # Graphes
-  ggplot(data=data, aes(x=observed, y=simulated)) + 
-    geom_point(aes_string(color=color), ...) +
+# simulated=f(observed) evaluation graphs
+#' @export evaluate_plot
+evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...) {
+  
+  ggplot(data=data, aes(x=observed, y=simulated)) +
+    geom_point(aes_string(color=color, ...)) +
     facet_wrap(as.formula(formula), scale=scale) +
-    stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
+    # stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
     geom_text(
-      data=evaluate_error(data, formula, output="label"),
+      data=data %>% group_by_(formula) %>% do(evaluate_error(., output="label")),
       aes(x=Inf, y=-Inf, label=label),
       colour="black", hjust=1.1, vjust=-1, size=size_label
     ) +
-    theme_bw() + labs(x="Observed data", y="Simulated data")
+    theme_bw() + labs(x="Simulated data", y="Observed data")
 }
 
 
-# Impact d'un trait sur le rendement moyen
-#' @export impact
-impact <- function(x) {
-	# Y_T - Y_t / mean(Y)
-	r <- data.frame(
-		precocity = (x[x$precocity=="L","RDT"] - x[x$precocity=="l","RDT"]) / mean(x$RDT) * 100,
-		leaf = (x[x$leaf=="N","RDT"] - x[x$leaf=="n","RDT"]) / mean(x$RDT) * 100,
-		profile = (x[x$profile=="H","RDT"] - x[x$profile=="h","RDT"]) / mean(x$RDT) * 100,
-		area = (x[x$area=="A","RDT"] - x[x$area=="a","RDT"]) / mean(x$RDT) * 100,
-		extinction = (x[x$extinction=="K","RDT"] - x[x$extinction=="k","RDT"]) / mean(x$RDT) * 100,
-		expansion = (x[x$expansion=="E","RDT"] - x[x$expansion=="e","RDT"]) / mean(x$RDT) * 100,
-		conductance = (x[x$conductance=="C","RDT"] - x[x$conductance=="c","RDT"]) / mean(x$RDT) * 100
-	)
-	return(r)
+# residuals evaluation graphs
+#' @export evaluate_residuals
+evaluate_residuals <- function(data, formula, color, scale="free", size_label=4, ...) {
+  
+  data %>%
+    mutate(residuals=observed-simulated) %>%
+    ggplot(aes(simulated, residuals)) +
+    geom_point(aes_string(color=color), ...) + 
+    facet_wrap(as.formula(formula), scale=scale) +
+    geom_hline(yintercept = 0) +
+    geom_text(
+      data=data %>% group_by_(formula) %>% do(evaluate_error(., output="label")),
+      aes(x=Inf, y=-Inf, label=label),
+      colour="black", hjust=1.1, vjust=-1, size=size_label
+    ) +
+    theme_bw() + labs(x="Simulated data", y="Residuals")
 }
+
+
