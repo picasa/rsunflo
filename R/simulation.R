@@ -662,11 +662,11 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
 }
 
 
-# simulated=f(observed) evaluation graphs
+# observed=f(simulated) evaluation graphs
 #' @export evaluate_plot
 evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...) {
   
-  ggplot(data=data, aes(x=observed, y=simulated)) +
+  ggplot(data=data, aes(x=simulated, y=observed)) +
     geom_point(aes_string(color=color, ...)) +
     facet_wrap(as.formula(formula), scale=scale) +
     # stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
