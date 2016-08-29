@@ -612,8 +612,8 @@ display <- function(x, view="timed") {
 evaluate_error <- function(data, observed="observed", simulated="simulated", output="numeric") {
   
   metrics <- data %>% 
-    filter(complete.cases(.)) %>% 
     select_(observed=observed, simulated=simulated) %>%
+    filter(complete.cases(.)) %>% 
     summarise(
       
       # general metrics
