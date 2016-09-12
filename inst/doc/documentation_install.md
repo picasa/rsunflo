@@ -58,7 +58,6 @@ R CMD INSTALL rvle
 ```
 git clone http://mulcyber.toulouse.inra.fr/anonscm/git/sunrise/sunrise.git sunflo
 cd sunflo
-git checkout -b v1.3 v1.3
 vle -P commun configure build install
 vle -P sunflo configure build install
 vle -P sunflo_itk configure build install

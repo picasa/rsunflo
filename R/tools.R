@@ -144,21 +144,23 @@ splom <- function(data, plot_size_lims=c(0,1)) {
   # compute correlations between variables
   data_cor <- data_splom %>%
     group_by(x_lab, y_lab) %>%
-    summarise(cor=cor(x, y), p=cor.test(x, y)$p.value, n=n()) %>%
+    summarise(
+      cor=cor(x, y, use="pairwise.complete.obs"),
+      p=cor.test(x, y)$p.value,
+      n=n()
+    ) %>%
     mutate(test=ifelse(p < 0.05, TRUE, FALSE)) %>%
     rename(x_lab=y_lab, y_lab=x_lab)
   
-  #plot performance of optimal solution in feasibility space  
+  # plot performance of optimal solution in feasibility space  
   plot <- ggplot() +
     geom_point(data=data_splom, aes(x, y)) +
-    geom_text(data=data_cor, aes(x=0.5, y=0.5, label=format(cor, digits=2), color=test), size=4) +
+    geom_text(data=data_cor, aes(x=0.5, y=0.5, label=round(cor, digits=2), color=test), size=4) +
     geom_text(data=data_labels, aes(x, y, label=x_lab), size=4, alpha=0.5) +
     facet_grid(y_lab ~ x_lab, drop=FALSE) +
     xlim(plot_size_lims) + ylim(plot_size_lims) + 
     theme(
-      panel.grid.minor = element_blank(),
-      panel.grid.major = element_blank(),
-      panel.background = element_rect(fill=NA, colour="#E6E6E6"),
+      panel.background = element_blank(),
       axis.ticks = element_blank(),
       axis.text.y = element_blank(),
       axis.text.x = element_blank(),
