@@ -281,6 +281,118 @@ play <- function(model, design, unit, template="default")
 }
 
 
+# call to rvle::run to expose all conditions for potential optimization, with fixed values listed in design (list)
+#' @export play_optimize
+
+play_optimize <- function(
+  model, design, unit,
+  
+  # candidate parameters to be optimized have default fixed value from design
+  begin = design[["begin"]][unit],
+  duration = design[["duration"]][unit],
+  file = as.character(design[["file"]][unit]),
+  nitrogen_initial_1 = design[["nitrogen_initial_1"]][unit],
+  nitrogen_initial_2 = design[["nitrogen_initial_2"]][unit],
+  water_initial_1 = design[["water_initial_1"]][unit],
+  water_initial_2 = design[["water_initial_2"]][unit],
+  crop_emergence = as.POSIXct("2016-01-01"),
+  root_depth = design[["root_depth"]][unit],
+  mineralization = design[["mineralization"]][unit],
+  field_capacity_1 = design[["field_capacity_1"]][unit],
+  field_capacity_2 = design[["field_capacity_2"]][unit],
+  wilting_point_1 = design[["wilting_point_1"]][unit],
+  wilting_point_2 = design[["wilting_point_2"]][unit],
+  soil_density_1 = design[["soil_density_1"]][unit],
+  soil_density_2 = design[["soil_density_2"]][unit],
+  stone_content = design[["stone_content"]][unit],
+  crop_sowing = design[["crop_sowing"]][unit],
+  crop_harvest = design[["crop_harvest"]][unit],
+  crop_density = design[["crop_density"]][unit],
+  nitrogen_date_1 = design[["nitrogen_date_1"]][unit],
+  nitrogen_date_2 = design[["nitrogen_date_2"]][unit],
+  nitrogen_dose_1 = design[["nitrogen_dose_1"]][unit],
+  nitrogen_dose_2 = design[["nitrogen_dose_2"]][unit],
+  water_date_1 = design[["water_date_1"]][unit],
+  water_date_2 = design[["water_date_2"]][unit],
+  water_date_3 = design[["water_date_3"]][unit],
+  water_dose_1 = design[["water_dose_1"]][unit],
+  water_dose_2 = design[["water_dose_2"]][unit],
+  water_dose_3 = design[["water_dose_3"]][unit],
+  TDE1 = design[["TDE1"]][unit],
+  TDF1 = design[["TDF1"]][unit],
+  TDM0 = design[["TDM0"]][unit],
+  TDM3 = design[["TDM3"]][unit],
+  TLN = design[["TLN"]][unit],
+  K = design[["K"]][unit],
+  LLH = design[["LLH"]][unit],
+  LLS = design[["LLS"]][unit],
+  LE = design[["LE"]][unit],
+  TR = design[["TR"]][unit],
+  HI = design[["HI"]][unit],
+  OC = design[["OC"]][unit],
+  ...
+){
+  
+  # set defaults conditions : 2 soils layers, all genotype-dependant parameters, high input management, emergence (n=42)
+  setDefault(
+    model,
+    begin  							                = begin,
+    duration					              		= duration,
+    CONFIG_ClimatNomFichier.meteo_file	= file,
+    CONFIG_SimuInit.rh1                 = nitrogen_initial_1,
+    CONFIG_SimuInit.rh2                 = nitrogen_initial_2,
+    CONFIG_SimuInit.Hini_C1             = water_initial_1,
+    CONFIG_SimuInit.Hini_C2             = water_initial_2,
+    CONFIG_SimuInit.dateLevee_casForcee = ifelse(
+      format(crop_emergence,"%m") == "01",
+      "00/00", format(crop_emergence, "%d/%m")),
+    CONFIG_Sol.profondeur               = root_depth,
+    CONFIG_Sol.Vp  		                  = mineralization,
+    CONFIG_Sol.Hcc_C1 		              = field_capacity_1,
+    CONFIG_Sol.Hcc_C2 		              = field_capacity_2,
+    CONFIG_Sol.Hpf_C1 		              = wilting_point_1,
+    CONFIG_Sol.Hpf_C2 		              = wilting_point_2,
+    CONFIG_Sol.da_C1 		 	              = soil_density_1,
+    CONFIG_Sol.da_C2 		    	          = soil_density_2,
+    CONFIG_Sol.TC 		                  = stone_content,
+    CONFIG_Conduite.jsemis    		    	= format(crop_sowing, format="%d/%m"),
+    CONFIG_Conduite.jrecolte            = format(crop_harvest, format="%d/%m"),
+    CONFIG_Conduite.densite        	    = crop_density,
+    CONFIG_Conduite.date_ferti_1       	= format(nitrogen_date_1, format="%d/%m"),
+    CONFIG_Conduite.date_ferti_2        = format(nitrogen_date_2, format="%d/%m"),
+    CONFIG_Conduite.apport_ferti_1     	= nitrogen_dose_1,
+    CONFIG_Conduite.apport_ferti_2      = nitrogen_dose_2,
+    CONFIG_Conduite.date_irrig_1        = format(water_date_1, format="%d/%m"),
+    CONFIG_Conduite.date_irrig_2        = format(water_date_2, format="%d/%m"),
+    CONFIG_Conduite.date_irrig_3        = format(water_date_3, format="%d/%m"),
+    CONFIG_Conduite.apport_irrig_1     	= water_dose_1,
+    CONFIG_Conduite.apport_irrig_2      = water_dose_2,
+    CONFIG_Conduite.apport_irrig_3      = water_dose_3,
+    CONFIG_Variete.date_TT_E1  		      = TDE1,
+    CONFIG_Variete.date_TT_F1  			    = TDF1,
+    CONFIG_Variete.date_TT_M0  			    = TDM0,
+    CONFIG_Variete.date_TT_M3  			    = TDM3,
+    CONFIG_Variete.TLN     			        = TLN,
+    CONFIG_Variete.ext     			        = K,
+    CONFIG_Variete.bSF   				        = LLH,
+    CONFIG_Variete.cSF   				        = LLS,
+    CONFIG_Variete.a_LE  				        = LE,
+    CONFIG_Variete.a_TR  				        = TR,
+    CONFIG_Variete.IRg   				        = HI,
+    CONFIG_Variete.thp   				        = OC
+  )
+  
+  # save vpz image
+  # saveVpz(model, "model.vpz")
+  
+  # evaluate the model
+  r <- results(run(model))
+  
+  return(r)
+}
+
+
+
 # Mise en forme des données brutes de sortie
 #' @export shape
 shape <- function(x, view) {
@@ -640,12 +752,12 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
       
       # correlation index
       r_pearson=cor(simulated, observed, method="pearson"),
-      p_pearson=cor.test(simulated, observed, method="pearson")$p.value,
+      p_pearson=ifelse(n > 1, cor.test(simulated, observed, method="pearson")$p.value, NA),
       r_kendall=cor(simulated, observed, method="kendall"),
-      p_kendall=cor.test(simulated, observed, method="kendall")$p.value,
+      p_kendall=ifelse(n > 1, cor.test(simulated, observed, method="kendall")$p.value, NA),
       r_squared=cor(simulated, observed, method="pearson")^2
     )
-   
+  
   labels <- data.frame(
     label = paste(
       "RMSE =", format(metrics$RMSE, digits=2),
