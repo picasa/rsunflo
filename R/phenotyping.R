@@ -74,17 +74,25 @@ soil_water_capacity_type <- function(
     ((100-Cailloux)/100)*(Profondeur/1000)*(1 + 0.05*MatiereOrganique - 0.1)
 }
 
-# estimer la réserve utile (mm) depuis la capacité de rétention en eau volumique et la profondeur
+# compute available soil content (mm) from default model inputs
 #' @export soil_water_capacity
 soil_water_capacity <- function(
-  RootDepth = 1800, # length (mm)
-  FieldCapacity = 19.7, # % weight
-  WiltingPoint = 9.7, # % weight
-  SoilDensity = 1.4, # mass/volume (g/cm3)
-  StoneContent = 0 # 
-) {(FieldCapacity/100 - WiltingPoint/100) * RootDepth * SoilDensity * (1 - StoneContent)}
-
-
+  root_depth, stone_content,  # length (mm), % weight
+  field_capacity_1, field_capacity_2, # % weight
+  wilting_point_1, wilting_point_2, # % weight
+  soil_density_1, soil_density_2, # mass/volume (g/cm3)
+  ...
+  ){
+  
+  # available soil water content for surface layer 
+  swc_1 <- (field_capacity_1/100-wilting_point_1/100)*(1-stone_content)*soil_density_1*300
+  # available soil water content for deep layer 
+  swc_2 <- (field_capacity_2/100-wilting_point_2/100)*(1-stone_content)*soil_density_2*(root_depth-300)
+  # total available soil water content 
+  swc <- swc_1 + swc_2
+  
+  return(swc)
+}
 
 # Phenology ####
 # Somme de temps thermique entre deux bornes : climat, date1, date2
