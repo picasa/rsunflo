@@ -752,9 +752,9 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
       
       # correlation index
       r_pearson=cor(simulated, observed, method="pearson"),
-      p_pearson=ifelse(n > 1, cor.test(simulated, observed, method="pearson")$p.value, NA),
+      p_pearson=ifelse(n > 2, cor.test(simulated, observed, method="pearson")$p.value, NA),
       r_kendall=cor(simulated, observed, method="kendall"),
-      p_kendall=ifelse(n > 1, cor.test(simulated, observed, method="kendall")$p.value, NA),
+      p_kendall=ifelse(n > 2, cor.test(simulated, observed, method="kendall")$p.value, NA),
       r_squared=cor(simulated, observed, method="pearson")^2
     )
   
