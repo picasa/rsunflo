@@ -1,18 +1,18 @@
 ---
-title: "Documentation for the SUNFLO crop model"
-output: rmarkdown::tufte_handout
+title: "Conceptual basis, formalisations and parameterization of the SUNFLO crop model"
+output: tufte::tufte_handout
 bibliography: ./files/bibliography.bib
-csl: ./style/elsevier.csl
-classoption: a4paper
+link-citations: yes
+csl: ./style/jxb.csl
+classoption: a4paper, fleqn
 ---
 
-```{r header, message=FALSE, warning=FALSE, echo=FALSE}
+```{r setup, message=FALSE, warning=FALSE, echo=FALSE}
 # TODO : made small parameters table linked subsets of the complete parameter table
 library(readxl)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
-library(DiagrammeR)
 library(knitr)
 
 # path (! wd is changed in next chunk)
@@ -22,6 +22,7 @@ opts_knit$set(root.dir = normalizePath('../../'))
 fig_dpi = 100
 ```
 
+
 ```{r data, message=FALSE, warning=FALSE, echo=FALSE}
 # data
 list_parameter <- "inst/doc/files/parameterization.xlsx"
@@ -30,43 +31,32 @@ sunflo <- list(
   climate = read_excel(list_parameter, sheet="climate"),
   parameters = read_excel(list_parameter, sheet="parameters"),
   outputs = read_excel(list_parameter, sheet="outputs"),
-  indicators = read_excel(list_parameter, sheet="indicators")
+  indicators = read_excel(list_parameter, sheet="indicators"),
+  predictors = read_excel(list_parameter, sheet="predictors")
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
 ```
 
 ```{r data_graph, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
-graph <- grViz("inst/files/structure_nodes.gv")
+graph <- DiagrammeR::grViz("inst/files/structure_nodes.gv")
 ```
 
-\begin{figure*}
-  \includegraphics[scale=2]{files/structure_nodes.pdf}
-\end{figure*}
+\setcounter{tocdepth}{1}
+\tableofcontents
 
-\newpage
+# Summary
+SUNFLO^[model version: tag 1.4, commit SHA `4d5c30d3`, \href{git clone http://mulcyber.toulouse.inra.fr/anonscm/git/sunrise/sunrise.git sunflo}{repository}] is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time ($t$), environment ($E$) which includes soil, climate and management practice and genetic diversity ($G$) [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
 
+This model is based on a conceptual framework initially proposed by @Monteith1977 and now shared by a large familly of crop models [@Jones2016].
+In this framework, the daily crop dry biomass ($DM_t$) is calculated as a difference equation ^[$DM_t = DM_{t-1} + PAR \times RIE \times RUE$] function of incident photosynthetically active radiation ($PAR$, $MJ.m^{-2}$), light interception efficiency ($RIE$) and radiation use efficiency ($RUE$, $g.MJ^{-1}$).
+The light interception efficiency is based on Beer-Lambert's law^[$RIE = 1-exp^{-k~LAI}$] as a function of leaf area index ($LAI$) and light extinction coefficient ($k$). The radiation use efficiency concept [@Monteith1994] is used to represent photosynthesis at the crop scale.
 
-# Abstract
-SUNFLO is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time, environment (soil and climate), management practice and genetic diversity [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
-
-This model is based on a conceptual framework initially proposed by @Monteith1977 and now shared by a large familly of crop models [REF].
-In this framework, the crop dry biomass growth rate ($dDM/dt$) is calculated as an ordinary differential equation [EQ1] function of incident photosynthetically active radiation ($PAR$, $MJ.m^{-2}$), light interception efficiency ($1-exp^{-k \cdot LAI}$) and radiation use efficiency ($RUE$, $g.MJ^{-1}$).
-The light interception efficiency is based on Beer-Lambert's law as a function of leaf area index ($LAI$) and light extinction coefficient ($k$). The radiation use efficiency concept [@Monteith1994] is used to represent photosynthesis at the crop scale.
-
-[EQ1] $$ dDM/dt = RUE \cdot (1-exp^{-k \cdot LAI}) \cdot PAR $$
-
-Broad scale processes of this framework, the dynamics of $LAI$, photosynthesis ($RUE$) and biomass allocation to grains were split into finer processes (e.g leaf expansion and senescence, response functions to environmental stresses) to reveal genotypic specificity and to allow the emergence of genotype x environment interactions. Globally, the SUNFLO crop model has about 50 equations and 64 parameters (43 plant-related traits and 21 environment-related).
+Broad scale processes of this framework, the dynamics of $LAI=f(t, G, E)$, photosynthesis ($RUE=f(t, G, E)$) and biomass allocation to grains were split into finer processes (e.g leaf expansion and senescence, response functions to environmental stresses) to reveal genotypic specificity and to allow the emergence of genotype-by-environment interactions. Globally, the SUNFLO crop model has about 50 equations and 64 parameters (43 plant-related traits and 21 environment-related).
 
 \newpage
 
 \footnotesize
-\tableofcontents
-
-\newpage
-
-
-
 
 # Inputs
 ```{r InputsParameters, echo=FALSE, results='asis'}
@@ -80,132 +70,156 @@ n_total <- sum(table_parameters_number$n)
 ```
 
 ## Climate
+
+Climate input data are measured from weather stations close to the field location.
+Alternatively, predicted data from gridded general circulation models can be used.
+
 ```{r InputsClimate, echo=FALSE, results='asis'}
-# data
-s <- sunflo$climate %>% select(label=label.doc, description=label.en, unit)
-# table
-kable(s, padding=0)
+table_climate <- sunflo$climate %>%
+  select(label=label.doc, description=label.en, unit)
+ 
+table_climate %>% kable(padding=0)
 ```
 
 ## Soil
+
+Soil is described by two layers (0-30 cm, 30 cm - root depth) and is summarised by its water capacity (mm) and mineralization rate.
+Soil parameters can be measured from a standard soil analysis or estimated using a soil database (e.g. \href{http://esdac.jrc.ec.europa.eu/content/esdb-derived-data}{European Soil Database, ESDB}) [@Hiederer2013].
+
 ```{r InputsSoil, echo=FALSE, results='asis'}
-# data
-s <- sunflo$parameters %>%
+table_soil <- sunflo$parameters %>%
   filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
-# table
-kable(s, padding=0, digits=1)
+
+table_soil %>% kable(padding=0, digits=1)
 ```
 
 ## Management
-```{r InputsManagement, echo=FALSE, results='asis'}
-# data
-s <- sunflo$parameters %>%
+```{r InputsManagement, echo=FALSE, results='asis', eval=FALSE}
+table_management <- sunflo$parameters %>%
   filter(category=="Conduite", template.default==1) %>%
   select(label=label.doc, description=label.en, unit)
-# table
-kable(s, padding=0)
+
+table_management %>% kable(padding=0)
 ```
 
-
-\newpage
-
-## Species
-```{r InputsSpecies, echo=FALSE, results='asis'}
-```
+|label        |description                |unit                             |
+|:------------|:--------------------------|:--------------------------------|
+|SowingDate   |Sowing date                |$date (dd/mm)$                   |
+|HarvestDate  |Harvest date               |$date (dd/mm)$                   |
+|SowingDensity|Plant density              |$plant.m^{-2}$                   |
+|Fertilization|Fertilization date vector  |$date (dd/mm)$                   |
+|Fertilization|Fertilization amount vector|$kg.ha^{-1}$ eq. mineral nitrogen|
+|Irrigation   |Irrigation date vector     |$date (dd/mm)$                   |
+|Irrigation   |Irrigation amount vector   |$mm$                             |
 
 ## Cultivar
+
+The values of the genotype-dependent parameters were obtained by measuring the value of phenotypic traits in dedicated field platforms [@Casadebaig2016a] and controlled conditions [@Casadebaig2008].
+
+\scriptsize
+
 ```{r InputsCultivar, echo=FALSE, results='asis'}
-# data
-s_en <- sunflo$parameters %>%
+table_cultivar <- sunflo$parameters %>%
   filter(category=="Variete", template.default==1) %>%
-  select(label=label.doc, description=label.en, value, unit, reference)
+  select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
 
-s_fr <- sunflo$parameters %>%
-  filter(category=="Variete", template.default==1) %>%
-  select(symbol=name.rsunflo.en, label=label.doc, description=label.fr, value, unit, reference)
-
-# table
-kable(s_en, padding=0, digits=2)
+table_cultivar %>% kable(padding=0, digits=2)
 ```
+
+\footnotesize
 
 
 \newpage
 
 # Phenology
+
+
 ```{r InputsPhenology, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %>% 
+table_phenology <- sunflo$parameters %>% 
   filter(module=="Phenology") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-kable(s, padding=0, digits=1)
+table_phenology %>% kable(padding=0, digits=1)
 ```
 
+
 ## Emergence
-$Emergence = Germination + ElongationRate \times SowingDepth$
+
+Seed germination and hypocotyl elongation are a function of temperature.
+
+$$Emergence = Germination + (ElongationRate \times SowingDepth)$$
 
 with:
 
 * $Germination = 86$, Thermal time for germination (°C.d);
-* $ElongationRate = 1.19$, Hypocotyl elongation rate (°Cd/mm)
-* $SowingDepth = 30$, Sowing depth (mm).
+* $ElongationRate = 1.19$, Hypocotyl elongation rate (°Cd mm^-1^)
+* $SowingDepth = 30$, Default sowing depth (mm).
+
 
 ## ThermalTime
+
+Thermal time accumulation is a function of base temperature, mean air temperature, and water stress.
+
 $$
-  ThermalTime_d=
-	\left\{ 
-	\begin{array}{ll}
-	\int_0^d (T_m - T_b) \times (1 + WaterStressPhenology)  & \textrm{if $T_m > T_b$} \\  
-	0 & \textrm{else}
-	\end{array} 
-	\right.
+ThermalTime_t =
+  \begin{cases}
+  \int_0^t (T_m - T_b) \times (1 + WaterStressPhenology), & \text{if } T_m > T_b \\  
+	0, & \text{else}
+	\end{cases}
 $$
 
 with: 
 
-* $T_m$, Daily mean air temperature (°C); 
-* $T_b = 4.8$, Basal temperature (°C) [@Granier1998]; 
+* $T_m$, daily mean air temperature (°C); 
+* $T_b = 4.8$, Base temperature (°C) [@Granier1998]; 
 * $ThermalStressPhenology$, Water stress effect on plant heating
 
 ## PhenoStages
-```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2.5, fig.fullwidth=TRUE}
-# Data
-parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
-                "ThermalTimeSenescence", "ThermalTimeMaturity",
-                "Germination")
+```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2, fig.fullwidth=TRUE}
+# data
+list_parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
+                "ThermalTimeSenescence", "ThermalTimeMaturity")
 
-list_phase <- c("Vegetative","Floral Initiation","Flowering","Grain Filling","Germination","Elongation")
+list_phase <- c("Germination","Elongation","Vegetative","Floral Initiation","Flowering","Grain Filling")
 
-s <- sunflo$parameters %>%
-  filter(module=="Phenology", label.doc %in% parameters) %>%
-  select(label=label.doc, value)
+# compute correct germination and sowing time relatively to emergence
+data_phenology <- sunflo$parameters %>%
+  filter(module=="Phenology", label.doc %in% list_parameters) %>%
+  select(label=label.doc, value) %>% 
+  bind_rows(., data_frame(
+    label=c("Emergence","Germination","Sowing"),
+    value=c(0, -1.19*30, -(1.19*30+86.2)))
+  ) %>% 
+  arrange(value)
 
-# add emergence state
-s <- rbind(s, data.frame(label="Emergence", value=0))
-# change germination value according to emergence
-s[s$label=="Germination",]$value <- -200+ s[s$label=="Germination",]$value
-# compute start phase for plotting
-s <- s %>% mutate(
+# compute start and end of phases for plotting
+data_phase <- data_frame(
   phase=factor(list_phase, levels=list_phase),
-  start=c(0, 482, 836, 1083, -200, -200+86.2),
-  end=value
+  start=data_phenology$value[1:6],
+  end=data_phenology$value[2:7]
 )
 
 # plot
-p <- ggplot(s) +
+list_colors <- c(terrain.colors(6)[5:6],terrain.colors(6)[1:4])
+
+plot_phenology <- data_phase %>% ggplot() +
   geom_segment(aes(x=start, xend=end, y=0, yend=0, color=phase), size=5) +
-  geom_text(aes(x=value, y=0, label=label), vjust=0.5, size=3, angle=90, hjust=-0.1) +
-  theme_bw() + labs(x="ThermalTime", y="") + ylim(0,0.5) +
-  scale_color_manual(values = terrain.colors(6)) +
+  geom_text(
+    data=data_phenology,
+    aes(x=value, y=0, label=label),
+    hjust=0, vjust=0.5, size=3, angle=90, nudge_y=0.05
+  ) +
+  theme_bw() + labs(x="ThermalTime", y="") + ylim(0, 1) +
+  scale_color_manual(values = list_colors) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
 
-print(p)
-# ggsave(p, file="./figure/PhenoStage.png", height=2.5, width=8, units="in", dpi=fig_dpi)
+print(plot_phenology)
 ```
 
-In the software model, phenostages are computed as integers $\in [0,7]$ corresponding to duration between key stages:
+Phenostages are computed as integers $\in [0,7]$ corresponding to duration between key phenological stages:
 
 * **0**, begining of simulation - sowing (bare soil)
 * **1**, sowing (A0) - emergence (A2)
@@ -218,20 +232,23 @@ In the software model, phenostages are computed as integers $\in [0,7]$ correspo
 
 \newpage
 
-# LeafArea
+# Leaf Area
 ```{r InputsLeafArea, echo=FALSE, results='asis'}
 # data
-s <- sunflo$parameters %>% 
-  filter(module=="LeafArea") %>%
+table_leaf_area <- sunflo$parameters %>% 
+  filter(module=="LeafArea", ! name.vle %in% c("LAI_b","LAI_e")) %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 # table
-kable(s, padding=0, digits=1)
+table_leaf_area %>% kable(padding=0, digits=1)
 ```
 
-\vspace{2cm}
 
 ## LeafInitiationTime, LeafExpansionTime, LeafSenescenceTime
+```{marginfigure}
+\vspace{1cm}
+```
+
 ```{r LeafInitiationTime, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 LeafInitiationTime <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=6*71.43){
@@ -248,9 +265,8 @@ LeafExpansionDuration <- function(i, TLN=30, LLH=17, y0=851.3, a=153, b=0.78){
   a + y0 * exp(-((i - LLH)^2) / ((b * TLN)^2))
 }
 
-# Data
+# data
 i <- 1:30
-
 d <- data_frame(x=i) %>% 
   mutate(
     Initiation = LeafInitiationTime(x),
@@ -259,62 +275,66 @@ d <- data_frame(x=i) %>%
   ) %>%
   gather(Process, y, -x)
 
-
-# Graph
-p <- ggplot(d, aes(x=y, y=x, color=Process)) + geom_path() +
+# plot
+plot_leaf_initiation <- d %>%
+  ggplot(aes(x=y, y=x, color=Process)) + geom_path() +
   theme_bw() + labs(x="ThermalTime", y="Node") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
+print(plot_leaf_initiation)
 ```
 
-The rate of leaf appearance depends on air temperature and two phyllochrons as preformed lower leaves appear at a lower rate [@Rey2003]
+The rate of leaf initiation depends on air temperature and two phyllochrons as preformed lower leaves appear at a lower rate [@Rey2003].
 
 $$
-  LeafInitiationTime_i = \left\{ 
-  \begin{array}{ll}
-	i \times Phyllotherm_1 & \textrm{if $i \leq 6$} \\  
-	(i-5) \times Phyllotherm_7 + 6 \times Phyllotherm_1 & \textrm{if $i \leq LeafNumber$}
-	\end{array} \right.
+LeafInitiationTime_i = 
+  \begin{cases}
+	i \times Phyllotherm_1, & \text{if } i \leq 6 \\  
+	(i-5) \times Phyllotherm_7 + 6 \times Phyllotherm_1, & \text{if } i \leq LeafNumber
+	\end{cases}
 $$
 
 with:
 
-* $Phyllotherm_1=76.43$ (°C.d)
-* $Phyllotherm_7=16.34$ (°C.d)
+* $Phyllotherm_1=76.43$ (°C d)
+* $Phyllotherm_7=16.34$ (°C d)
 
-Thermal time to 50% of final leaf area was defined as a function of the thermal time required for leaf appearance.
+Thermal time at 50% of final leaf area is defined as a function of leaf initiation.
 
-$$LeafExpansionTime_i=LeafInitiation_i + 1/a$$
+$$LeafExpansionTime_i=LeafInitiationTime_i + 1/a$$
 
 with $a=0.01379$.
 
 
 ## LeafExpansionDuration
-```{r LeafExpansionDuration, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Data
-i <- 1:30
+```{marginfigure}
+\vspace{1cm}
+```
 
+```{r LeafExpansionDuration, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# data
+i <- 1:30
 d <- data_frame(x=i) %>%
   mutate(LeafExpansionDuration = LeafExpansionDuration(x)) %>%
   gather(Process, y, -x)
 
-# Graph
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+# plot
+plot_leaf_duration <- d %>%
+  ggplot(aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="Node", y="LeafExpansionDuration") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
-
+print(plot_leaf_duration)
 ```
 
+The duration of leaf expansion is a function of plant architecture (leaf number and leaf profile).
 
 $$LeafExpansionDuration_i = a + b \times exp^{\frac{-(i-PotentialLeafProfile)^2}{(c \times PotentialLeafNumber)^2}}$$
 
 with: 
 
-* $a = PotentialLeafDurationMin = 153$ (°C.d)
-* $b = PotentialLeafDurationMax = 851.3$ (°C.d)
+* $a = PotentialLeafDurationMin = 153$ (°C d)
+* $b = PotentialLeafDurationMax = 851.3$ (°C d)
 * $c = PotentialLeafDurationWidth = 0.78$
 
 $$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
@@ -327,21 +347,22 @@ PotentialLeafArea <- function(i, LLS=448, LLH=17, a=-2.05, b=0.049) {
   LLS * exp(a*((i-LLH)/(LLH-1))^2 + b*((i-LLH)/(LLH-1))^3) 
 }
 
-# Data
+# data
 i <- 1:30
-
 d <- data_frame(x=i) %>%
   mutate(PotentialLeafArea = PotentialLeafArea(x)) %>%
   gather(Process, y, -x)
 
-# Graph
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+# plot
+plot_leaf_area <- d %>%
+  ggplot(aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="Node", y="PotentialLeafArea") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
-
+print(plot_leaf_area)
 ```
+
+The potential area of individual leaves is a function of plant architecture descriptors (total leaf number, area and position of the largest leaf).
 
 $$
 PotentialLeafArea_i = PotentialLeafSize \times exp^{a \times (\frac{i-PotentialLeafProfile}{PotentialLeafProfile-1})^2 + b \times
@@ -349,9 +370,11 @@ PotentialLeafArea_i = PotentialLeafSize \times exp^{a \times (\frac{i-PotentialL
 $$
 
 with: 
-* $a=-2.05$ and $b=0.049$, shape parameters
-* $PotentialLeafSize$ (cm2) and $PotentialLeafProfile$ (node), genotypic parameters.
 
+* $a=-2.05$ and $b=0.049$, shape parameters
+* $PotentialLeafSize$ (cm^2^) and $PotentialLeafProfile$ (node), genotype-dependent parameters.
+
+\newpage
 
 ## LeafExpansionRate, LeafSenescenceRate
 ```{r LeafGrowthRate, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
@@ -362,7 +385,6 @@ LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
 
 # Data
 t <- 0:2000
-
 d <- data_frame(x=t) %>% 
   mutate(
     Expansion = LeafGrowthRate(x, te=500, Ae=300, Teff=(25-4.8)),
@@ -371,25 +393,29 @@ d <- data_frame(x=t) %>%
   gather(Process, y, -x)
 
 # Graph
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+plot_leaf_growth <- d %>%
+  ggplot(aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="ThermalTime (°Cd)", y="GrowthRate (cm2/°Cd)") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
+print(plot_leaf_growth)
 # ggsave(p, file="inst/doc/files/figures/LeafGrowthRate.pdf", height=3, width=3, units="in")
 ```
 
+Potential expansion or senescence rate of leaf $i$ is a function of thermal time and potential area of the leaf.
+The illustration uses $i=10$ as values for $PotentialLeafArea_i$, $LeafExpansionTime_i$ and $LeafSenescenceTime_i$
+
 $$
 \begin{split}
-LeafExpansionRate_i = (T_m - T_b) \times PotentialLeafArea_i \times a \times \\
-\frac{exp^{-a(ThermalTime-LeafExpansionTime_i)}}{(1+exp^{-a(ThermalTime-LeafExpansionTime_i)})^2}
+LeafExpansionRate_i = & ~ (T_m - T_b) \times PotentialLeafArea_i \times a \\
+& \times \frac{exp^{-a(ThermalTime-LeafExpansionTime_i)}}{(1+exp^{-a(ThermalTime-LeafExpansionTime_i)})^2}
 \end{split}
 $$
 
 $$
 \begin{split}
-LeafSenescenceRate_i = (T_m - T_b) \times LeafArea_i \times a \times \\
-\frac{exp^{-a(ThermalTime-LeafSenescenceTime_i)}}{(1+exp^{-a(ThermalTime-LeafSenescenceTime_i)})^2}
+LeafSenescenceRate_i = & ~ (T_m - T_b) \times LeafArea_i \times a \\
+& \times \frac{exp^{-a(ThermalTime-LeafSenescenceTime_i)}}{(1+exp^{-a(ThermalTime-LeafSenescenceTime_i)})^2}
 \end{split}
 $$
 
@@ -399,30 +425,40 @@ with:
 * $T_b=4.8$, base temperature (°C)
 * $a=0.01379$
 
-The illustration uses $i=10$ as values for $PotentialLeafArea_i$, $LeafExpansionTime_i$ and $LeafSenescenceTime_i$
 
 
 ## LeafArea, PlantLeafArea
 
-$$LeafArea_i=\int LeafExpansionRate_i - \int LeafSenescenceRate_i$$
+Individual leaf expansion is impacted by water and nitrogen stress during leaf longevity. Leaf senescence is only function of temperature. Active leaf area is the difference between total and senescent leaf area. 
 
-$$PlantLeafArea = \sum_{i=1}^{LeafNumber} LeafArea_i$$
+$$TotalLeafArea_{it} = \int_0^t LeafExpansionRate_{it} \times WaterStressExpansion_{t} \times NitrogenStressExpansion_t$$
+$$SenescentLeafArea_{it} = \int_0^t LeafSenescenceRate_{it}$$
 
-\newpage
+$$PlantLeafArea_t = \sum_{i=1}^{LeafNumber} TotalLeafArea_{it} - SenescentLeafArea_{it}$$
 
-# Light interception
 
-## LAI
-$$LAI = SowingDensity \times PlantLeafArea$$
 
-## RIE
-$$RIE = 1 - exp^{(-ExtinctionCoefficient \times LAI)}$$
+# Light Interception
 
+```{r InputsLightInterception, echo=FALSE, results='asis'}
+# data
+table_light <- sunflo$parameters %>% 
+  filter(module=="LightInterception") %>%
+  select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
+
+# table
+table_light %>% kable(padding=0, digits=1)
+```
+
+## Leaf Area Index (LAI)
+$$LAI_t = SowingDensity \times PlantLeafArea_t$$
+
+## Radiation Interception Efficiency (RIE)
 ```{r RIE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
+# function
 RIE <- function(LAI, k) {1 - exp(-k * LAI)}
 
-# Graph
+# data
 lai <- seq(0,5, by=0.1)
 
 d <- data_frame(x=lai) %>%
@@ -432,33 +468,52 @@ d <- data_frame(x=lai) %>%
   ) %>%
   gather(k, y, -x)
 
-# Graph
-p <- ggplot(d, aes(x, y, color=k)) + geom_path() +
-  theme_bw() + labs(x="Leaf Area Index (LAI)", y="RIE") +
+# plot
+plot_RIE <- d %>%
+  ggplot(aes(x, y, color=k)) + geom_path() +
+  theme_bw() + labs(x="Leaf Area Index (LAI)", y="Radiation Interception Efficiency (RIE)") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
-#ggsave(p, file="inst/doc/files/figures/RIE.pdf", height=3, width=3, units="in")
+print(plot_RIE)
+#ggsave(plot_RIE, file="inst/doc/files/figures/RIE.pdf", height=3, width=3, units="in")
 ```
+
+Beer–Lambert law is used to model light interception assuming an homogeneous distribution of leaves for a given soil area ($LAI$).
+
+$$RIE = 1 - exp^{(-k \times LAI_t)}$$
+with: 
+
+* $k$, light extinction coefficient, genotype-dependent parameter.
+
 
 
 \newpage
 
 # Biomass production
 
-## RUE
+```{r InputsBiomass, echo=FALSE, results='asis'}
+# data
+table_biomass <- sunflo$parameters %>% 
+  filter(module=="Biomass") %>%
+  select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
 
+# table
+table_biomass %>% kable(padding=0, digits=2)
+```
+
+## Radiation Use Efficiency (RUE)
+
+The variation of radiation use efficiency during crop development is modeled with a piecewise function. The increase in energy cost of the biomass produced (oil content) is modeled by exponential decrease of $RUE$ during grain filling. 
 
 $$
-PotentialRUE = \left\{ 
-	\begin{array}{ll}
-	r_0 & \textrm{if $ThermalTime < 300 $} \\  
-	r_0 + 2 \times \frac{ThermalTime-300}{ThermalTimeFlowering-300} & \textrm{if $300 < ThermalTime < ThermalTimeFlowering$}\\
-	r_{max} & \textrm{if $ThermalTimeFlowering < ThermalTime < ThermalTimeSenescence$}\\
-	a \times exp^{b \times (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})} & \textrm{if $ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity$}\\
-  0 & \textrm{else}
-	\end{array}
-  \right.
+PotentialRUE_t =  
+	\begin{cases}
+	r_0, & \textrm{if } ThermalTime < 300 \\  
+	r_0 + 2 \times \frac{ThermalTime-300}{ThermalTimeFlowering-300}, & \textrm{if } 300 < ThermalTime < ThermalTimeFlowering\\
+	r_{max}, & \textrm{if } ThermalTimeFlowering < ThermalTime < ThermalTimeSenescence\\
+	a \times exp^{b \times (1-\frac{ThermalTime - ThermalTimeMaturity}{ThermalTimeMaturity - ThermalTimeSenescence})}, & \textrm{if } ThermalTimeSenescence < ThermalTime < ThermalTimeMaturity\\
+  0, \textrm{else}
+	\end{cases}
 $$
 
 with:
@@ -468,8 +523,14 @@ with:
 * $a=0.015$, final RUE
 * $b=4.5$, slope of RUE decrease in grain filling stage
 
+
+The considered abiotic stresses (temperature, water, nitrogen) multiplicatively impact the potential $RUE$ each day.
+
+$$RUE_t = PotentialRUE_t \times ThermalStressRUE_t \times WaterStressRUE_t \times NitrogenStressRUE_t$$
+
+## CropBiomass 
 ```{r RUE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
+# function
 PotentialRUE <- function(
   t,
   r0=1,
@@ -495,35 +556,114 @@ PotentialRUE <- function(
   )
 }
 
-# Graph
+# data
 t <- 0:2000
 
 d <- data_frame(x=t) %>% 
   mutate(PotentialRUE=PotentialRUE(x)) %>%
   gather(Process, y, -x)
 
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+# plot
+plot_RUE <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="Thermal Time (°C.d)", y="PotentialRUE") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
-#ggsave(p, file="inst/doc/files/figures/PotentialRUE.pdf", height=3, width=3, units="in")
+print(plot_RUE)
+#ggsave(plot_RUE, file="inst/doc/files/figures/PotentialRUE.pdf", height=3, width=3, units="in")
 ```
 
-\vspace{2cm}
+Intercepted light is the main driver of biomass accumulation ($CropBiomassRate$), based on @Monteith1977 model.
 
-## CropBiomass [@Monteith1977]
-$$dCropBiomass = Radiation \times 0.48 \times RIE \times RUE \cdot dt$$
+$$CropBiomass_t = CropBiomass_{t-1} + (PAR_t \times RIE_t \times RUE_t)$$
 
-## CropPerformance
+with:
+
+* $PAR_t=Radiation_t \times 0.48$, Photosynthetically active radiation
+
+
+# Crop Performance
+
+Harvest index and oil content value at harvest time are predicted using a linear regression based on a subset of simulated state variables. 
+
+## Harvest Index
+```{r InputsHarvestIndex, echo=FALSE, results="asis"}
+# data
+table_model_hi <- sunflo$predictors %>% 
+  filter(model=="HI") %>%
+  select(factor, process, symbol=name.rsunflo.en, description=label.en, unit,	formula, integration)
+
+# table
+table_model_hi %>% kable(padding=0, digits=2)
+```
+
+The following coefficients are used to predict harvest index at harvest time [@Casadebaig2011].
+
+```
+Coefficients:
+ 		 Estimate	 Std. Error t value Pr(>|t|)
+(Intercept)  9.370e-02  6.996e-02   1.339 0.182276
+STDM_F      -1.552e-04  6.376e-05  -2.434 0.015982 *
+NETR_EF     -2.828e-03  1.335e-03  -2.118 0.035650 *
+NETR_FM     -2.557e-03  1.174e-03  -2.178 0.030813 *
+NETR_MH     -1.940e-03  4.995e-04  -3.884 0.000148 ***
+STR_FH      -3.907e-04  1.696e-04  -2.304 0.022464 *
+TT_FH        1.274e-04  3.190e-05   3.992 9.80e-05 ***
+HI           8.189e-01  1.540e-01   5.317 3.34e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Adjusted R-squared: 0.3036 F-statistic: 11.84 on 7 and 167 DF,  p-value: 3.311e-12
+```
+
+## Oil Content
+```{r InputsOilContent, echo=FALSE, results="asis"}
+# data
+table_model_oc <- sunflo$predictors %>% 
+  filter(model=="OC") %>%
+  select(factor, process, symbol=name.rsunflo.en, description=label.en, unit,	formula, integration)
+
+# table
+table_model_oc %>% kable(padding=0, digits=2)
+```
+
+The following coefficients are used to predict oil content at harvest time [@Andrianasolo2014].
+
+```
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -18.702220   3.898791  -4.797 2.26e-06 ***
+OC             0.996473   0.059631  16.711  < 2e-16 ***
+SFTSW_FM       0.111097   0.026317   4.221 2.99e-05 ***
+SFTSW_MH       0.126438   0.041208   3.068 0.002297 ** 
+NNNIE_EM      -0.068492   0.015455  -4.432 1.20e-05 ***
+SNAB_MH       -0.035815   0.010669  -3.357 0.000862 ***
+NHT_MH        -0.235708   0.049564  -4.756 2.75e-06 ***
+LAD_MH         0.007082   0.009191   0.771 0.441441    
+MRUE_MH       21.052693   2.900957   7.257 2.01e-12 ***
+DENS           0.831619   0.172779   4.813 2.10e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.516 on 408 degrees of freedom
+Multiple R-squared:  0.5022,	Adjusted R-squared:  0.4913 
+F-statistic: 45.74 on 9 and 408 DF,  p-value: < 2.2e-16
+```
+
+
+## Crop Yield
+
+At harvest time, crop yield is computed as the proportion of total aerial biomass allocated to seeds (i.e. crop yield is not defined before harvest).
+
+$$CropYield_{harvest} = CropBiomass_{harvest} \times HarvestIndex_{harvest}$$
+
 
 
 \newpage
 
 # Thermal stress
-## ThermalStressRUE [@Villalobos1996]
+
+## ThermalStressRUE 
 ```{r ThermalStressRUE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
+# function
 ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   ifelse(
     tm > tb & tm < tol, tm * (1/(tol - tb)) - (tb/(tol - tb)),
@@ -539,31 +679,32 @@ ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   )
 }
 
-# Graph
+# data
 t <- seq(0,45,by=0.2)
 
 d <- data_frame(x=t) %>% 
   mutate(ThermalStressRUE=ThermalStressRUE(x)) %>%
   gather(Process, y, -x)
 
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+# plot
+plot_ThermalStressRUE <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressRUE") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
-# ggsave(p, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=fig_dpi)
+print(plot_ThermalStressRUE)
+# ggsave(plot_ThermalStressRUE, file="./figure/ThermalStressRUE.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
+The impact of temperature on photosynthesis is modeled with a piecewise linear function, with four thresholds defined below [@Villalobos1996].
 
 $$
-ThermalStressRUE = \left\{ 
-  \begin{array}{ll}
-  T_m \times \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b} & \textrm{if $T_b < T_m < T_{ol}$} \\  
-  1 & \textrm{if $T_{ol} < T_m < T_{ou}$} \\
-  T_m \times \frac{1}{T_{ou} - T_c} - \frac{T_c}{T_{ou} - T_c} & \textrm{if $T_{ou} < T_m < T_c$} \\
-  0 & \textrm{else}
-	\end{array}
-  \right.
+ThermalStressRUE_t =  
+  \begin{cases}
+  T_m \times \frac{1}{T_{ol} - T_b} - \frac{T_b}{T_{ol} - T_b}, & \textrm{if } T_b < T_m < T_{ol} \\  
+  1, & \textrm{if } T_{ol} < T_m < T_{ou} \\
+  T_m \times \frac{1}{T_{ou} - T_c} - \frac{T_c}{T_{ou} - T_c}, & \textrm{if } T_{ou} < T_m < T_c \\
+  0, & \textrm{else}
+	\end{cases}
 $$
 
 with:
@@ -575,30 +716,34 @@ with:
 
 
 
-## ThermalStressMineralization [@Vale2007]
+## ThermalStressMineralization 
 ```{r ThermalStressMineralization, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
+# function
 ThermalStressMineralization <- function(tm, tb=15, tc=36) {
   tc/(1 + (tc - 1) * exp(-0.119 * (tm - tb)))
 }
 
-## Graph
+# data
 t <- seq(0,45,by=0.2)
 
 d <- data_frame(x=t) %>% 
   mutate(ThermalStressMineralization=ThermalStressMineralization(x)) %>%
   gather(Process, y, -x)
 
-p <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
+# plot
+plot_ThermalStressMineralization <- ggplot(d, aes(x, y, color=Process)) + geom_path() +
   theme_bw() + labs(x="Mean Air Temperature (°C)", y="ThermalStressMineralization") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
+print(plot_ThermalStressMineralization)
 
-# ggsave(p, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=fig_dpi)
+# ggsave(plot_ThermalStressMineralization, file="./figure/ThermalStressMineralization.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$ThermalStressMineralization = \frac{T_c}{1 + (T_c - 1) \times exp^{(-0.119 \times (T_m - T_b))}}$$
+A logistic function is used to describe the effect of air temperature on net nitrogen mineralization [@Vale2006; @Vale2007]. 
+The parameterization does not change with soil type. 
+
+$$ThermalStressMineralization_t = \frac{T_c}{1 + (T_c - 1) \times exp^{(-0.119 \times (T_m - T_b))}}$$
 
 with: 
 
@@ -607,163 +752,14 @@ with:
 
 ## ThermalStressAllocation
 
-\newpage
+Predictors based on temperature are used in linear models of harvest index and oil content and are described in the *Crop Performance* section. 
 
-# Water stress
-
-## WaterDemand
-
-$$WaterDemand = K_c \times PET \times RIE$$
-
-with $K_c = 1.2$, crop coefficient
-
-## WaterSupply
-```{r WaterSupply, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
-WaterStressConductivity <- function(t) {sqrt(t+1) - sqrt(t)}
-
-# Graph
-t <- seq(0,30, by=0.1) 
-
-d <- data_frame(x=t) %>%
-  mutate(SoilConductivity = WaterStressConductivity(x)) %>%
-  gather(Process, y, -x)
-
-p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
-  labs(x="Dry Days (d)", y="SoilConductivity") +
-  theme(legend.direction = "horizontal", legend.position = "bottom")
-
-print(p)
-
-```
-
-$$WaterSupply = Rainfall + Irrigation - Transpiration - Evaporation - Drainage$$
-
-$$Transpiration = WaterDemand \times WaterStressConductance$$
-
-$$Evaporation = (1 - RIE) \times PET \times SoilConductivity$$
-
-$$SoilConductivity = \sqrt{x + 1} - \sqrt{x}$$
-
-with 
-
-$$
-  dx/dt =
-  \left\{ 
-	\begin{array}{ll}
-	1  & \textrm{if $Rainfall + Irrigation <= 4$} \\  
-	0 & \textrm{else}
-	\end{array} 
-	\right.
-$$
-
-## WaterStress
-$$WaterStress = \frac{WaterAvailable}{WaterTotal}$$
-
-$$WaterAvailable = WaterSupply$$
-
-$$WaterTotal = SoilWaterCapacity \times SoilDensity \times (1 - StoneContent) \times RootingDepth$$
-
-## WaterStressExpansion, WaterStressConductance
-```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
-WaterStressProcess <- function(ftsw, a=-5) {
-  -1 + 2/(1 + exp(a*ftsw))
-}
-
-## Graph
-ftsw <- seq(0,1, by=0.01)
-
-d <- data_frame(x=ftsw) %>%
-  mutate(
-    Expansion = WaterStressProcess(x, a=-4.42),
-    Conductance = WaterStressProcess(x, a=-9.3)
-  ) %>%
-  gather(Process, y, -x)
-
-p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
-  labs(x="WaterStress (FTSW)", y="WaterStressProcess") +
-  theme(legend.direction = "horizontal", legend.position = "bottom")
-
-print(p)
-# ggsave(p, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=fig_dpi)
-```
-
-$$ WaterStressProcess = -1 + \frac{2}{1 + exp^{(a \times WaterStress)}}$$ 
-
-with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
-
-
-## WaterStressPhenology
-$$WaterStressPhenology = a \times (1 - WaterStressConductance)$$
-with $a=0.1$, scaling parameter for water-stress plant heating
-
-## WaterStressMineralization
-$$WaterStressMineralization = 1 - (1 - y_0) \times (1 - RelativeWaterContent_{layer1})$$
-
-\newpage
-
-# Nitrogen stress
-
-## NitrogenDemand
-
-```{r NitrogenDemand, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
-NitrogenContent <- function(biomass, a=4.53, b=0.42) {
-  pmin(a, a*biomass^-b)
-}
-
-## Graph
-biomass <- seq(0,10, by=0.01)
-
-d <- data_frame(x=biomass) %>%
-  mutate(
-    Critical = NitrogenContent(x, a=4.53, b=0.42),
-    Maximum = NitrogenContent(x, a=6.49, b=0.44)
-  ) %>%
-  gather(Process, y, -x)
-
-p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
-  labs(x="CropBiomass (t.ha-1)", y="NitrogenContent (%)") +
-  theme(legend.direction = "horizontal", legend.position = "bottom")
-
-print(p)
-```
-
-$$ NitrogenContent =	min(a, a \times CropBiomass^{-b})$$
-
-with: 
-
-* $CropBiomass$, Daily shoot biomass ($t.ha^{-1}$); 
-* $a=4.53$ and $b=0.42$ defining $NitrogenContentCritical$ [@Debaeke2012a]; 
-* $a=6.49$ and $b=0.44$ defining $NitrogenContentMaximum$ [@Debaeke2012a]; 
-
-$$NitrogenDemand = NitrogenCritical = NitrogenCriticalContent \times CropBiomass$$
-
-## NitrogenSupply
-
-$$NitrogenSupply = NitrogenAbsorbed = NitrogenAbsorbedMassFlow + NitrogenAbsorbedTransport$$
-
-$$NitrogenAbsorbedMassFlow = TranspirationRate_l \times SoilNitrogen$$
-
-## NitrogenStress
-
-$$NitrogenStress = NitrogenSupply/NitrogenDemand = NNI $$ Vitesse d'extraction d'eau par les racine dans C1 (mm/j)
-
-## NitrogenStressExpansion
-
-## NitrogenStressRUE
-
-
-
-
-\newpage
 
 # Radiation stress
-## RadiationStressExpansion [@Rey2003]
+## RadiationStressExpansion
 
 ```{r RadiationStressExpansion, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
-# Function
+# function
 RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.09) {
   s * (a + (b/(1 + exp((c - nipar)/d))))
 }
@@ -775,22 +771,388 @@ d <- data_frame(x=ipar) %>%
   mutate(Expansion = RadiationStressExpansion(x)) %>%
   gather(Process, y, -x)
 
-p <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+plot_RadiationStressExpansion <- d %>% 
+  ggplot(aes(x, y, color=Process)) +
+  geom_line() + theme_bw() +
   labs(x="Intercepted Radiation per LAI (MJ)", y="RadiationStressExpansion") +
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-print(p)
+print(plot_RadiationStressExpansion)
 # ggsave(p, file="./figure/RadiationStressExpansion.png", height=3.5, width=4, units="in", dpi=fig_dpi)
 ```
 
-$$RadiationStressExpansion = s \times a + \frac{b}{1 + exp^{(\frac{c - IPAR/LAI}{d})}}$$ 
+Competition for light affects leaf expansion, allowing to model the plant area response to sowing density [@Rey2003]. 
+
+$$RadiationStressExpansion_t = s \times a + \frac{b}{1 + exp^{(\frac{c - \frac{IPAR_t}{LAI_t}}{d})}}$$ 
 
 with:
 
+* $IPAR_t = PAR_t \times RIE_t$, light intercepted by the crop;
 * $s=2.5$, scaling parameter for density effect;
 * $a=-0.14$; $b=1.13$; $c=4.13$; $d=2.09$
 
+
+
 \newpage
+
+# Water stress
+
+\scriptsize
+
+```{r InputsWaterStress, echo=FALSE, results='asis'}
+# data
+table_water_stress <- sunflo$parameters %>% 
+  filter(module=="WaterStress") %>%
+  select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
+
+# table
+table_water_stress %>% kable(padding=0, digits=1)
+```
+
+\footnotesize
+
+## RootGrowth
+
+Root growth is a linear function of temperature and stops at estimated maximum soil rooting depth.
+
+$$
+RootDepth =
+  \begin{cases}
+  RootGrowthRate \times T_m, & \textrm{if } RootDepth < RootDepthLimit \\  
+  RootDepthLimit, & \textrm{else}
+  \end{cases}
+$$
+
+with: 
+
+* $RootGrowthRate = 0.7$, root elongation rate (mm °Cd^-1^)
+* $RootDepthMax = 1800$, maximum root depth (mm)
+
+
+## WaterSupply 
+The water balance model treats the soil as a reservoir with three dynamic layers: surface layer (0-30 cm), root layer (30-rooting front), and soil layer (rooting front - soil depth) [@Sarr2004].
+Rainfall, irrigation and evaporation only impacts the balance of the surface layer.
+Water movement in the soil is assumed to be only vertical, with runoff and lateral flow being ignored. 
+Drainage occurs when the water content of a layer exceeds its water retention capacity (defined by the $SoilWaterCapacity$ parameter).
+
+
+
+$$WaterAvailable_t = Rainfall_t + Irrigation_t - Evaporation_t - Transpiration_t - Drainage_t$$
+
+
+Soil evaporation is modeled with the same approach as crop transpiration. 
+
+$$Evaporation_t = (1 - RIE) \times PET \times WaterStressEvaporation$$
+
+
+```{r WaterStressEvaporation, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# function
+WaterStressEvaporation <- function(x) {sqrt(x+1) - sqrt(x)}
+
+# data
+t <- seq(0,30, by=0.1) 
+
+d <- data_frame(x=t) %>%
+  mutate(WaterStressEvaporation = WaterStressEvaporation(x)) %>%
+  gather(Process, y, -x)
+
+# plot
+plot_WaterStressEvaporation <- ggplot(d, aes(x, y, color=Process)) + geom_line() + theme_bw() +
+  labs(x="Dry Days (d)", y="WaterStressEvaporation") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(plot_WaterStressEvaporation)
+
+```
+
+The relative soil evaporation is based on @Ritchie1981 two-stage model, where soil evaporation is reduced as a function ($WaterStressEvaporation$) of the number of days since last water input ($x$)
+
+$$WaterStressEvaporation = \sqrt{x + 1} - \sqrt{x}$$
+with: 
+
+$$
+  dx/dt =
+	\begin{cases}
+	1,  & \textrm{if } Rainfall + Irrigation <= 4 \\  
+	0,  & \textrm{else}
+	\end{cases} 
+$$
+
+Crop transpiration rate correspond to the water demand scaled by the reduction of transpiration under water deficit (control of stomatal conductance).
+
+$$Transpiration_t = WaterDemand_t \times WaterStressConductance_t$$
+
+## WaterDemand
+
+Water demand is a function of crop light interception and potential evapotranspiration.
+
+$$WaterDemand_t = RIE_t \times PET_t \times K_c$$
+
+with $K_c = 1.2$, crop coefficient
+
+
+## WaterStress
+
+The fraction of transpirable soil water [$FTSW$, @Sinclair2005b] accounts for the amount of soil water available to the plant within the root zone. $FTSW$ is used to drive function representing various physiological responses to water deficit in the model.
+
+
+$$WaterStress_t = FTSW_t = \frac{WaterAvailable_t}{WaterTotal_t}$$
+
+Total water available for the crop depends on rooting depth and soil texture and density.
+
+$$WaterTotal_t = RootDepth_t \times SoilWaterCapacity \times SoilDensity \times (1-StoneContent)$$
+
+with $SoilWaterCapacity = \theta_{fc} - \theta_{wp}$, the difference between the gravimetric water content at field capacity and at wilting point. 
+
+## WaterStressExpansion, WaterStressConductance, WaterStressRUE
+```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# function
+WaterStressProcess <- function(ftsw, a=-5) {
+  -1 + 2/(1 + exp(a*ftsw))
+}
+
+# data
+ftsw <- seq(0,1, by=0.01)
+
+d <- data_frame(x=ftsw) %>%
+  mutate(
+    Expansion = WaterStressProcess(x, a=-4.42),
+    Conductance = WaterStressProcess(x, a=-9.3),
+    Phenology = 0.1* (1 - Conductance)
+  ) %>%
+  gather(Process, y, -x) %>% 
+  mutate(Process=factor(Process, levels=c("Phenology","Expansion","Conductance")))
+
+# plot
+plot_WaterStressProcess <- d %>% 
+  ggplot(aes(x, y, color=Process)) +
+  geom_line() + theme_bw() +
+  labs(x="WaterStress (FTSW)", y="Impact on process") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(plot_WaterStressProcess)
+# ggsave(plot_WaterStressProcess, file="./figure/WaterStressProcess.png", height=4, width=4, units="in", dpi=fig_dpi)
+```
+
+Leaf expansion and plant transpiration rates are exponentially reduced with increased water deficit.
+The same response curve is used for transpiration ($WaterStressConductance$) and photosynthesis ($WaterStressRUE$).
+
+$$WaterStressProcess_t = -1 + \frac{2}{1 + exp^{(a \times WaterStress_t)}}$$ 
+
+with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
+
+
+## WaterStressPhenology
+
+Accelerated crop developement under water deficit is modeled as a function plant sensitivity to water deficit.
+
+$$WaterStressPhenology_t = a \times (1 - WaterStressConductance_t)$$
+with $a=0.1$, scaling parameter for water-stress plant heating
+
+## WaterStressMineralization
+
+```{r WaterStressMineralization, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# function
+WaterStressMineralization <- function(x, y0=0.2) {(1-y0) * x + y0}
+
+# data
+x <- seq(0,1, by=0.01) 
+
+d <- data_frame(x=x) %>%
+  mutate(WaterStressMineralization = WaterStressMineralization(x)) %>%
+  gather(Process, y, -x)
+
+# plot
+plot_WaterStressMineralization <- d %>% 
+  ggplot(aes(x, y, color=Process)) +
+  geom_line() + theme_bw() +
+  labs(x="Relative water content", y="WaterStressMineralization") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(plot_WaterStressMineralization)
+
+```
+
+The effect of soil water content on net mineral nitrogen mineralization is described by a linear function [@Mary1999; @Vale2006].
+
+$$WaterStressMineralization = (1 - y_0) \times RelativeWaterContent + y_0$$
+
+with:
+
+* $y_0 = 0.2$, relative nitrogen mineralization rate at wilting point
+* $RelativeWaterContent = \frac{\theta - \theta_{wp}}{\theta_{fc} - \theta_{wp}}$, relative water content in surface layer.
+
+\newpage
+
+
+# Nitrogen stress
+
+\scriptsize
+
+```{r InputsNitrogenStress, echo=FALSE, results='asis'}
+# data
+table_nitrogen_stress <- sunflo$parameters %>% 
+  filter(module=="NitrogenStress") %>%
+  select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
+
+# table
+table_nitrogen_stress %>% kable(padding=0, digits=1)
+```
+
+\footnotesize
+
+## NitrogenSupply
+
+The mineral nitrogen content of the soil layers (kg ha^-1^) depends on nitrogen fertilization, mineralization, leaching, denitrification, and plant uptake.
+The amount of nitrogen added to the surface layer from fertilization depends on a threshold of water input (5 mm) for solubilization and nitrogen use efficiency^[$NUE = 30 + 0.34 \times CropBiomassRate \times 100$], which is modeled as a linear function of crop growth rate (g m ^-2^ °Cd^-1^) [@Limaux1999].
+Leaching is the product of drained water ($Drainage$) and the nitrogen concentration from the soil layer concerned.
+
+$$
+\begin{split}
+SoilNitrogenContent_t = & ~ Fertilization_t + Mineralization_t - Leaching_t \\
+& - Denitrification_t - NitrogenUptake_t
+\end{split}
+$$
+Nitrogen mineralization takes place in surface layer and is impacted by relative soil water content and temperature.
+
+$$
+\begin{split}
+MineralizationRate_t = & ~ PotentialMineralizationRate \times WaterStressMineralization_t \\
+& \times ThermalStressMineralization_t
+\end{split}
+$$
+Denitrification occurs when the surface soil layer is water saturated and is function of air temperature [@Sinclair1995].
+
+$$DenitrificationRate_t = 6 \times exp^{(a \times T_m - b)}$$
+
+with:
+
+* $T_m$, daily mean air temperature (°C);
+* $a=0.07738$ and $b=6.593$ [@Sinclair1995]
+
+Soil nitrogen is absorbed in the transpirational stream (mass flow).
+
+$$
+\begin{split}
+NitrogenSupply_t & = NitrogenUptake_t \\
+\end{split}
+$$
+
+$$
+\begin{split}
+NitrogenUptakeRate_t & = TranspirationRate_t \times SoilNitrogenConcentration_t
+\end{split}
+$$
+
+```{r NitrogenAbsorbedTransport, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE, eval=FALSE}
+# equation
+
+# $$
+# \begin{split}
+# NitrogenAbsorbedTransport_t = & ~ Vm_1 \times \frac{SoilNitrogen_t}{Km_1+SoilNitrogen_t} + \\
+# & ~ Vm_2 \times \frac{SoilNitrogen_t}{Km_2+SoilNitrogen_t} \times RootDepth
+# \end{split}
+# $$
+
+# function
+NitrogenAbsorbedTransport <- function(x, a=0.1, vm1=0.0018, km1=50, vm2=0.05, km2=25000, z=1000) {
+  ((vm1 * (x*100*31)) / (km1 + (x*100*31))) + ((vm2 * (x*100*31)) / (km2 + (x*100*31))) * 24 * a * z
+}
+
+# data
+concentration <- seq(0,0.3, by=0.01)
+
+d <- data_frame(x=concentration) %>%
+  mutate(
+    ActiveTransport = NitrogenAbsorbedTransport(x, a=0.1)
+  ) %>%
+  gather(Process, y, -x)
+
+# plot
+plot_NitrogenAbsorbedTransport <- d %>% 
+  ggplot(aes(x, y, color=Process)) +
+  geom_line() + theme_bw() +
+  labs(x="SoilNitrogen (kg l-1)", y="NitrogenAbsorbed (kg ha-1)") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(plot_NitrogenAbsorbedTransport)
+```
+
+## NitrogenDemand
+
+```{r NitrogenDemand, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+# function
+NitrogenConcentration <- function(biomass, a=4.53, b=0.42) {
+  pmin(a, a*biomass^-b)
+}
+
+# data
+biomass <- seq(0,10, by=0.01)
+
+d <- data_frame(x=biomass) %>%
+  mutate(
+    Critical = NitrogenConcentration(x, a=4.53, b=0.42),
+    Maximum = NitrogenConcentration(x, a=6.49, b=0.44)
+  ) %>%
+  gather(Process, y, -x)
+
+# plot
+plot_NitrogenDemand <- d %>% 
+  ggplot(aes(x, y, color=Process)) +
+  geom_line() + theme_bw() +
+  labs(x="CropBiomass (t.ha-1)", y="NitrogenConcentration (%)") +
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
+print(plot_NitrogenDemand)
+```
+
+Crop nitrogen demand is driven by the nitrogen dilution in the biomass produced. 
+Two thresholds (critical and maximal) for plant nitrogen concentration (% dry matter) were thus experimentally defined by monitoring nitrogen accumulation in relation to crop biomass for various fertilization levels (0–160 kg ha^-1^) in field [@Debaeke2012a].
+
+$$ CropNitrogenConcentration =	min(a, a \times CropBiomass^{-b})$$
+
+with: 
+
+* $CropBiomass$, daily shoot biomass (t ha^-1^); 
+* $CropNitrogenConcentrationCritical$ is defined with $a=4.53$ and $b=0.42$; 
+* $CropNitrogenConcentrationMaximum$ is defined with $a=6.49$ and $b=0.44$; 
+
+The critical crop nitrogen uptake is defined as the minimum nitrogen uptake necessary to achieve maximum biomass accumulation.
+
+$$NitrogenDemand_t = CropNitrogenConcentrationCritical_t \times CropBiomass_t$$
+
+
+
+
+## NitrogenStress
+
+Nitrogen stress index [Nitrogen Nutrition Index, NNI, see @Lemaire1997], is based on the ratio of actually absorbed nitrogen ($NitrogenSupply$, kg ha^-1^) to the critical nitrogen amount needed to satisfy the demand (N$NitrogenDemand$, kg ha^-1^).
+
+$$NitrogenStress_t = \frac{NitrogenSupply_t}{NitrogenDemand_t} = NNI$$ 
+
+## NitrogenStressExpansion
+
+The impact of nitrogen deficit on leaf expansion is a linear function of nitrogen stress index [@Brisson2009].
+
+$$
+NitrogenStressExpansion_t = 
+\begin{cases}
+1.75 \times NNI - 0.75, & \textrm{if } NNI > 0.6 \\
+0.3, & \textrm{else}
+\end{cases}
+$$
+
+
+## NitrogenStressRUE
+
+The impact of nitrogen deficit on photosynthesis ($RUE$) is the ratio of daily nitrogen uptake rate to the daily critical nitrogen amount needed to satisfy the demand.
+
+$$NitrogenStressRUE_t = \frac{NitrogenSupplyRate_t}{NitrogenDemandRate_t}$$
+
+
+
+\newpage
+
 
 
 
@@ -824,3 +1186,5 @@ kable(s, padding=0)
 \newpage
 
 # References
+
+\scriptsize
