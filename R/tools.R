@@ -41,12 +41,6 @@ modelmaker_management <- function(x) {
 
 # Statistical indicators and function ####
 
-# Calculer RMSE
-#' @export  rmse
-rmse <- function(obs, sim) {
-  sqrt(mean(na.omit(obs - sim)^2))
-}
-
 
 # Calculer l'efficience du modèle
 #' @export efficiency
@@ -57,13 +51,6 @@ efficiency <- function (obs, sim) {
 # Not in
 #' @export '%ni%'
 '%ni%' <- Negate('%in%')
-
-# Correspondance partielle entre les noms de variétés fournis et une liste de référence
-# max.distance = list(sub=3, del=6, ins=3)
-match_fuzzy <- function(x, reference, index=1){
-  agrep(pattern = x, x = reference, max.distance = 0.1, value=TRUE, ignore.case=TRUE)[index]
-}
-
 
 
 

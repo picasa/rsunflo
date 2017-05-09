@@ -74,13 +74,13 @@ soil_water_capacity_type <- function(
     ((100-Cailloux)/100)*(Profondeur/1000)*(1 + 0.05*MatiereOrganique - 0.1)
 }
 
-# compute available soil content (mm) from default model inputs
+# compute available soil content (mm), default model inputs
 #' @export soil_water_capacity
 soil_water_capacity <- function(
-  root_depth, stone_content,  # length (mm), % weight
-  field_capacity_1, field_capacity_2, # % weight
-  wilting_point_1, wilting_point_2, # % weight
-  soil_density_1, soil_density_2, # mass/volume (g/cm3)
+  root_depth=1000, stone_content=0.1,  # length (mm), % weight
+  field_capacity_1=19.7, field_capacity_2=19.7, # % weight
+  wilting_point_1=9.7, wilting_point_2=9.7, # % weight
+  soil_density_1=1.3, soil_density_2=1.3, # mass/volume (g/cm3)
   ...
   ){
   
@@ -95,17 +95,17 @@ soil_water_capacity <- function(
 }
 
 # Phenology ####
-# Somme de temps thermique entre deux bornes : climat, date1, date2
+# compute temperature sum between two dates 
 #' @export thermal_time
-thermal_time <- function(climate, eID, start, end, Tb = 4.8){
+thermal_time <- function(climate, id, start, end, base=4.8){
   if (is.na(start) | is.na(end)) {
     return(NA)
   } else {
-    # Selection du vecteur de température moyenne
-    s <- climate[climate$eID == eID,"TM"][start:end] 
-    # Somme conditionnelle
-    r <- sum(ifelse(s - Tb < 0, 0, s - Tb))
-    return(r)
+    # select vector for mean temperature
+    temperature <- table_climate %>% filter(trial_id == id) %>% slice(start:end) %>% .$TM
+    # conditional temperature sum
+    thermal_time <- sum(ifelse(temperature - base < 0, 0, temperature - base))
+    return(thermal_time)
   }
 }
 
@@ -246,11 +246,4 @@ curve_breaklinear <- function(x, a, b) {
   return(t)        
 }
 
-# Phenotypage réponse : Extraire un dataframe du paramétrage d'un objet nls 
-#' @export extract_parameters_response
-extract_parameters_response <- function(x) {
-  t <- data.frame(summary(x)$parameters)
-  colnames(t) <- c("value","sd","t","pr")
-  return(t)
-}
 

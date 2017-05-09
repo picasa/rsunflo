@@ -779,7 +779,7 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
 evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...) {
   
   ggplot(data=data, aes(x=simulated, y=observed)) +
-    geom_point(aes_string(color=color, ...)) +
+    geom_point(aes_string(color=color), ...) +
     facet_wrap(as.formula(formula), scale=scale) +
     # stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
