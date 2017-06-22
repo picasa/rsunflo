@@ -5,7 +5,7 @@
 
 # compute reference evapotranspiration according to Penman-Monteith formula and [@Wallach2006] assumption
 #' @export et_penman_monteith
-et_penman_monteith <- function(tmin, tmax, tdew, rad, wind, lat, lon, elevation, day) {
+et_penman_monteith <- function(tmin, tmax, tdew, rad, wind, lat, lon, elevation, day, ...) {
   
   # From [@Wallach2006]
   # Inputs
@@ -97,7 +97,7 @@ soil_water_capacity <- function(
 # Phenology ####
 # compute temperature sum between two dates 
 #' @export thermal_time
-thermal_time <- function(climate, id, start, end, base=4.8){
+thermal_time <- function(climate, id, start, end, base=4.8, ...){
   if (is.na(start) | is.na(end)) {
     return(NA)
   } else {
@@ -126,7 +126,7 @@ phenostage <- function(flowering) {
 
 # Modèle de surface de feuille = f(Longeur, Largeur) cm
 #' @export leaf_size
-leaf_size <- function(length, width, a0=0.7, a=0.736, b=-8.86, c=0.684, shape="simple"){
+leaf_size <- function(length, width, a0=0.7, a=0.736, b=-8.86, c=0.684, shape="simple", ...){
   
   switch(
     shape,
@@ -149,7 +149,7 @@ leaf_size <- function(length, width, a0=0.7, a=0.736, b=-8.86, c=0.684, shape="s
 
 # Modèle de profil foliaire
 #' @export leaf_profile
-leaf_profile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output="profile") {
+leaf_profile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output="profile", ...) {
   
   # Nombre de phytomères
   n <- 1:TLN
@@ -182,7 +182,7 @@ leaf_profile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output=
 # Modèle de coefficient d'extinction = f(TLN, LLS, LLH)
 # Coeff_k = -1,11.10-2 x n_Fmax – 1,09.10-2 x NF – 1,12.10-3 x SFimax – 0,11 x H + 6,5.10-5 x (0,5 x NF x SFimax + 30 x NF) + 1,58
 #' @export coefficient_extinction
-coefficient_extinction <- function(TLN, LLH, LLS, H) {  
+coefficient_extinction <- function(TLN, LLH, LLS, H, ...) {  
   # Methode Pouzet-Bugat [Pouzet1985]
   TPA <- 0.5*TLN*LLS +30*TLN  
   

@@ -97,7 +97,7 @@ biplot_ammi <- function(m) {
 splom <- function(data, plot_size_lims=c(0,1)) {
   
   # add id and normalize values
-  data <- data %>% mutate_each(funs(rescale)) %>% mutate(id=1:n())
+  data <- data %>% mutate_all(funs(rescale)) %>% mutate(id=1:n())
   
   # list selected variables (traits) 
   list_variables <- data %>% select(-id) %>% names(.)
