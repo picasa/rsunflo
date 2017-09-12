@@ -219,23 +219,28 @@ curve_expansion <- function(x, a) {
   return(t)
 }
 
-# Function for computing quantitative low temperature stress index
-#' @export curve_thermal_low
-curve_thermal_low <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
-  ifelse(tm > tb & tm < tol, tm * (1/(tol - tb)) - (tb/(tol - tb)),
-         ifelse(tm <= tb, 0, 1)
+# compute quantitative low and high temperature stress index on RUE
+#' @export curve_thermal_rue
+curve_thermal_rue <- function(tm, tb=4.8, tol=20, tou=28, tc=37, type="low") {
+  
+  switch(
+    type, 
+    
+    low = {
+      ifelse(tm > tb & tm < tol, tm * (1/(tol - tb)) - (tb/(tol - tb)),
+             ifelse(tm <= tb, 0, 1)
+      )
+    },
+    
+    high={
+      ifelse(tm > tou & tm < tc, tm * (1/(tou - tc)) - (tc/(tou-tc)),
+             ifelse(tm >= tc, 0, 1)
+      )
+    }
   )
 }
 
-# Function for computing quantitative high temperature stress index
-#' @export curve_thermal_high
-curve_thermal_high <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
-  ifelse(tm > tou & tm < tc, tm * (1/(tou - tc)) - (tc/(tou-tc)),
-         ifelse(tm >= tc, 0, 1)
-  )
-}
-
-# Fonction bi-linéaire
+# break linear model
 #' @export curve_breaklinear
 curve_breaklinear <- function(x, a, b) {
   t=NULL
