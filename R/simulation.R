@@ -159,127 +159,59 @@ design <- function(design, file, template="default", format="websim", user="casa
 
 
 
-# Simulation unitaire depuis une ligne d'un plan d'expérience
-# TODO : adaptation de la fonction au plan : 
-#   automatique selon les infos du plan : non renseigné = defaut du vpz
+# run sunflo VLE model as a function of experimental design
+# TODO : expose all parameters in function to use purrr::pmap with incomplete designs (use vpz value as default)
 #' @export play
 
-play <- function(model, design, unit, template="default") 
-{
+play <- function(data, model=sunflo, unit) {
   
-  switch(template,
-         
-         # default : 2 horizons de sol, tout paramètres variétaux, conduite intensive, levée forcée (n=42)
-         default = {
-           r <- results(
-             run(
-               model,
-               begin  							                = design[["begin"]][unit],
-               duration					              		= design[["duration"]][unit],
-               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-               CONFIG_SimuInit.rh1                 = as.numeric(design[["nitrogen_initial_1"]][unit]),
-               CONFIG_SimuInit.rh2                 = as.numeric(design[["nitrogen_initial_2"]][unit]),
-               CONFIG_SimuInit.Hini_C1             = as.numeric(design[["water_initial_1"]][unit]),
-               CONFIG_SimuInit.Hini_C2             = as.numeric(design[["water_initial_2"]][unit]),
-               CONFIG_SimuInit.dateLevee_casForcee = ifelse(format(design[["crop_emergence"]][unit], "%m") == "01",
-                                                            "00/00", format(design[["crop_emergence"]][unit], "%d/%m")
-               ),
-               CONFIG_Sol.profondeur               = design[["root_depth"]][unit],
-               CONFIG_Sol.Vp  		                  = design[["mineralization"]][unit],
-               CONFIG_Sol.Hcc_C1 		              = design[["field_capacity_1"]][unit],
-               CONFIG_Sol.Hcc_C2 		              = design[["field_capacity_2"]][unit],
-               CONFIG_Sol.Hpf_C1 		              = design[["wilting_point_1"]][unit],
-               CONFIG_Sol.Hpf_C2 		              = design[["wilting_point_2"]][unit],
-               CONFIG_Sol.da_C1 		 	              = design[["soil_density_1"]][unit],
-               CONFIG_Sol.da_C2 		    	          = design[["soil_density_2"]][unit],
-               CONFIG_Sol.TC 		                  = design[["stone_content"]][unit],
-               CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
-               CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
-               CONFIG_Conduite.densite        	    = design[["crop_density"]][unit],
-               CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
-               CONFIG_Conduite.date_ferti_2        = format(design[["nitrogen_date_2"]][unit], "%d/%m"),
-               CONFIG_Conduite.apport_ferti_1     	= as.numeric(design[["nitrogen_dose_1"]][unit]),
-               CONFIG_Conduite.apport_ferti_2      = as.numeric(design[["nitrogen_dose_2"]][unit]),
-               CONFIG_Conduite.date_irrig_1        = format(design[["water_date_1"]][unit], "%d/%m"),
-               CONFIG_Conduite.date_irrig_2        = format(design[["water_date_2"]][unit], "%d/%m"),
-               CONFIG_Conduite.date_irrig_3        = format(design[["water_date_3"]][unit], "%d/%m"),
-               CONFIG_Conduite.apport_irrig_1     	= as.numeric(design[["water_dose_1"]][unit]),
-               CONFIG_Conduite.apport_irrig_2      = as.numeric(design[["water_dose_2"]][unit]),
-               CONFIG_Conduite.apport_irrig_3      = as.numeric(design[["water_dose_3"]][unit]),
-               CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
-               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-               CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
-               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-               CONFIG_Variete.ext     			        = design[["K"]][unit],
-               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-               CONFIG_Variete.thp   				        = design[["OC"]][unit]
-             )
-           ) 
-         },
-         
-         # gem : profondeur de sol, conduite extensive, tout paramètres variétaux (n=21)
-         gem = {
-           r <- results(
-             run(
-               model,
-               begin    						                = design[["begin"]][unit],
-               duration					              		= design[["duration"]][unit],
-               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-               CONFIG_Sol.profondeur               = as.numeric(design[["root_depth"]][unit]),
-               CONFIG_Conduite.jsemis    		    	= format(design[["crop_sowing"]][unit], "%d/%m"),
-               CONFIG_Conduite.jrecolte            = format(design[["crop_harvest"]][unit], "%d/%m"),
-               CONFIG_Conduite.densite        	    = as.numeric(design[["crop_density"]][unit]),
-               CONFIG_Conduite.date_ferti_1       	= format(design[["nitrogen_date_1"]][unit], "%d/%m"),
-               CONFIG_Conduite.apport_ferti_1     	= as.numeric(design[["nitrogen_dose_1"]][unit]),
-               CONFIG_Variete.date_TT_E1  		      = design[["TDE1"]][unit],
-               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-               CONFIG_Variete.date_TT_M0  			    = design[["TDM0"]][unit],
-               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-               CONFIG_Variete.ext     			        = design[["K"]][unit],
-               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-               CONFIG_Variete.thp   				        = design[["OC"]][unit]
-             )
-           ) 
-         },
-         
-         # genotype : année, paramètres variétaux réduits ()
-         genotype = {
-           r <- results(
-             run(
-               model,
-               begin      					                = design[["begin"]][unit],
-               CONFIG_ClimatNomFichier.meteo_file	= as.character(design[["file"]][unit]),
-               CONFIG_Variete.date_TT_E1  		      = 0.576 * design[["TDF1"]][unit],
-               CONFIG_Variete.date_TT_F1  			    = design[["TDF1"]][unit],
-               CONFIG_Variete.date_TT_M0  			    = 246.5 + design[["TDF1"]][unit],
-               CONFIG_Variete.date_TT_M3  			    = design[["TDM3"]][unit],
-               CONFIG_Variete.TLN     			        = design[["TLN"]][unit],
-               CONFIG_Variete.ext     			        = design[["K"]][unit],
-               CONFIG_Variete.bSF   				        = design[["LLH"]][unit],
-               CONFIG_Variete.cSF   				        = design[["LLS"]][unit],
-               CONFIG_Variete.a_LE  				        = design[["LE"]][unit],
-               CONFIG_Variete.a_TR  				        = design[["TR"]][unit],
-               CONFIG_Variete.IRg   				        = design[["HI"]][unit],
-               CONFIG_Variete.thp   				        = design[["OC"]][unit]
-             )
-           ) 
-         }
-  )
+  # get parameters from design
+  # TODO : get default parameter values from model
+  data <- data %>% slice(unit)
   
-  # Retour 
-  return(r)
+  # run model with new parameters  
+  output <- model %>% 
+    run(
+      cBegin.begin_date                   = as.character(data$begin),
+      simulation_engine.duration          = as.numeric(data$duration),
+      sunflo_climat.meteo_file            = as.character(data$file),
+      itk.jsemis                          = as.character(data$crop_sowing),
+      itk.jrecolte                        = as.character(data$crop_harvest),
+      itk.densite                         = as.numeric(data$crop_density),
+      itk.fertilization_1                 = paste0("=",data$nitrogen_date_1,"$dose=",data$nitrogen_dose_1),
+      itk.fertilization_2                 = paste0("=",data$nitrogen_date_2,"$dose=",data$nitrogen_dose_2),
+      itk.irrigation_1                    = paste0("=",data$water_date_1,"$dose=",data$water_dose_1),
+      itk.irrigation_2                    = paste0("=",data$water_date_2,"$dose=",data$water_dose_2),
+      CONFIG_SimuInit.init_value_N1       = as.numeric(data$nitrogen_initial_1),
+      CONFIG_SimuInit.init_value_N3       = as.numeric(data$nitrogen_initial_2),
+      CONFIG_Sol.Hini_C1                  = as.numeric(data$water_initial_1),
+      CONFIG_Sol.Hini_C2                  = as.numeric(data$water_initial_2),
+      CONFIG_Sol.profondeur               = as.numeric(data$sowing_depth),
+      CONFIG_Sol.Vp  		                  = as.numeric(data$mineralization),
+      CONFIG_Sol.Hcc_C1 		              = as.numeric(data$field_capacity_1),
+      CONFIG_Sol.Hcc_C2 		              = as.numeric(data$field_capacity_2),
+      CONFIG_Sol.Hpf_C1 		              = as.numeric(data$wilting_point_1),
+      CONFIG_Sol.Hpf_C2 		              = as.numeric(data$wilting_point_2),
+      CONFIG_Sol.da_C1 		 	              = as.numeric(data$soil_density_1),
+      CONFIG_Sol.da_C2 		    	          = as.numeric(data$soil_density_2),
+      CONFIG_Sol.TC 		                  = as.numeric(data$stone_content),
+      CONFIG_Variete.date_TT_E1  		      = as.numeric(data$TDE1),
+      CONFIG_Variete.date_TT_F1  			    = as.numeric(data$TDF1),
+      CONFIG_Variete.date_TT_M0  			    = as.numeric(data$TDM0),
+      CONFIG_Variete.date_TT_M3  			    = as.numeric(data$TDM3),
+      CONFIG_Variete.TLN     			        = as.numeric(data$TLN),
+      CONFIG_Variete.ext     			        = as.numeric(data$K),
+      CONFIG_Variete.bSF   				        = as.numeric(data$LLH),
+      CONFIG_Variete.cSF   				        = as.numeric(data$LLS),
+      CONFIG_Variete.a_LE  				        = as.numeric(data$LE),
+      CONFIG_Variete.a_TR  				        = as.numeric(data$TR),
+      CONFIG_Variete.IRg   				        = as.numeric(data$HI),
+      CONFIG_Variete.thp   				        = as.numeric(data$OC)
+    ) %>%
+    results()
+  
+  return(output) 
 }
-
 
 # call to rvle::run to expose all conditions for potential optimization, with fixed values listed in design (list)
 #' @export play_optimize
@@ -287,7 +219,7 @@ play <- function(model, design, unit, template="default")
 play_optimize <- function(
   model, design, unit,
   
-  # candidate parameters to be optimized have default fixed value from design
+  # set parameters default value from design (from vpz ?)
   begin = design[["begin"]][unit],
   duration = design[["duration"]][unit],
   file = as.character(design[["file"]][unit]),
@@ -395,74 +327,49 @@ play_optimize <- function(
 
 # Mise en forme des données brutes de sortie
 #' @export shape
-shape <- function(x, view) {
+shape <- function(data, view="generic") {
   
 	switch(view,
 		
-	   debug = {
-	     # Nettoyage des noms de colonne
-	     x <- x[[1]]
-	     colnames(x) <- sub(".*\\.","", colnames(x))
-	     
-	     # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
-	     # to JDN as.numeric(as.Date(x, format= "%m/%d/%Y")) + 2440588
-	     # delta = julian(x = 01, d = 01, y = 1970, origin = c(month=11, day=24, year=-4713))
-	     x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
-	   },
+	       generic = {
+	         # shorten colums names
+	         names(data[[1]]) <- sub(".*\\.","", names(data[[1]]))
+	         
+	         # rename output variables and
+	         # convert VLE time format (JDN cf. http://en.wikipedia.org/wiki/Julian_day) to date
+	         # delta = julian(x = 01, d = 01, y = 1970, origin = c(month=11, day=24, year=-4713))
+	         output <- data %>% .[[1]] %>%
+	           select(-time) %>% 
+	           rename(time=current_date) %>% 
+	           mutate(time=as.Date(time, origin="1970-01-01") - 2440588) 
+	       },
+
+	       timed = {
+	         names(data[[1]]) <- sub(".*\\.","", names(data[[1]]))
+	        
+	         output <- data %>% .[[1]] %>% 
+	           select(
+	             time=current_date, TTA2=TT_A2, PhenoStage=PhasePhenoPlante,
+	             TN=Tmin, TM=Mean, TX=Tmax, GR=RAD, PET=ETP, RR=Pluie,
+	             FTSW, FHTR, FHRUE, ETPET=ETRETM, FTRUE=FT, NAB=Nabs, NNI=INN, FNRUE=FNIRUE, 
+	             LAI, RIE=Ei, RUE=Eb, TDM, GY=photo_RDT_aFinMATURATION, OC=photo_TH_aFinMATURATION
+	           ) %>% 
+	           mutate(time=as.Date(time, origin="1970-01-01") - 2440588)
+	       },
 	       
-		timed = {
-		  # Nettoyage des noms de colonne
-      x <- x[[1]]
-		  colnames(x) <- sub(".*\\.","", colnames(x))
-      
-      # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
-      # to JDN as.numeric(as.Date(x, format= "%m/%d/%Y")) + 2440588
-      # delta = julian(x = 01, d = 01, y = 1970, origin = c(month=11, day=24, year=-4713))
-      x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
-      
-			# viewDynamic : utilisation noms de variables en
-			colnames(x) <- c("time","RUE","RIE","LAI","TDM",
-	                   "PhenoStage","TTA2","TM","FNRUE","NNI","NAB",
-	                   "ETRETM","FHRUE","FHTR","FTSW","FTRUE",
-                       "OC","GY","ETP","RR","GR","TN","TX")
-	    },
-	             
-    end = {
-		  # Nettoyage des noms de colonne
-		  x <- x[[1]]
-		  colnames(x) <- sub(".*\\.","", colnames(x))
-      
-		  # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
-		  x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
-      
-      # viewStatic
-			longnames <- c(
-				"photo_TH_aFinMATURATION",
-				"photo_RDT_aFinMATURATION")
-			colnames(x)[match(longnames, colnames(x))] <- c("OC","GY")
-		},
-         
-    indicators = {
-      # Nettoyage des noms de colonne
-      x <- x[[1]]
-      colnames(x) <- sub(".*\\.","", colnames(x))
-      
-      # Conversion de date VLE (JDN cf. http://en.wikipedia.org/wiki/Julian_day)
-      x <- mutate(x, time = as.Date(time, origin = "1970-01-01") - 2440588)
-      
-      # viewStatic
-      longnames <- c(
-        "photo_TH_aFinMATURATION",
-        "photo_INN_CROISSANCEACTIVE_A_FLORAISON",
-        "photo_RDT_aFinMATURATION")
-      colnames(x)[match(longnames, colnames(x))] <- c("OC","NNI","GY")
-    }
+	       end = {
+	         names(data[[1]]) <- sub(".*\\.","", names(data[[1]]))
+	         
+	         output <- data %>% .[[1]] %>% 
+	           select(time=current_date, GY=photo_RDT_aFinMATURATION, OC=photo_TH_aFinMATURATION) %>% 
+	           mutate(time=as.Date(time, origin="1970-01-01") - 2440588) 
+	       },
 	)
-	return(x)
+  return(as_tibble(output))
 }
 
 
-# Fonction de synthèse des covariables (1 valeur par usm)
+# summarise timed output variables 
 #' @export indicate
 indicate <- function(x, integration="crop", Tb=4.8) {
   
@@ -490,10 +397,7 @@ indicate <- function(x, integration="crop", Tb=4.8) {
     crop = {
       # Calcul des indicateurs
       o <- data.frame(
-        # Graphes
-        # xm <- melt(x, id.vars=c("time","TTA2"))
-        # xyplot(value ~ time | variable, data=xm, type="l", scale="free")
-        
+
         # Phenologie
         D_SE = sum(SE),
         D_EF = sum(EF),
@@ -504,13 +408,13 @@ indicate <- function(x, integration="crop", Tb=4.8) {
         # Ressources environnementales
         SGR = sum(x$GR[EH] * 0.48), # PAR
         SRR = sum(x$RR[EH]),
-        SETP = sum(x$ETP[EH]),
-        SCWD = sum(x$RR[EH] - x$ETP[EH]),
+        SPET = sum(x$PET[EH]),
+        SCWD = sum(x$RR[EH] - x$PET[EH]),
         
         # Contraintes hydriques
         ## basés sur FTSW
         SFTSW = sum(1 - x$FTSW[EH]),
-        NETR = sum(x$ETRETM[EH] < 0.6),
+        NET = sum(x$ETPET[EH] < 0.6),
         SFHTR = sum(1 - x$FHTR[EH]),
         SFHRUE = sum(1 - x$FHRUE[EH]), 
         
@@ -570,28 +474,28 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          SRR_MH = sum(x$RR[MH]),
          
          # Cumul d'évapotranspiration potentielle
-         SETP = sum(x$ETP[EH]),
-         SETP_EF = sum(x$ETP[EF]),
-         SETP_FM = sum(x$ETP[FM]),
-         SETP_MH = sum(x$ETP[MH]),
+         SPET = sum(x$PET[EH]),
+         SPET_EF = sum(x$PET[EF]),
+         SPET_FM = sum(x$PET[FM]),
+         SPET_MH = sum(x$PET[MH]),
          
-         # Déficit hydrique climatique : sum(P-ETP)
-         SCWD = sum((x$RR-x$ETP)[EH]),
-         SCWD_EF = sum((x$RR-x$ETP)[EF]),
-         SCWD_FM = sum((x$RR-x$ETP)[FM]),
-         SCWD_MH = sum((x$RR-x$ETP)[MH]),
+         # Déficit hydrique climatique : sum(P-PET)
+         SCWD = sum((x$RR-x$PET)[EH]),
+         SCWD_EF = sum((x$RR-x$PET)[EF]),
+         SCWD_FM = sum((x$RR-x$PET)[FM]),
+         SCWD_MH = sum((x$RR-x$PET)[MH]),
          
-         # Déficit hydrique édaphique : mean(ETR/ETM)
-         METR = mean(x$ETRETM[EH]),
-         METR_EF = mean(x$ETRETM[EF]),
-         METR_FM = mean(x$ETRETM[FM]),
-         METR_MH = mean(x$ETRETM[MH]),
+         # Déficit hydrique édaphique : mean(ET/PET)
+         MET = mean(x$ETPET[EH]),
+         MET_EF = mean(x$ETPET[EF]),
+         MET_FM = mean(x$ETPET[FM]),
+         MET_MH = mean(x$ETPET[MH]),
          
-         # Déficit hydrique édaphique qualitatif : sum(ETR/ETM < 0.6)
-         NETR = sum(x$ETRETM[EH] < 0.6),
-         NETR_EF = sum(x$ETRETM[EF] < 0.6), 
-         NETR_FM = sum(x$ETRETM[FM] < 0.6),
-         NETR_MH = sum(x$ETRETM[MH] < 0.6),
+         # Déficit hydrique édaphique qualitatif : sum(ET/PET < 0.6)
+         NET = sum(x$ETPET[EH] < 0.6),
+         NET_EF = sum(x$ETPET[EF] < 0.6), 
+         NET_FM = sum(x$ETPET[FM] < 0.6),
+         NET_MH = sum(x$ETPET[MH] < 0.6),
          
          # Déficit hydrique édaphique quantitatif : sum(1-FTSW)
          SFTSW = sum(1 - x$FTSW[EH]),
@@ -701,17 +605,17 @@ indicate <- function(x, integration="crop", Tb=4.8) {
 }
 
 
-# Visualisation  des simulations
+# Visualize timed output variables
 #' @export display
-display <- function(x, view="timed") {
+display <- function(data, view="timed") {
   switch(
     view,
     timed = {
-      d <- reshape2::melt(x, id.vars=c("time", "TTA2"))
-      ggplot(d, aes(x=time, y=value)) +
+      data %>% 
+        gather(variable, value, -time, factor_key=TRUE) %>% 
+        ggplot(aes(x=time, y=value)) +
         geom_line() +
-        facet_wrap(~ variable, scale="free") +
-        theme_bw()
+        facet_wrap(~ variable, scale="free")     
     }
   )
 }
