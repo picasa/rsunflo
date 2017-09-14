@@ -1,54 +1,39 @@
 
 ## Dependances
-```{r dependancies, message=FALSE}
-# Dépendances
-library(XLConnect)
-library(plyr)
-library(dplyr)
-library(tidyr)
+```{r setup, message=FALSE}
+# packages
+library(readxl)
+library(lubridate)
+library(tidyverse)
+library(rvle)
 library(rsunflo)
-library(ggplot2)
 ```
 
 
 ## Plannification
-### Création de plan d'expérience (WebSim)
-```{r design_websim}
-# Import des données
-## Essais (n=2)
-d <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="essais")
-## Genotypes (n=3)
-g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
-
-# Plan factoriel complet
-p <- expand.grid(carol=d$carol, genotype=g$genotype)
-p <- p %>% join(d) %>% join(g)
-
-# Ecriture au format websim
-design(p, file="inst/doc/files/design_websim.xls", format="websim", user="casadebaig")
-```
 
 ### Création du plan d'expérience (rsunflo)
 ```{r design_rsunflo}
 # Import des données
 ## Essais (n=2)
-d <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="essais")
+d <- read_xlsx("inst/doc/files/design.xlsx", sheet="essais")
 ## Genotypes (n=3)
-g <- readWorksheetFromFile(file="inst/doc/files/design.xlsx", sheet="genotype")
+g <- read_xlsx("inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
-p <- expand.grid(carol=d$carol, genotype=g$genotype)
-p <- p %>% join(d) %>% join(g)
+p <- crossing(carol=d$carol, genotype=g$genotype)
+p <- p %>% left_join(d) %>% left_join(g)
 
 # Mise en forme au format rsunflo
 DurationSoil = 5 # durée (j) de la période de simulation sans culture
-design <- p %>% mutate(
-  id = 1:dim(p)[1],
-  begin = as.numeric(as.Date(begin)) + 2440588,
-  end = as.numeric(as.Date(crop_harvest)) + 2440588 + DurationSoil,
-  duration = end - begin,
-  file = paste("DB/test/",carol,".txt",sep="")
-)
+
+design <- p %>%
+  mutate(
+    id = 1:dim(p)[1],
+    end = crop_harvest + days(DurationSoil),
+    duration = as.numeric(end - begin),
+    file = paste("DB/files_test/",carol,".txt",sep="")
+  )
 
 # export design
 saveRDS(design, "inst/doc/files/design.rds")
@@ -59,7 +44,7 @@ saveRDS(design, "inst/doc/files/design.rds")
 ## Simulation
 
 ```{r simulation_rsunflo}
-# Dependances
+# packages
 library(rvle)
 
 # chargement du plan d'experience
@@ -73,7 +58,7 @@ design_vle <- as.list(design)
 sunflo %>% run() %>% results() %>% shape(view="timed")
 
 # Paramétrisation issue du plan d'expérience (1 unité de simulation)
-sunflo %>% play(design_vle, unit=1) %>% shape(view="timed")
+design %>% play(unit=1) %>% shape(view="timed")
 
 # Sortie graphique
 sunflo %>% play(design_vle, unit=1) %>% shape(view="timed") %>% display()
@@ -99,13 +84,21 @@ library(rvle)
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 
 # load reference simulation (SUNFLO v1.2, VLE 1.0.3)
-load("inst/doc/files/output_ref.rdata")
+output_ref <- readRDS("inst/doc/files/output_ref.rds") %>%
+  rename(PET=ETP, ETPET=ETRETM) %>% 
+  gather(variable, value_ref, -time) 
 
 # run current model
-output_new <- sunflo %>% run() %>% results() %>% shape(view="timed")
+output_new <- sunflo %>% run() %>% results() %>% shape(view="timed") %>%
+  gather(variable, value_new, -time)
 
-# test
-identical(output_ref, output_new)
+# plot differences, test : identical(output_ref, output_new)
+plot_dynamics <- left_join(output_ref, output_new) %>% 
+  gather(version, value, -time, -variable) %>% 
+  ggplot(aes(time, value, color=version)) +
+  geom_line() +
+  facet_wrap(~ variable, scale="free")
+
 ```
 
 

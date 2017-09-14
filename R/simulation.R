@@ -186,7 +186,7 @@ play <- function(data, model=sunflo, unit) {
       CONFIG_SimuInit.init_value_N3       = as.numeric(data$nitrogen_initial_2),
       CONFIG_Sol.Hini_C1                  = as.numeric(data$water_initial_1),
       CONFIG_Sol.Hini_C2                  = as.numeric(data$water_initial_2),
-      CONFIG_Sol.profondeur               = as.numeric(data$sowing_depth),
+      CONFIG_Sol.profondeur               = as.numeric(data$root_depth),
       CONFIG_Sol.Vp  		                  = as.numeric(data$mineralization),
       CONFIG_Sol.Hcc_C1 		              = as.numeric(data$field_capacity_1),
       CONFIG_Sol.Hcc_C2 		              = as.numeric(data$field_capacity_2),
@@ -428,8 +428,8 @@ indicate <- function(x, integration="crop", Tb=4.8) {
         SFTRUE = sum(1 - x$FTRUE[EH]),
         NHT = sum(x$TM[EH] > 28),
         NLT = sum(x$TM[EH] < 20),
-        SHT = sum(1 - curve_thermal_high(x$TM[EH])),
-        SLT = sum(1 - curve_thermal_low(x$TM[EH])),
+        SHT = sum(1 - curve_thermal_rue(x$TM[EH], type="high")),
+        SLT = sum(1 - curve_thermal_rue(x$TM[EH], type="low")),
         
         # Évolution de la surface foliaire
         LAI = max(x$LAI[EH]),
@@ -528,48 +528,48 @@ indicate <- function(x, integration="crop", Tb=4.8) {
          SFTRUE_FM = sum(1 - x$FTRUE[FM]),
          SFTRUE_MH = sum(1 - x$FTRUE[MH]),
          
-         # Chaud
+         # heat stress
          NHT = sum(x$TM[EH] > 28),
          NHT_EF = sum(x$TM[EF] > 28),
          NHT_FM = sum(x$TM[FM] > 28),
          NHT_MH = sum(x$TM[MH] > 28),
-         SHT = sum(1 - curve_thermal_high(x$TM[EH])),
-         SHT_EF = sum(1 - curve_thermal_high(x$TM[EF])),
-         SHT_FM = sum(1 - curve_thermal_high(x$TM[FM])),
-         SHT_MH = sum(1 - curve_thermal_high(x$TM[MH])),
+         SHT = sum(1 - curve_thermal_rue(x$TM[EH], type="high")),
+         SHT_EF = sum(1 - curve_thermal_rue(x$TM[EF], type="high")),
+         SHT_FM = sum(1 - curve_thermal_rue(x$TM[FM], type="high")),
+         SHT_MH = sum(1 - curve_thermal_rue(x$TM[MH], type="high")),
          
-         # Froid
+         # cold stress
          NLT = sum(x$TM[EH] < 20),
          NLT_EF = sum(x$TM[EF] < 20),
          NLT_FM = sum(x$TM[FM] < 20),
          NLT_MH = sum(x$TM[MH] < 20),
-         SLT = sum(1 - curve_thermal_low(x$TM[EH])),
-         SLT_EF = sum(1 - curve_thermal_low(x$TM[EF])),
-         SLT_FM = sum(1 - curve_thermal_low(x$TM[FM])),
-         SLT_MH = sum(1 - curve_thermal_low(x$TM[MH])),
+         SLT = sum(1 - curve_thermal_rue(x$TM[EH], type="low")),
+         SLT_EF = sum(1 - curve_thermal_rue(x$TM[EF], type="low")),
+         SLT_FM = sum(1 - curve_thermal_rue(x$TM[FM], type="low")),
+         SLT_MH = sum(1 - curve_thermal_rue(x$TM[MH], type="low")),
          
-         # Contraintes azotées
+         # nitrogen stress 
          # NNIF = x[x$PhasePhenoPlante==4,"NNI"][1], # INN floraison
-         # Azote absorbé
+         # absorbed nitrogen
          SNAB = max(x$NAB[EH]),
          SNAB_EF = max(x$NAB[EF]),
          SNAB_FM = max(x$NAB[FM]),
          SNAB_EM = max(x$NAB[EM]),
          SNAB_MH = max(x$NAB[MH]),
          
-         # Indice de nutrition azoté (deficit azoté)
+         # nitrogen nutrition index 
          SNNI = sum(1 - x$NNI[EH & x$NNI <1]),
          SNNI_EF = sum(1 - x$NNI[EF & x$NNI <1]),
          SNNI_FM = sum(1 - x$NNI[FM & x$NNI <1]),
          SNNI_MH = sum(1 - x$NNI[MH & x$NNI <1]),
          
-         # Effet contrainte azoté sur la photosynthèse
+         # nitrogen impact on phytosynthesis
          SFNRUE = sum(1 - x$FNRUE[EH]),
          SFNRUE_EF = sum(1 - x$FNRUE[EF]),
          SFNRUE_FM = sum(1 - x$FNRUE[FM]),
          SFNRUE_MH = sum(1 - x$FNRUE[MH]),
       
-         # INN à la floraison
+         # NNI at flowering
          NNI_F = x$NNI[FM][1],
          
          # Nombre de jours INN < 0.8 jusqu'à M0
@@ -636,7 +636,7 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
       n = n(),
       mean_observed = mean(observed),
       mean_simulated = mean(simulated),
-      bias = mean_observed - mean_simulated,
+      bias = mean_simulated - mean_observed,
       bias_squared = bias^2,
       SSE = sum((observed - simulated)^2),
       MSE = SSE/n,
