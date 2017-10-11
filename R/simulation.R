@@ -115,7 +115,7 @@ design <- function(design, file, template="default", format="websim", user="casa
             nitrogen_date_2 = format(nitrogen_date_2, "%d/%m"),
             water_date_1 = format(water_date_1, "%d/%m"),
             water_date_2 = format(water_date_2, "%d/%m"),
-            water_date_3 = format(water_date_3, "%d/%m"),
+            water_date_3 = format(water_date_3, "%d/%m")
           )
           
           # Mise en forme du fichier 
@@ -629,14 +629,14 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
   
   metrics <- data %>% 
     select_(observed=observed, simulated=simulated) %>%
-    filter(complete.cases(.)) %>% 
+    drop_na() %>% 
     summarise(
       
       # general metrics
       n = n(),
       mean_observed = mean(observed),
       mean_simulated = mean(simulated),
-      bias = mean_simulated - mean_observed,
+      bias = mean(observed - simulated),
       bias_squared = bias^2,
       SSE = sum((observed - simulated)^2),
       MSE = SSE/n,
