@@ -16,24 +16,25 @@ library(rsunflo)
 ```{r design_rsunflo}
 # Import des données
 ## Essais (n=2)
-d <- read_xlsx("inst/doc/files/design.xlsx", sheet="essais")
+trials <- read_xlsx("inst/doc/files/design.xlsx", sheet="trials")
 ## Genotypes (n=3)
-g <- read_xlsx("inst/doc/files/design.xlsx", sheet="genotype")
+genotypes <- read_xlsx("inst/doc/files/design.xlsx", sheet="genotype")
 
 # Plan factoriel complet
-p <- crossing(carol=d$carol, genotype=g$genotype)
-p <- p %>% left_join(d) %>% left_join(g)
+design <- crossing(trial_id=trials$trial_id, genotype=genotypes$genotype)
+design <- design %>% left_join(trials) %>% left_join(genotypes)
 
 # Mise en forme au format rsunflo
-DurationSoil = 5 # durée (j) de la période de simulation sans culture
+duration_soil = days(5) # durée (j) de la période de simulation sans culture
 
-design <- p %>%
+design <- design %>%
   mutate(
-    id = 1:dim(p)[1],
-    end = crop_harvest + days(DurationSoil),
+    id = 1:n(),
+    begin = crop_sowing - duration_soil,
+    end = crop_harvest + duration_soil,
     duration = as.numeric(end - begin),
-    file = paste("DB/files_test/",carol,".txt",sep="")
-  )
+    file = paste("DB/files_test/",trial_id,".txt",sep="")
+  ) 
 
 # export design
 saveRDS(design, "inst/doc/files/design.rds")

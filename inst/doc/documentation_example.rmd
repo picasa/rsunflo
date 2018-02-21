@@ -1,0 +1,35 @@
+
+```{r setup, message=FALSE}
+# packages
+library(tidyverse)
+library(rvle)
+library(rsunflo)
+```
+
+
+# Simulation
+
+```{r simulation}
+
+# load design of experiments
+design <- readRDS("inst/doc/files/design.rds")
+
+# load the sunflo model
+sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
+run_sunflo <- function(id){design %>% play(unit=id) %>% shape(view="timed")}
+
+# run the model with default parameterization 
+sunflo %>% run() %>% results() %>% shape(view="timed") %>% display()
+
+# run the model with parameters defined in the design of experiments
+design %>% play(unit=1) %>% shape(view="timed") %>% display()
+
+# multi-simulation (4 core i7 : 71 ms/sim), for larger design, parallelization is possible with the *doMC* package
+list_simulation <- design %>% select(id) 
+
+output <- list_simulation %>%
+  plyr::mdply(possibly(run_sunflo, NULL)) %>% as_tibble() 
+
+# compute crop performance indicator (one experiment -> one vector)
+output_indicators <- output %>% group_by(id) %>% do(indicate(.))
+```

@@ -7,15 +7,16 @@ A set of tools for working with the SUNFLO crop model at different steps.
 * simulation: designing virtual experiments and multi-simulation in R or web service interface.
 * modeling: tracking the variation of prediction capacity along with model development.
 
-Documentation : 
+Documentation: 
 
-* user manual : description of the workflow for simulation and model parameterization [(pdf)](inst/doc/documentation_user.pdf)
-* model manual : graphic documentation of the sunflo algorithm [(pdf)](inst/doc/documentation_model.pdf)
+* model manual: graphic documentation of the sunflo algorithm [(pdf)](inst/doc/documentation_model.pdf)
+* user manual: description of the workflow for simulation and model parameterization [(pdf, in French)](inst/doc/documentation_user.pdf)
+* example: simulate a basic design of experiments [rmd](inst/doc/documentation_example.rmd)
 
 ### Installation
 To run simulations with the SUNFLO crop model and this R package, two softwares (VLE and R) and two packages (sunflo and rsunflo) need to be installed.
 
-1. install the `VLE` simulation platform : [VLE project on github](https://github.com/vle-forge/vle)
+1. install the `VLE` simulation platform : `VLE project` [github](https://github.com/vle-forge/vle) or [website](http://www.vle-project.org/download/) and `RVLE` R package [github](https://github.com/vle-forge/rvle)
 
 2. install the `SUNFLO` crop model for VLE simulation platform : [RECORD project model library](http://www6.inra.fr/record/Bibliotheque-de-modeles/Modeles-du-domaine-des-agro-ecosystemes)
 
