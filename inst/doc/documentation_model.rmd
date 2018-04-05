@@ -46,7 +46,7 @@ graph <- DiagrammeR::grViz("inst/files/structure_nodes.gv")
 \tableofcontents
 
 # Summary
-SUNFLO^[model version: tag 1.4, commit SHA `4d5c30d3`, \href{git clone http://mulcyber.toulouse.inra.fr/anonscm/git/sunrise/sunrise.git sunflo}{repository}] is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time ($t$), environment ($E$) which includes soil, climate and management practice and genetic diversity ($G$) [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
+SUNFLO^[model version: commit SHA `897bc320`, \href{git@forgemia.inra.fr:record/sunflo.git}{repository}] is a process-based model for the sunflower crop which was developped to simulate the grain yield and oil concentration as a function of time ($t$), environment ($E$) which includes soil, climate and management practice and genetic diversity ($G$) [@Debaeke2010; @Casadebaig2011; @Lecoeur2011].  
 
 This model is based on a conceptual framework initially proposed by @Monteith1977 and now shared by a large familly of crop models [@Jones2016].
 In this framework, the daily crop dry biomass ($DM_t$) is calculated as a difference equation ^[$DM_t = DM_{t-1} + PAR \times RIE \times RUE$] function of incident photosynthetically active radiation ($PAR$, $MJ.m^{-2}$), light interception efficiency ($RIE$) and radiation use efficiency ($RUE$, $g.MJ^{-1}$).
