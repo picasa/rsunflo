@@ -1,3 +1,8 @@
+#' @import ggplot2
+#' @import dplyr
+#' @import tidyr
+
+
 # Unit conversions and tools ####
 
 

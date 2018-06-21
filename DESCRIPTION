@@ -10,13 +10,11 @@ Version: 0.1
 Author: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
 Maintainer: Pierre Casadebaig <pierre.casadebaig@toulouse.inra.fr>
 Imports:
-    testthat,
-    reshape2,
-    plyr,
-    dplyr,
     lubridate,
-    ggplot2
-Suggests:
+    testthat,
+    dplyr,
+    tidyr,
+    ggplot2,
     rvle
 License: GPL
 RoxygenNote: 6.0.1

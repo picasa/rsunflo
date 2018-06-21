@@ -1,5 +1,10 @@
 # Tools for input, simulation and output data.
 
+#' @import ggplot2
+#' @import dplyr
+#' @import rvle
+
+
 # Climate ####
 # Fonction pour la gestion des données climatiques
 #' @export climate
@@ -18,10 +23,10 @@ climate <- function(x,
       # Ajout des colonnes utilisées par RECORD
       x <- mutate(
         x,
-        JourJ = yday(date),
-        Annee = year(date),
-        Mois = month(date),
-        Jour = day(date) 
+        JourJ = lubridate::yday(date),
+        Annee = lubridate::year(date),
+        Mois = lubridate::month(date),
+        Jour = lubridate::day(date) 
       )
       
       # Mise en forme du fichier de sortie
@@ -102,88 +107,14 @@ test_design <- function(object){
     "duration", "file")
   
   # test for default set of input names in object headers 
-  expect_true(all(list_inputs %in% names(object)))
+  testthat::expect_true(all(list_inputs %in% names(object)))
   
   # test for missing values in object columns
-  expect_false(any(object %>% select(!!list_inputs) %>% is.na()))
+  testthat::expect_false(any(object %>% select(!!list_inputs) %>% is.na()))
   
   # TODO test for formatting and units
   
 }
-
-
-# Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
-#' @export design
-design <- function(design, file, template="default", format="websim", user="casadebaig") {
-  switch(
-    template,
-    
-    default = {
-      switch(
-        format,
-      
-        websim = {
-          
-          # Mise en forme des champs de date, duration.
-          p <- plyr::mutate(
-            design,
-            id = paste(carol, genotype, sep="_"),
-            file = paste(user,"/meteo/", carol, ".txt", sep=""),
-            duration = as.character(crop_harvest - begin + 5),
-            begin = format(begin, "%Y-%m-%d"),
-            crop_sowing = format(crop_sowing, "%d/%m"),
-            crop_emergence = ifelse(
-              format(crop_emergence, "%m") == "01",
-              "00/00",
-              format(crop_emergence, "%d/%m")
-            ),
-            crop_harvest = format(crop_harvest, "%d/%m"),
-            nitrogen_date_1 = format(nitrogen_date_1, "%d/%m"),
-            nitrogen_date_2 = format(nitrogen_date_2, "%d/%m"),
-            water_date_1 = format(water_date_1, "%d/%m"),
-            water_date_2 = format(water_date_2, "%d/%m"),
-            water_date_3 = format(water_date_3, "%d/%m")
-          )
-          
-          # Mise en forme du fichier 
-          # Entetes depuis fichier csv websim
-          names.websim <- c("Nom","Debut","Duree","date_TT_E1/77","date_TT_F1/78",
-                            "date_TT_M0/79","date_TT_M3/80","TLN/72","bSF/75",
-                            "cSF/76","ext/81","a_LE/73","a_TR/74","IRg/69",
-                            "thp/82","datas_file/1","profondeur/68","Hcc_C1/59",
-                            "Hpf_C1/61","Hcc_C2/60","Hpf_C2/62","da_C1/66",
-                            "da_C2/67","TC/64","Vp/65","dateLevee_casForcee/54",
-                            "rh1/55","rh2/56","Hini_C1/51","Hini_C2/52","jsemis/25",
-                            "jrecolte/24","densite/23","date_ferti_1/13","apport_ferti_1/3",
-                            "date_ferti_2/14","apport_ferti_2/4","date_irrig_1/17",
-                            "apport_irrig_1/7","date_irrig_2/18","apport_irrig_2/8",
-                            "date_irrig_3/19","apport_irrig_3/9")
-          
-          # Entetes depuis fichier xls ou r pour rsunflo (ordre de websim)
-          names.rsunflo <- c("id","begin","duration","TDE1","TDF1","TDM0","TDM3",
-                             "TLN","LLH","LLS","K","LE","TR","HI","OC","file",
-                             "root_depth","field_capacity_1","wilting_point_1",
-                             "field_capacity_2","wilting_point_2", "soil_density_1",
-                             "soil_density_2","stone_content","mineralization",
-                             "crop_emergence","nitrogen_initial_1","nitrogen_initial_2",
-                             "water_initial_1","water_initial_2","crop_sowing",
-                             "crop_harvest","crop_density","nitrogen_date_1",
-                             "nitrogen_dose_1","nitrogen_date_2","nitrogen_dose_2",
-                             "water_date_1","water_dose_1","water_date_2","water_dose_2",
-                             "water_date_3","water_dose_3")
-          
-          p <- p[,names.rsunflo]
-          names(p) <- names.websim
-          
-          # Ecriture
-          writeWorksheetToFile(file=file, data=p, sheet="Feuille1")
-          
-        }
-      )
-    }
-  )
-}
-
 
 
 # run sunflo VLE model as a function of experimental design
@@ -642,7 +573,7 @@ display <- function(data, view="timed") {
         gather(variable, value, -time, factor_key=TRUE) %>% 
         ggplot(aes(x=time, y=value)) +
         geom_line() +
-        facet_wrap(~ variable, scale="free")     
+        facet_wrap(~ variable, scales="free")     
     }
   )
 }
@@ -711,7 +642,7 @@ evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...)
   
   ggplot(data=data, aes(x=simulated, y=observed)) +
     geom_point(aes_string(color=color), ...) +
-    facet_wrap(as.formula(formula), scale=scale) +
+    facet_wrap(as.formula(formula), scales=scale) +
     # stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
     geom_abline(intercept=0, slope=1) +
     geom_text(
@@ -731,7 +662,7 @@ evaluate_residuals <- function(data, formula, color, scale="free", size_label=4,
     mutate(residuals=observed-simulated) %>%
     ggplot(aes(simulated, residuals)) +
     geom_point(aes_string(color=color), ...) + 
-    facet_wrap(as.formula(formula), scale=scale) +
+    facet_wrap(as.formula(formula), scales=scale) +
     geom_hline(yintercept = 0) +
     geom_text(
       data=data %>% group_by_(formula) %>% do(evaluate_error(., output="label")),
