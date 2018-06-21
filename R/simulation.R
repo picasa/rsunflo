@@ -85,6 +85,33 @@ climate <- function(x,
 
 # Simulation ####
 
+# Test design object for default column name and missing data
+#' @export test_design
+test_design <- function(object){
+  
+  # list default inputs for simulation
+  list_inputs <- c(
+    "file", "root_depth", "stone_content", "field_capacity_1", "wilting_point_1",
+    "field_capacity_2", "wilting_point_2", "soil_density_1", "soil_density_2",
+    "mineralization", "crop_sowing", "crop_harvest", "crop_density",
+    "nitrogen_date_1", "nitrogen_dose_1", "nitrogen_date_2", "nitrogen_dose_2",
+    "water_date_1", "water_dose_1", "water_date_2", "water_dose_2", "water_date_3",
+    "water_dose_3", "crop_emergence", "water_initial_1", "water_initial_2",
+    "nitrogen_initial_1", "nitrogen_initial_2", "TDE1", "TDF1", "TDM0", "TDM3",
+    "TLN", "LLH", "LLS", "K", "LE", "TR", "HI", "OC", "begin", "end",
+    "duration", "file")
+  
+  # test for default set of input names in object headers 
+  expect_true(all(list_inputs %in% names(object)))
+  
+  # test for missing values in object columns
+  expect_false(any(object %>% select(!!list_inputs) %>% is.na()))
+  
+  # TODO test for formatting and units
+  
+}
+
+
 # Mise en forme de plan d'expérience spécifique des différents outils (rsunflo, websim, varieto)
 #' @export design
 design <- function(design, file, template="default", format="websim", user="casadebaig") {
