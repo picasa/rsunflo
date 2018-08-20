@@ -2,8 +2,6 @@
 
 #' @import ggplot2
 #' @import dplyr
-#' @import rvle
-
 
 # Climate ####
 # Fonction pour la gestion des données climatiques
