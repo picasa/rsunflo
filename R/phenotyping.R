@@ -179,14 +179,17 @@ leaf_profile <- function(TLN, LLS, LLH, a=-2.05, b=0.049, shape="fixed", output=
 
 
 
-# Modèle de coefficient d'extinction = f(TLN, LLS, LLH)
-# Coeff_k = -1,11.10-2 x n_Fmax – 1,09.10-2 x NF – 1,12.10-3 x SFimax – 0,11 x H + 6,5.10-5 x (0,5 x NF x SFimax + 30 x NF) + 1,58
+# model extinction coefficience as a function of architectural traits
+# TLN : total leaf number (leaf rank)
+# LLH : largest leaf height (leaf rank)
+# LLS : largest leaf size (cm^2)
+# H : plant height (cm)
 #' @export coefficient_extinction
 coefficient_extinction <- function(TLN, LLH, LLS, H, ...) {  
-  # Methode Pouzet-Bugat [Pouzet1985]
+  # Pouzet-Bugat method [@Pouzet1985]
   TPA <- 0.5*TLN*LLS +30*TLN  
   
-  # [Casadebaig2008]
+  # fitted in @Casadebaig2008
   K <- -1.11E-2*LLH -1.09E-2*TLN -1.12E-3*LLS -0.11E-2*H +6.5E-5*TPA +1.58
   return(K)
 }
