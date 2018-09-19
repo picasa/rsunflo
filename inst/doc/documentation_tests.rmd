@@ -1,5 +1,4 @@
 
-## Dependances
 ```{r setup, message=FALSE}
 # packages
 library(readxl)
@@ -10,22 +9,20 @@ library(rsunflo)
 ```
 
 
-## Plannification
+## Experimental design
 
-### Création du plan d'expérience (rsunflo)
 ```{r design_rsunflo}
-# Import des données
-## Essais (n=2)
+# import trials (n=2)
 trials <- read_xlsx("inst/doc/files/design.xlsx", sheet="trials")
-## Genotypes (n=3)
+# import genotypes (n=3)
 genotypes <- read_xlsx("inst/doc/files/design.xlsx", sheet="genotype")
 
-# Plan factoriel complet
+# create a test full factorial design 
 design <- crossing(trial_id=trials$trial_id, genotype=genotypes$genotype)
 design <- design %>% left_join(trials) %>% left_join(genotypes)
 
-# Mise en forme au format rsunflo
-duration_soil = days(5) # durée (j) de la période de simulation sans culture
+# format the design of experiment according to rsunflo specs
+duration_soil = days(5) # duration (d) for bare-soil simulation 
 
 design <- design %>%
   mutate(
@@ -48,40 +45,38 @@ saveRDS(design, "inst/doc/files/design.rds")
 # packages
 library(rvle)
 
-# chargement du plan d'experience
+# load experimental design (dataframe with inputs in columns, simulation in lines)
 design <- readRDS("inst/doc/files/design.rds")
 
-# Modèle et plan
-sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
-design_vle <- as.list(design)
+# define model and model call
+sunflo <- new("Rvle", file="sunflo_web.vpz", pkg="sunflo")
+run_sunflo <- function(id, design){design %>% play(unit=id) %>% shape(view="timed")}
+run_sunflo_safe <- possibly(run_sunflo, NULL)
 
-# Paramétrisation par défaut
+# run model with default parameterization
 sunflo %>% run() %>% results() %>% shape(view="timed")
 
-# Paramétrisation issue du plan d'expérience (1 unité de simulation)
+# run model for one simulation from design of experiments
 design %>% play(unit=1) %>% shape(view="timed")
 
-# Sortie graphique
-sunflo %>% play(design_vle, unit=1) %>% shape(view="timed") %>% display()
+# default graphical visualization
+design %>% play(unit=1) %>% shape(view="timed") %>% display()
 
-# Multi-simulation du plan d'expérience (parallélisation possible : require(doMC), ?mlply)
-model <- function(id){sunflo %>% play(design_vle, unit=match(id, design_vle$id)) %>% shape(view="timed")}
-
+# run model for multiple simulations (multicore enabled with require(doMC), ?mlply)
 list_simulation <- design %>% select(id) 
-output <- plyr::mlply(list_simulation, failwith(NULL, model))
+output <- list_simulation %>% plyr::mlply(run_sunflo_safe, design)
 
-# Agregation (1 unité -> une matrice)
-output_timed <- output %>% compact() %>% ldply(.id="id")
+# get timed model outputs (1 id -> 1 dataframe)
+output_timed <- output %>% compact() %>% plyr::ldply(.id="id")
 
-# Calcul d'indicateurs (1 unité -> un vecteur)
-output_indicators <- output %>% compact() %>% ldply(indicate, .id="id")
+# summarize timed model outputs (1 id -> 1 vector)
+output_indicators <- output %>% compact() %>% plyr::ldply(indicate, .id="id")
 ```
 
 
-```{r simulation_debug, eval=FALSE}
+```{r simulation_test, eval=FALSE}
+# load model
 library(rvle)
-
-# Modèle et plan
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 
 # load reference simulation (SUNFLO v1.2, VLE 1.0.3)

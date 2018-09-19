@@ -14,11 +14,11 @@ yday_date <- function(yday, year) {
 }
 
 
-#' @export modelmaker_management
-modelmaker_management <- function(x) {
+#' @export spread_management
+spread_management <- function(x) {
   
-  # Nitrogen (2 modalities)
-  s <- x[x$Fertilisation != 0,c("date","Fertilisation")]
+  # nitrogen 
+  s <- x[x$fertilisation != 0,c("date","fertilisation")]
   names(s) <- c("date","dose")
   n <- data.frame(
     nitrogen_date_1 = s$date[1],
@@ -27,8 +27,8 @@ modelmaker_management <- function(x) {
     nitrogen_dose_2 = s$dose[2]
   )
   
-  # Water (3 modalities)
-  s <- x[x$Irrigation != 0,c("date","Irrigation")]
+  # water
+  s <- x[x$irrigation != 0,c("date","irrigation")]
   names(s) <- c("date","dose")
   w <- data.frame(
     water_date_1 = s$date[1],
@@ -36,10 +36,22 @@ modelmaker_management <- function(x) {
     water_date_2 = s$date[2],
     water_dose_2 = s$dose[2],
     water_date_3 = s$date[3],
-    water_dose_3 = s$dose[3]
+    water_dose_3 = s$dose[3],
+    water_date_4 = s$date[4],
+    water_dose_4 = s$dose[4],
+    water_date_5 = s$date[5],
+    water_dose_5 = s$dose[5],
+    water_date_6 = s$date[6],
+    water_dose_6 = s$dose[6],
+    water_date_7 = s$date[7],
+    water_dose_7 = s$dose[7],
+    water_date_8 = s$date[8],
+    water_dose_8 = s$dose[8],
+    water_date_9 = s$date[9],
+    water_dose_9 = s$dose[9]
   )
   
-  # Output
+  # output
   return(data.frame(n,w))
 }
 
