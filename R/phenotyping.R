@@ -198,11 +198,18 @@ coefficient_extinction <- function(TLN, LLH, LLS, H, ...) {
 
 # Allocation ####
 
-# Conversion de teneur en huile aux normes (9% eau, 2% impureté) vers la teneur GPS
-#' @export conversion_oilcontent
-conversion_oilcontent <- function(x, humidity=9, impurity=2) {
+# Convert oil content expressed at norms of humidity (9%) and impurity (2%) to a dry matter basis
+#' @export convert_oilcontent
+convert_oilcontent <- function(x, humidity=9, impurity=2) {
   r <- (1-impurity/100) * (1-humidity/100)
   return(x * 1/r)
+}
+
+# Convert grain content expressed at norms of humidity (9%) and impurity (2%) to a dry matter basis
+#' @export convert_grainyield
+convert_grainyield <- function(x, humidity=9, impurity=2) {
+  r <- (1-impurity/100) * (1-humidity/100)
+  return(x * r)
 }
 
 
