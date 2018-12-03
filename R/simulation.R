@@ -112,6 +112,15 @@ test_design <- function(object){
   
   # TODO test for formatting and units
   
+  # TODO test for existence of files in indicated path
+  # list_files <- paste0("~/.vle/pkgs-2.0/sunflo/data/", design %>% distinct(file) %>% pull(file))
+  # file.exists(list_files)
+  
+  # TODO more test ideas
+  # range(design$stone_content)
+  # error_soil <- design %>% filter(field_capacity_1 <= wilting_point_1)
+  # error_date <- design %>% mutate(cycle = crop_harvest - crop_sowing) %>% filter(cycle < 100)
+  # error_climate : test year length in climate files
 }
 
 
@@ -134,10 +143,10 @@ play <- function(data, model=sunflo, unit) {
       itk.jsemis                          = as.character(data$crop_sowing),
       itk.jrecolte                        = as.character(data$crop_harvest),
       itk.densite                         = as.numeric(data$crop_density),
-      itk.fertilization_1                 = paste0("=",data$nitrogen_date_1,"$dose=",data$nitrogen_dose_1),
-      itk.fertilization_2                 = paste0("=",data$nitrogen_date_2,"$dose=",data$nitrogen_dose_2),
-      itk.irrigation_1                    = paste0("=",data$water_date_1,"$dose=",data$water_dose_1),
-      itk.irrigation_2                    = paste0("=",data$water_date_2,"$dose=",data$water_dose_2),
+      itk.fertilization_1                 = paste0("date=",as.character(data$nitrogen_date_1),"$dose=",data$nitrogen_dose_1),
+      itk.fertilization_2                 = paste0("date=",as.character(data$nitrogen_date_2),"$dose=",data$nitrogen_dose_2),
+      itk.irrigation_1                    = paste0("date=",as.character(data$water_date_1),"$dose=",data$water_dose_1),
+      itk.irrigation_2                    = paste0("date=",as.character(data$water_date_2),"$dose=",data$water_dose_2),
       CONFIG_SimuInit.init_value_N1       = as.numeric(data$nitrogen_initial_1),
       CONFIG_SimuInit.init_value_N3       = as.numeric(data$nitrogen_initial_2),
       CONFIG_Sol.Hini_C1                  = as.numeric(data$water_initial_1),
