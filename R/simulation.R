@@ -645,22 +645,7 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
 
 # observed=f(simulated) evaluation graphs
 #' @export evaluate_plot
-evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...) {
-  
-  ggplot(data=data, aes(x=simulated, y=observed)) +
-    geom_point(aes_string(color=color), ...) +
-    facet_wrap(as.formula(formula), scales=scale) +
-    # stat_smooth(method="lm", se=FALSE, linetype=2, color="black") +
-    geom_abline(intercept=0, slope=1) +
-    geom_text(
-      data=data %>% group_by_(formula) %>% do(evaluate_error(., output="label")),
-      aes(x=Inf, y=-Inf, label=label),
-      colour="black", hjust=1.1, vjust=-1, size=size_label
-    ) +
-    theme_bw() + labs(x="Simulated data", y="Observed data")
-}
-
-evaluate_plot2 <- function(data, formula, color, scale = "free", size_label = 4, 
+evaluate_plot <- function(data, formula, color, scale = "free", size_label = 4, 
                            ...) 
 {
   color <- enquo(color)
