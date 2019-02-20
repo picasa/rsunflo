@@ -660,6 +660,22 @@ evaluate_plot <- function(data, formula, color, scale="free", size_label=4, ...)
     theme_bw() + labs(x="Simulated data", y="Observed data")
 }
 
+evaluate_plot2 <- function(data, formula, color, scale = "free", size_label = 4, 
+                           ...) 
+{
+  color <- enquo(color)
+  ggplot(data = data) + geom_point( aes(color = !!color,x = simulated, y = observed), 
+                                    ...) + 
+    geom_point( aes(x = observed, y = simulated ), alpha = 0) + #Add symetrical transparent points to have squared facet 
+    facet_wrap(as.formula(formula), scales = scale) + 
+    geom_abline(intercept = 0, slope = 1) + geom_text(data = data %>% 
+                                                        group_by_(formula) %>% do(evaluate_error(., output = "label")), 
+                                                      aes(x = Inf, y = -Inf, label = label), colour = "black", 
+                                                      hjust = 1.1, vjust = -1, size = size_label) + theme_bw() + 
+    labs(x = "Simulated data", y = "Observed data")
+}
+
+
 
 # residuals evaluation graphs
 #' @export evaluate_residuals
