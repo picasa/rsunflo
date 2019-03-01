@@ -38,13 +38,9 @@ saveRDS(design, "inst/doc/files/design.rds")
 ```
 
 
-
 ## Simulation
 
 ```{r simulation_rsunflo}
-# packages
-library(rvle)
-
 # load experimental design (dataframe with inputs in columns, simulation in lines)
 design <- readRDS("inst/doc/files/design.rds")
 
@@ -76,7 +72,6 @@ output_indicators <- output %>% compact() %>% plyr::ldply(indicate, .id="id")
 
 ```{r simulation_test, eval=FALSE}
 # load model
-library(rvle)
 sunflo <- new("Rvle", file = "sunflo_web.vpz", pkg = "sunflo")
 
 # load reference simulation (SUNFLO v1.2, VLE 1.0.3)

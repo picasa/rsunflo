@@ -10,35 +10,34 @@ classoption: a4paper, fleqn
 ```{r setup, message=FALSE, warning=FALSE, echo=FALSE}
 # TODO : made small parameters table linked subsets of the complete parameter table
 library(readxl)
-library(tidyr)
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(knitr)
 
 # path (! wd is changed in next chunk)
 opts_knit$set(root.dir = normalizePath('../../'))
+opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 
 # options
 fig_dpi = 100
 ```
 
 
-```{r data, message=FALSE, warning=FALSE, echo=FALSE}
+```{r data}
 # data
 list_parameter <- "inst/doc/files/parameterization.xlsx"
 
 sunflo <- list(
-  climate = read_excel(list_parameter, sheet="climate"),
-  parameters = read_excel(list_parameter, sheet="parameters"),
-  outputs = read_excel(list_parameter, sheet="outputs"),
-  indicators = read_excel(list_parameter, sheet="indicators"),
-  predictors = read_excel(list_parameter, sheet="predictors")
+  climate = read_excel(list_parameter, sheet="input_variables"),
+  parameters = read_excel(list_parameter, sheet="input_parameters"),
+  outputs = read_excel(list_parameter, sheet="output_variables"),
+  indicators = read_excel(list_parameter, sheet="table_indicators"),
+  predictors = read_excel(list_parameter, sheet="table_predictors")
 )
 sunflo$parameters <- mutate(sunflo$parameters, value=as.numeric(gsub(",",".",value)))
 
 ```
 
-```{r data_graph, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+```{r data_graph, eval=FALSE}
 graph <- DiagrammeR::grViz("inst/files/structure_nodes.gv")
 ```
 
@@ -59,7 +58,7 @@ Broad scale processes of this framework, the dynamics of $LAI=f(t, G, E)$, photo
 \footnotesize
 
 # Inputs
-```{r InputsParameters, echo=FALSE, results='asis'}
+```{r InputsParameters, results='asis'}
 table_parameters <- sunflo$parameter %>%
   filter(count==1) %>%
   select(category, name.vle, label.doc, label.en)
@@ -74,7 +73,7 @@ n_total <- sum(table_parameters_number$n)
 Climate input data are measured from weather stations close to the field location.
 Alternatively, predicted data from gridded general circulation models can be used.
 
-```{r InputsClimate, echo=FALSE, results='asis'}
+```{r InputsClimate, results='asis'}
 table_climate <- sunflo$climate %>%
   select(label=label.doc, description=label.en, unit)
  
@@ -86,16 +85,16 @@ table_climate %>% kable(padding=0)
 Soil is described by two layers (0-30 cm, 30 cm - root depth) and is summarised by its water capacity (mm) and mineralization rate.
 Soil parameters can be measured from a standard soil analysis or estimated using a soil database (e.g. \href{http://esdac.jrc.ec.europa.eu/content/esdb-derived-data}{European Soil Database, ESDB}) [@Hiederer2013].
 
-```{r InputsSoil, echo=FALSE, results='asis'}
+```{r InputsSoil, results='asis'}
 table_soil <- sunflo$parameters %>%
-  filter(category=="Pedoclimat", template.default==1, name.vle!="datas_file") %>%
+  filter(category=="Pedoclimat", template.default==1, name.vle!="meteo_file") %>%
   select(label=label.doc, description=label.en, value, unit, reference)
 
 table_soil %>% kable(padding=0, digits=1)
 ```
 
 ## Management
-```{r InputsManagement, echo=FALSE, results='asis', eval=FALSE}
+```{r InputsManagement, results='asis', eval=FALSE}
 table_management <- sunflo$parameters %>%
   filter(category=="Conduite", template.default==1) %>%
   select(label=label.doc, description=label.en, unit)
@@ -119,7 +118,7 @@ The values of the genotype-dependent parameters were obtained by measuring the v
 
 \scriptsize
 
-```{r InputsCultivar, echo=FALSE, results='asis'}
+```{r InputsCultivar, results='asis'}
 table_cultivar <- sunflo$parameters %>%
   filter(category=="Variete", template.default==1) %>%
   select(symbol=symbol.doc, label=label.doc, description=label.en, value, unit, reference)
@@ -135,7 +134,7 @@ table_cultivar %>% kable(padding=0, digits=2)
 # Phenology
 
 
-```{r InputsPhenology, echo=FALSE, results='asis'}
+```{r InputsPhenology, results='asis'}
 # data
 table_phenology <- sunflo$parameters %>% 
   filter(module=="Phenology") %>%
@@ -178,7 +177,7 @@ with:
 * $ThermalStressPhenology$, Water stress effect on plant heating
 
 ## PhenoStages
-```{r PhenoStages, echo=FALSE, fig.width=8, fig.height=2, fig.fullwidth=TRUE}
+```{r PhenoStages, fig.width=8, fig.height=2, fig.fullwidth=TRUE}
 # data
 list_parameters <- c("ThermalTimeVegetative", "ThermalTimeFlowering",
                 "ThermalTimeSenescence", "ThermalTimeMaturity")
@@ -189,14 +188,14 @@ list_phase <- c("Germination","Elongation","Vegetative","Floral Initiation","Flo
 data_phenology <- sunflo$parameters %>%
   filter(module=="Phenology", label.doc %in% list_parameters) %>%
   select(label=label.doc, value) %>% 
-  bind_rows(., data_frame(
+  bind_rows(., tibble(
     label=c("Emergence","Germination","Sowing"),
     value=c(0, -1.19*30, -(1.19*30+86.2)))
   ) %>% 
   arrange(value)
 
 # compute start and end of phases for plotting
-data_phase <- data_frame(
+data_phase <- tibble(
   phase=factor(list_phase, levels=list_phase),
   start=data_phenology$value[1:6],
   end=data_phenology$value[2:7]
@@ -233,7 +232,7 @@ Phenostages are computed as integers $\in [0,7]$ corresponding to duration betwe
 \newpage
 
 # Leaf Area
-```{r InputsLeafArea, echo=FALSE, results='asis'}
+```{r InputsLeafArea, results='asis'}
 # data
 table_leaf_area <- sunflo$parameters %>% 
   filter(module=="LeafArea", ! name.vle %in% c("LAI_b","LAI_e")) %>%
@@ -245,11 +244,12 @@ table_leaf_area %>% kable(padding=0, digits=1)
 
 
 ## LeafInitiationTime, LeafExpansionTime, LeafSenescenceTime
-```{marginfigure}
+```{marginfigure, echo=TRUE}
 \vspace{1cm}
 ```
 
-```{r LeafInitiationTime, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+
+```{r LeafInitiationTime, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 LeafInitiationTime <- function(i, phy_1=71.43, phy_7=16.34, i_max=30, a=6*71.43){
   ifelse(
@@ -267,7 +267,7 @@ LeafExpansionDuration <- function(i, TLN=30, LLH=17, y0=851.3, a=153, b=0.78){
 
 # data
 i <- 1:30
-d <- data_frame(x=i) %>% 
+d <- tibble(x=i) %>% 
   mutate(
     Initiation = LeafInitiationTime(x),
     Expansion = Initiation + 1/0.01379,
@@ -311,10 +311,10 @@ with $a=0.01379$.
 \vspace{1cm}
 ```
 
-```{r LeafExpansionDuration, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r LeafExpansionDuration, fig.width=4, fig.height=4, fig.margin=TRUE}
 # data
 i <- 1:30
-d <- data_frame(x=i) %>%
+d <- tibble(x=i) %>%
   mutate(LeafExpansionDuration = LeafExpansionDuration(x)) %>%
   gather(Process, y, -x)
 
@@ -341,7 +341,7 @@ $$LeafSenescenceTime_i = LeafExpansionTime_i + LeafExpansionDuration_i$$
 
 
 ## PotentialLeafArea
-```{r PotentialLeafArea, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r PotentialLeafArea, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 PotentialLeafArea <- function(i, LLS=448, LLH=17, a=-2.05, b=0.049) {
   LLS * exp(a*((i-LLH)/(LLH-1))^2 + b*((i-LLH)/(LLH-1))^3) 
@@ -349,7 +349,7 @@ PotentialLeafArea <- function(i, LLS=448, LLH=17, a=-2.05, b=0.049) {
 
 # data
 i <- 1:30
-d <- data_frame(x=i) %>%
+d <- tibble(x=i) %>%
   mutate(PotentialLeafArea = PotentialLeafArea(x)) %>%
   gather(Process, y, -x)
 
@@ -377,7 +377,7 @@ with:
 \newpage
 
 ## LeafExpansionRate, LeafSenescenceRate
-```{r LeafGrowthRate, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r LeafGrowthRate, fig.width=4, fig.height=4, fig.margin=TRUE}
 # Function
 LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
   Teff * (Ae * Ke) * exp(-Ke * (t - te)) / (1 + exp(-Ke * (t - te)))^2
@@ -385,7 +385,7 @@ LeafGrowthRate <- function(t, te, Ae, Teff, Ke=0.01379){
 
 # Data
 t <- 0:2000
-d <- data_frame(x=t) %>% 
+d <- tibble(x=t) %>% 
   mutate(
     Expansion = LeafGrowthRate(x, te=500, Ae=300, Teff=(25-4.8)),
     Senescence = LeafGrowthRate(x, te=1500, Ae=300, Teff=(25-4.8))
@@ -440,7 +440,7 @@ $$PlantLeafArea_t = \sum_{i=1}^{LeafNumber} TotalLeafArea_{it} - SenescentLeafAr
 
 # Light Interception
 
-```{r InputsLightInterception, echo=FALSE, results='asis'}
+```{r InputsLightInterception, results='asis'}
 # data
 table_light <- sunflo$parameters %>% 
   filter(module=="LightInterception") %>%
@@ -454,19 +454,25 @@ table_light %>% kable(padding=0, digits=1)
 $$LAI_t = SowingDensity \times PlantLeafArea_t$$
 
 ## Radiation Interception Efficiency (RIE)
-```{r RIE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r RIE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 RIE <- function(LAI, k) {1 - exp(-k * LAI)}
 
 # data
 lai <- seq(0,5, by=0.1)
+k <- c(0.7, 0.9)
 
-d <- data_frame(x=lai) %>%
+d <- tibble(x=lai) %>%
   mutate(
     low = RIE(x, k=0.7),
     high = RIE(x, k=0.9)
   ) %>%
   gather(k, y, -x)
+
+# crossing(k, lai) %>% 
+#   group_by(k) %>% 
+#   nest() %>% 
+  
 
 # plot
 plot_RIE <- d %>%
@@ -491,7 +497,7 @@ with:
 
 # Biomass production
 
-```{r InputsBiomass, echo=FALSE, results='asis'}
+```{r InputsBiomass, results='asis'}
 # data
 table_biomass <- sunflo$parameters %>% 
   filter(module=="Biomass") %>%
@@ -529,7 +535,7 @@ The considered abiotic stresses (temperature, water, nitrogen) multiplicatively 
 $$RUE_t = PotentialRUE_t \times ThermalStressRUE_t \times WaterStressRUE_t \times NitrogenStressRUE_t$$
 
 ## CropBiomass 
-```{r RUE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r RUE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 PotentialRUE <- function(
   t,
@@ -559,7 +565,7 @@ PotentialRUE <- function(
 # data
 t <- 0:2000
 
-d <- data_frame(x=t) %>% 
+d <- tibble(x=t) %>% 
   mutate(PotentialRUE=PotentialRUE(x)) %>%
   gather(Process, y, -x)
 
@@ -586,7 +592,7 @@ with:
 Harvest index and oil content value at harvest time are predicted using a linear regression based on a subset of simulated state variables. 
 
 ## Harvest Index
-```{r InputsHarvestIndex, echo=FALSE, results="asis"}
+```{r InputsHarvestIndex, results="asis"}
 # data
 table_model_hi <- sunflo$predictors %>% 
   filter(model=="HI") %>%
@@ -615,7 +621,7 @@ Adjusted R-squared: 0.3036 F-statistic: 11.84 on 7 and 167 DF,  p-value: 3.311e-
 ```
 
 ## Oil Content
-```{r InputsOilContent, echo=FALSE, results="asis"}
+```{r InputsOilContent, results="asis"}
 # data
 table_model_oc <- sunflo$predictors %>% 
   filter(model=="OC") %>%
@@ -662,7 +668,7 @@ $$CropYield_{harvest} = CropBiomass_{harvest} \times HarvestIndex_{harvest}$$
 # Thermal stress
 
 ## ThermalStressRUE 
-```{r ThermalStressRUE, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r ThermalStressRUE, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
   ifelse(
@@ -682,7 +688,7 @@ ThermalStressRUE <- function(tm, tb=4.8, tol=20, tou=28, tc=37) {
 # data
 t <- seq(0,45,by=0.2)
 
-d <- data_frame(x=t) %>% 
+d <- tibble(x=t) %>% 
   mutate(ThermalStressRUE=ThermalStressRUE(x)) %>%
   gather(Process, y, -x)
 
@@ -717,7 +723,7 @@ with:
 
 
 ## ThermalStressMineralization 
-```{r ThermalStressMineralization, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r ThermalStressMineralization, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 ThermalStressMineralization <- function(tm, tb=15, tc=36) {
   tc/(1 + (tc - 1) * exp(-0.119 * (tm - tb)))
@@ -726,7 +732,7 @@ ThermalStressMineralization <- function(tm, tb=15, tc=36) {
 # data
 t <- seq(0,45,by=0.2)
 
-d <- data_frame(x=t) %>% 
+d <- tibble(x=t) %>% 
   mutate(ThermalStressMineralization=ThermalStressMineralization(x)) %>%
   gather(Process, y, -x)
 
@@ -758,7 +764,7 @@ Predictors based on temperature are used in linear models of harvest index and o
 # Radiation stress
 ## RadiationStressExpansion
 
-```{r RadiationStressExpansion, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r RadiationStressExpansion, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.09) {
   s * (a + (b/(1 + exp((c - nipar)/d))))
@@ -767,7 +773,7 @@ RadiationStressExpansion <- function(nipar, s=2.5, a=-0.14, b=1.13, c=4.13, d=2.
 ## Graph
 ipar <- seq(0,15,by=0.1)
 
-d <- data_frame(x=ipar) %>%
+d <- tibble(x=ipar) %>%
   mutate(Expansion = RadiationStressExpansion(x)) %>%
   gather(Process, y, -x)
 
@@ -783,7 +789,7 @@ print(plot_RadiationStressExpansion)
 
 Competition for light affects leaf expansion, allowing to model the plant area response to sowing density [@Rey2003]. 
 
-$$RadiationStressExpansion_t = s \times a + \frac{b}{1 + exp^{(\frac{c - \frac{IPAR_t}{LAI_t}}{d})}}$$ 
+$$RadiationStressExpansion_t = s \times (a + \frac{b}{1 + exp^{(\frac{c - \frac{IPAR_t}{LAI_t}}{d})}})$$ 
 
 with:
 
@@ -799,7 +805,7 @@ with:
 
 \scriptsize
 
-```{r InputsWaterStress, echo=FALSE, results='asis'}
+```{r InputsWaterStress, results='asis'}
 # data
 table_water_stress <- sunflo$parameters %>% 
   filter(module=="WaterStress") %>%
@@ -845,14 +851,14 @@ Soil evaporation is modeled with the same approach as crop transpiration.
 $$Evaporation_t = (1 - RIE) \times PET \times WaterStressEvaporation$$
 
 
-```{r WaterStressEvaporation, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r WaterStressEvaporation, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 WaterStressEvaporation <- function(x) {sqrt(x+1) - sqrt(x)}
 
 # data
 t <- seq(0,30, by=0.1) 
 
-d <- data_frame(x=t) %>%
+d <- tibble(x=t) %>%
   mutate(WaterStressEvaporation = WaterStressEvaporation(x)) %>%
   gather(Process, y, -x)
 
@@ -905,7 +911,7 @@ $$WaterTotal_t = RootDepth_t \times SoilWaterCapacity \times SoilDensity \times 
 with $SoilWaterCapacity = \theta_{fc} - \theta_{wp}$, the difference between the gravimetric water content at field capacity and at wilting point. 
 
 ## WaterStressExpansion, WaterStressConductance, WaterStressRUE
-```{r WaterStressProcess, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r WaterStressProcess, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 WaterStressProcess <- function(ftsw, a=-5) {
   -1 + 2/(1 + exp(a*ftsw))
@@ -914,7 +920,7 @@ WaterStressProcess <- function(ftsw, a=-5) {
 # data
 ftsw <- seq(0,1, by=0.01)
 
-d <- data_frame(x=ftsw) %>%
+d <- tibble(x=ftsw) %>%
   mutate(
     Expansion = WaterStressProcess(x, a=-4.42),
     Conductance = WaterStressProcess(x, a=-9.3),
@@ -951,14 +957,14 @@ with $a=0.1$, scaling parameter for water-stress plant heating
 
 ## WaterStressMineralization
 
-```{r WaterStressMineralization, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r WaterStressMineralization, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 WaterStressMineralization <- function(x, y0=0.2) {(1-y0) * x + y0}
 
 # data
 x <- seq(0,1, by=0.01) 
 
-d <- data_frame(x=x) %>%
+d <- tibble(x=x) %>%
   mutate(WaterStressMineralization = WaterStressMineralization(x)) %>%
   gather(Process, y, -x)
 
@@ -989,7 +995,7 @@ with:
 
 \scriptsize
 
-```{r InputsNitrogenStress, echo=FALSE, results='asis'}
+```{r InputsNitrogenStress, results='asis'}
 # data
 table_nitrogen_stress <- sunflo$parameters %>% 
   filter(module=="NitrogenStress") %>%
@@ -1044,7 +1050,7 @@ NitrogenUptakeRate_t & = TranspirationRate_t \times SoilNitrogenConcentration_t
 \end{split}
 $$
 
-```{r NitrogenAbsorbedTransport, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE, eval=FALSE}
+```{r NitrogenAbsorbedTransport, fig.width=4, fig.height=4, fig.margin=TRUE, eval=FALSE}
 # equation
 
 # $$
@@ -1062,7 +1068,7 @@ NitrogenAbsorbedTransport <- function(x, a=0.1, vm1=0.0018, km1=50, vm2=0.05, km
 # data
 concentration <- seq(0,0.3, by=0.01)
 
-d <- data_frame(x=concentration) %>%
+d <- tibble(x=concentration) %>%
   mutate(
     ActiveTransport = NitrogenAbsorbedTransport(x, a=0.1)
   ) %>%
@@ -1080,7 +1086,7 @@ print(plot_NitrogenAbsorbedTransport)
 
 ## NitrogenDemand
 
-```{r NitrogenDemand, echo=FALSE, fig.width=4, fig.height=4, fig.margin=TRUE}
+```{r NitrogenDemand, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
 NitrogenConcentration <- function(biomass, a=4.53, b=0.42) {
   pmin(a, a*biomass^-b)
@@ -1089,7 +1095,7 @@ NitrogenConcentration <- function(biomass, a=4.53, b=0.42) {
 # data
 biomass <- seq(0,10, by=0.01)
 
-d <- data_frame(x=biomass) %>%
+d <- tibble(x=biomass) %>%
   mutate(
     Critical = NitrogenConcentration(x, a=4.53, b=0.42),
     Maximum = NitrogenConcentration(x, a=6.49, b=0.44)
@@ -1160,7 +1166,7 @@ $$NitrogenStressRUE_t = \frac{NitrogenSupplyRate_t}{NitrogenDemandRate_t}$$
 
 ## Timed variables
 
-```{r OutputsTimed, echo=FALSE, results='asis'}
+```{r OutputsTimed, results='asis'}
 # data
 s <- sunflo$outputs %>% select(symbol=name.rsunflo.en, label=label.doc, description=label.en, unit)
 
@@ -1172,7 +1178,7 @@ kable(s, padding=0)
 
 ## Indicators
 
-```{r OutputsIndicators, echo=FALSE, results='asis'}
+```{r OutputsIndicators, results='asis'}
 # data
 s <- sunflo$indicators %>%
   filter(verbose=="crop") %>%
