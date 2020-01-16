@@ -84,6 +84,7 @@ table_climate %>% kable(padding=0)
 
 Soil is described by two layers (0-30 cm, 30 cm - root depth) and is summarised by its water capacity (mm) and mineralization rate.
 Soil parameters can be measured from a standard soil analysis or estimated using a soil database (e.g. \href{http://esdac.jrc.ec.europa.eu/content/esdb-derived-data}{European Soil Database, ESDB}) [@Hiederer2013].
+Maximum rooting depth should be superior to the depth of surface layer (300 mm).
 
 ```{r InputsSoil, results='asis'}
 table_soil <- sunflo$parameters %>%

@@ -108,6 +108,7 @@ test_design <- function(object){
   testthat::expect_true(all(list_inputs %in% names(object)))
   
   # test for missing values in object columns
+  # TODO : better test by returning positions object %>% filter_at(.vars=list_inputs, any_vars(is.na(.)))
   testthat::expect_false(any(object %>% select(!!list_inputs) %>% is.na()))
   
   # TODO test for formatting and units
@@ -588,7 +589,8 @@ display <- function(data, view="timed") {
 # Analysis ####
 
 # compute metrics for goodness of fit [@Wallach2014]
-# TODO : use data argument and non standard evaluation ?
+# TODO : use data argument and non standard evaluation 
+# TODO : add accuracy, precision, recall
 #' @export evaluate_error
 evaluate_error <- function(data, observed="observed", simulated="simulated", output="numeric") {
   
