@@ -126,7 +126,7 @@ test_design <- function(object){
 
 
 # run sunflo VLE model as a function of experimental design
-# TODO : expose all parameters in function to use purrr::pmap with incomplete designs (use vpz value as default)
+
 #' @export play
 
 play <- function(data, model=sunflo, unit) {
@@ -592,7 +592,8 @@ display <- function(data, view="timed") {
 # TODO : use data argument and non standard evaluation 
 # TODO : add accuracy, precision, recall
 #' @export evaluate_error
-evaluate_error <- function(data, observed="observed", simulated="simulated", output="numeric") {
+evaluate_error <- function(
+    data, observed="observed", simulated="simulated", output="numeric") {
   
   metrics <- data %>% 
     select_(observed=observed, simulated=simulated) %>%
@@ -647,19 +648,22 @@ evaluate_error <- function(data, observed="observed", simulated="simulated", out
 
 # observed=f(simulated) evaluation graphs
 #' @export evaluate_plot
-evaluate_plot <- function(data, formula, color, scale = "free", size_label = 4, 
-                           ...) 
+evaluate_plot <- function(
+    data, variable, color, scale = "free", size_label = 4, alpha = 0.5) 
 {
-  color <- enquo(color)
-  ggplot(data = data) + geom_point( aes(color = !!color,x = simulated, y = observed), 
-                                    ...) + 
-    geom_point( aes(x = observed, y = simulated ), alpha = 0) + #Add symetrical transparent points to have squared facet 
-    facet_wrap(as.formula(formula), scales = scale) + 
-    geom_abline(intercept = 0, slope = 1) + geom_text(data = data %>% 
-                                                        group_by_(formula) %>% do(evaluate_error(., output = "label")), 
-                                                      aes(x = Inf, y = -Inf, label = label), colour = "black", 
-                                                      hjust = 1.1, vjust = -1, size = size_label) + theme_bw() + 
+  
+  data |> ggplot() +
+    geom_point(aes(color = {{color}}, x = simulated, y = observed), alpha = alpha) + 
+    facet_wrap(variable, scales = "free") + 
+    geom_abline(intercept = 0, slope = 1) +
+    geom_text(
+      data = data %>% 
+        group_by(!!!variable) %>%
+        do(evaluate_error(., output = "label")), 
+      aes(x = Inf, y = -Inf, label = label), colour = "black", 
+      hjust = 1.1, vjust = -1, size = size_label) + theme_bw() + 
     labs(x = "Simulated data", y = "Observed data")
+  
 }
 
 
@@ -669,10 +673,10 @@ evaluate_plot <- function(data, formula, color, scale = "free", size_label = 4,
 evaluate_residuals <- function(data, formula, color, scale="free", size_label=4, ...) {
   
   data %>%
-    mutate(residuals=observed-simulated) %>%
+    mutate(residuals = observed - simulated) %>%
     ggplot(aes(simulated, residuals)) +
-    geom_point(aes_string(color=color), ...) + 
-    facet_wrap(as.formula(formula), scales=scale) +
+    geom_point(aes_string(color = color), ...) + 
+    facet_wrap(as.formula(formula), scales = scale) +
     geom_hline(yintercept = 0) +
     geom_text(
       data=data %>% group_by_(formula) %>% do(evaluate_error(., output="label")),
