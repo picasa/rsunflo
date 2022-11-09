@@ -5,9 +5,10 @@
 
 # Climate ####
 # Fonction pour la gestion des données climatiques
+#' 
 #' @export climate
 climate <- function(x, 
-	input.format,
+	input.format = "date",
 	input.labels,
 	output.labels = c("JourJ","Annee","Mois","Jour","Tmin","Tmax","ETP","RAD","Pluie"), 
 	output.prefix = "TMP")
@@ -17,7 +18,7 @@ climate <- function(x,
     input.format,
     
     # Format site, date, [mesures]
-    date={
+    date = {
       # Ajout des colonnes utilisées par RECORD
       x <- mutate(
         x,
@@ -593,10 +594,10 @@ display <- function(data, view="timed") {
 # TODO : add accuracy, precision, recall
 #' @export evaluate_error
 evaluate_error <- function(
-    data, observed="observed", simulated="simulated", output="numeric") {
+    data, observed = "observed", simulated = "simulated", output = "numeric") {
   
   metrics <- data %>% 
-    select_(observed=observed, simulated=simulated) %>%
+    select(observed = {{observed}}, simulated = {{simulated}}) %>%
     drop_na() %>% 
     summarise(
       
@@ -612,22 +613,27 @@ evaluate_error <- function(
       RRMSE = RMSE/mean_observed,
       MAE = mean(abs(observed - simulated)),
       RMAE = MAE/mean(abs(observed)),
-      RMAEP = mean(abs(observed - simulated)/abs(observed)),
-      EF = 1 - sum((observed - simulated)^2)/sum((observed - mean_observed)^2),
-      index_willmott = 1 - sum((observed - simulated)^2)/sum((abs(simulated - mean(observed)) + abs(observed - mean(observed)))^2),
+      RMAEP = mean(abs(observed - simulated) / abs(observed)),
+      EF = 1 - sum((observed - simulated)^2) / sum((observed - mean_observed)^2),
+      index_willmott = 1 - sum((observed - simulated)^2) / 
+        sum((abs(simulated - mean(observed)) + abs(observed - mean(observed)))^2),
       
       # MSE decomposition
       SDSD = (sd(simulated) - sd(observed))^2 * (n - 1)/n,
       LCS = 2 * sd(observed) * sd(simulated) * (1 - cor(observed, simulated)) * (n - 1)/n,
-      NU = (1 - (cov(observed, simulated)/var(simulated)))^2 * var(simulated) * (n - 1)/n,
+      NU = (1 - (cov(observed, simulated) / var(simulated)))^2 * var(simulated) * (n - 1)/n,
       LC = (1 - cor(observed, simulated)^2) * var(observed) * (n - 1)/n,
       
       # correlation index
-      r_pearson=cor(simulated, observed, method="pearson"),
-      p_pearson=ifelse(n > 2, cor.test(simulated, observed, method="pearson")$p.value, NA),
-      r_kendall=cor(simulated, observed, method="kendall"),
-      p_kendall=ifelse(n > 2, cor.test(simulated, observed, method="kendall")$p.value, NA),
-      r_squared=cor(simulated, observed, method="pearson")^2
+      r_pearson = cor(simulated, observed, method="pearson"),
+      p_pearson = ifelse(
+        n > 2,
+        cor.test(simulated, observed, method="pearson")$p.value, NA),
+      r_kendall = cor(simulated, observed, method="kendall"),
+      p_kendall = ifelse(
+        n > 2,
+        cor.test(simulated, observed, method="kendall")$p.value, NA),
+      r_squared = cor(simulated, observed, method="pearson")^2
     )
   
   labels <- data.frame(
