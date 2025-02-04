@@ -29,9 +29,9 @@ devtools::install_github("picasa/rsunflo")
 
 
 ### References
-[1] Casadebaig, P.; Guilioni, L.; Lecoeur, J.; Christophe, A.; Champolivier, L. & Debaeke, P. (2011), 'SUNFLO, a model to simulate genotype-specific performance of the sunflower crop in contrasting environments', Agricultural and Forest Meteorology 151, 163-178. [(pdf)](https://www.researchgate.net/publication/230758361_SUNFLO_a_model_to_simulate_genotype-specific_performance_of_the_sunflower_crop_in_contrasting_environments)
+[1] Casadebaig, P.; Guilioni, L.; Lecoeur, J.; Christophe, A.; Champolivier, L. & Debaeke, P. (2011), 'SUNFLO, a model to simulate genotype-specific performance of the sunflower crop in contrasting environments', Agricultural and Forest Meteorology 151, 163-178. [(pdf)](https://drive.google.com/file/d/1_LR4LWu7TvmNTLDSPyDRRQlldTYEG5Hd/view?usp=sharing)
 
-[2] Lecoeur, J.; Poiré-Lassus, R.; Christophe, A.; Pallas, B.; Casadebaig, P.; Debaeke, P.; Vear, F. & Guilioni, L. (2011), 'Quantifying physiological determinants of genetic variation for yield potential in sunflower. SUNFLO: a model-based analysis', Functional Plant Biology 38(3), 246--259. [(pdf)](https://www.researchgate.net/publication/216526215_Quantifying_physiological_determinants_of_genetic_variation_for_yield_potential_in_sunflower._SUNFLO_A_model-based_analysis)
+[2] Lecoeur, J.; Poiré-Lassus, R.; Christophe, A.; Pallas, B.; Casadebaig, P.; Debaeke, P.; Vear, F. & Guilioni, L. (2011), 'Quantifying physiological determinants of genetic variation for yield potential in sunflower. SUNFLO: a model-based analysis', Functional Plant Biology 38(3), 246--259. [(pdf)](https://drive.google.com/file/d/0BwYvFKb9sBxfUHJWTXU5T09lRTQ/view?usp=sharing&resourcekey=0-ys_RFyS3-9NEuYRT17IkhQ)
 
 
 
