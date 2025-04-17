@@ -658,20 +658,21 @@ evaluate_plot <- function(
     data, variable, color, scale = "free", size_label = 4, alpha = 0.5) 
 {
   
+  label <- data %>%  
+    group_by({{ variable }}) %>%
+    do(evaluate_error(., output = "label"))
+  
   data |> ggplot() +
-    geom_point(aes(color = {{color}}, x = simulated, y = observed), alpha = alpha) + 
-    facet_wrap(variable, scales = "free") + 
+    geom_point(aes(color = {{ color }}, x = simulated, y = observed), alpha = alpha) +
+    facet_wrap(vars({{ variable }}), scales = "free") +
     geom_abline(intercept = 0, slope = 1) +
     geom_text(
-      data = data %>% 
-        group_by(!!!variable) %>%
-        do(evaluate_error(., output = "label")), 
-      aes(x = Inf, y = -Inf, label = label), colour = "black", 
-      hjust = 1.1, vjust = -1, size = size_label) + theme_bw() + 
-    labs(x = "Simulated data", y = "Observed data")
+      data = label,
+      aes(x = Inf, y = -Inf, label = label), colour = "black",
+      hjust = 1.1, vjust = -1, size = size_label) +
+    labs(x = "Simulated data", y = "Observed data") + theme_bw()
   
 }
-
 
 
 # residuals evaluation graphs

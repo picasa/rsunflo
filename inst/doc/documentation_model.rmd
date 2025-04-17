@@ -216,6 +216,12 @@ plot_phenology <- data_phase %>% ggplot() +
   scale_color_manual(values = list_colors) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank())
 
+# ggsave(
+#   plot_phenology,
+#   file = "inst/doc/files/plot_phenology.png",
+#   width = 100, height = 30, units = "mm", scale = 2, dpi = 100
+# )
+
 print(plot_phenology)
 ```
 
@@ -914,8 +920,12 @@ with $SoilWaterCapacity = \theta_{fc} - \theta_{wp}$, the difference between the
 ## WaterStressExpansion, WaterStressConductance, WaterStressRUE
 ```{r WaterStressProcess, fig.width=4, fig.height=4, fig.margin=TRUE}
 # function
-WaterStressProcess <- function(ftsw, a=-5) {
+WaterStressExpansion <- function(ftsw, a=-5) {
   -1 + 2/(1 + exp(a*ftsw))
+}
+
+WaterStressConductance <- function(ftsw, a=-5) {
+  1 / (1 + 4.5 * exp(a*ftsw))
 }
 
 # data
@@ -923,8 +933,8 @@ ftsw <- seq(0,1, by=0.01)
 
 d <- tibble(x=ftsw) %>%
   mutate(
-    Expansion = WaterStressProcess(x, a=-4.42),
-    Conductance = WaterStressProcess(x, a=-9.3),
+    Expansion = WaterStressExpansion(x, a=-4.42),
+    Conductance = WaterStressConductance(x, a=-9.3),
     Phenology = 0.1* (1 - Conductance)
   ) %>%
   gather(Process, y, -x) %>% 
@@ -944,7 +954,9 @@ print(plot_WaterStressProcess)
 Leaf expansion and plant transpiration rates are exponentially reduced with increased water deficit.
 The same response curve is used for transpiration ($WaterStressConductance$) and photosynthesis ($WaterStressRUE$).
 
-$$WaterStressProcess_t = -1 + \frac{2}{1 + exp^{(a \times WaterStress_t)}}$$ 
+$$WaterStressExpansion_t = -1 + \frac{2}{1 + exp^{(a \times WaterStress_t)}}$$ 
+
+$$WaterStressConductance_t = \frac{1}{1 + exp^{(4.5 \times a \times WaterStress_t)}}$$ 
 
 with $a \in [-15.6;-2.3]$, genotype-dependant response parameter
 
